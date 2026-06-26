@@ -19,15 +19,21 @@ function teaGradient([from, to]: [string, string]): string {
   ].join(", ");
 }
 
+/** Logo Lipton aux vraies couleurs : bandeau rouge + texte blanc sur champ jaune. */
+function LiptonLogo({ className = "" }: { className?: string }) {
+  return (
+    <span className={`lipton-logo ${className}`}>
+      <span className="lipton-logo__banner">Lipton</span>
+    </span>
+  );
+}
+
 function Sachet({ tea }: { tea: TeaSachet }) {
-  const [from] = tea.colors;
   return (
     <div className="sachet" aria-hidden="true">
       <span className="sachet__string" style={{ background: tea.ink }} />
       <span className="sachet__bag" style={{ borderColor: tea.ink }}>
-        <span className="sachet__tag" style={{ background: tea.ink, color: from }}>
-          Lipton
-        </span>
+        <LiptonLogo className="lipton-logo--mini" />
       </span>
     </div>
   );
@@ -193,7 +199,7 @@ export function App() {
       <header className="hero">
         <p className="hero__kicker">Collection</p>
         <h1 className="hero__title">
-          Sachets de thé <span className="hero__brand">Lipton</span>
+          Sachets de thé <LiptonLogo className="lipton-logo--hero" />
         </h1>
         <p className="hero__subtitle">
           Triés par couleurs — clique sur un thé pour ouvrir sa fiche colorée.

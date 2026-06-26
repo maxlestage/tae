@@ -90,8 +90,40 @@ body {
   letter-spacing: -0.02em;
 }
 
-.hero__brand {
-  color: #ffcc00;
+/* Logo Lipton — champ jaune + bandeau rouge + texte blanc (couleurs de marque) */
+.lipton-logo {
+  display: inline-block;
+  background: #ffe105;
+  padding: 0.16em 0.2em;
+  border-radius: 0.32em;
+  vertical-align: baseline;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.lipton-logo__banner {
+  display: inline-block;
+  background: #e20025;
+  color: #fff;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  padding: 0.02em 0.4em;
+  border-radius: 0.18em;
+}
+
+.lipton-logo--hero {
+  font-size: 0.85em;
+  transform: translateY(-0.04em);
+}
+
+.lipton-logo--mini {
+  font-size: 0.5rem;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.lipton-logo--mini .lipton-logo__banner {
+  padding: 0.02em 0.25em;
 }
 
 .hero__subtitle {
@@ -289,13 +321,6 @@ body {
   padding-bottom: 4px;
 }
 
-.sachet__tag {
-  font-size: 0.5rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  padding: 0.05rem 0.25rem;
-  border-radius: 3px;
-}
 
 .card__name {
   margin: 0.5rem 0 0.25rem;
