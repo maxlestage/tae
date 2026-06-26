@@ -1,0 +1,20 @@
+{
+  "name": "lipton-tea-colors",
+  "version": "1.0.0",
+  "description": "Sachets de thé Lipton triés par couleurs, avec une fiche colorée aux couleurs du thé ou de sa boîte.",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot ./index.html",
+    "start": "bun ./index.html",
+    "build": "bun build ./index.html --outdir=dist --minify"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}
