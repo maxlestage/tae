@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: bun server.ts
+  web: node server.js

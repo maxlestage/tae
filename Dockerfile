@@ -1,23 +1,23 @@
-# --- Étape build : installe les deps et compile le front avec Bun ---
-FROM oven/bun:1 AS build
+# --- Étape build : installe les deps et compile le front avec esbuild ---
+FROM node:22-slim AS build
 WORKDIR /app
 
 # Cache des dépendances
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+COPY package.json package-lock.json* ./
+RUN npm install
 
 # Build statique → ./dist
 COPY . .
-RUN bun build ./index.html --outdir=dist --minify
+RUN npm run build
 
 # --- Étape runtime : image légère qui sert ./dist ---
-FROM oven/bun:1-slim AS runtime
+FROM node:22-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
 COPY --from=build /app/dist ./dist
-COPY server.ts ./
+COPY server.js ./
 
-# Heroku fournit $PORT au démarrage ; server.ts l'utilise.
+# Heroku fournit $PORT au démarrage ; server.js l'utilise.
 EXPOSE 3000
-CMD ["bun", "server.ts"]
+CMD ["node", "server.js"]

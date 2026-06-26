@@ -1,8 +1,9 @@
 # 🫖 Lipton — Sachets de thé par couleurs
 
-Front-end **React + Bun** qui présente une collection de sachets de thé Lipton
-**triés par couleurs**. Chaque thé a sa **fiche colorée** reprenant les teintes
-du thé ou de sa boîte (dégradé + nuancier des codes hex).
+Front-end **React 19** (build **esbuild**, serveur **Node**) qui présente une
+collection de sachets de thé Lipton **triés par couleurs**. Chaque thé a sa
+**fiche colorée** reprenant les teintes du thé ou de sa boîte (dégradé +
+nuancier des codes hex).
 
 ## Fonctionnalités
 
@@ -10,26 +11,40 @@ du thé ou de sa boîte (dégradé + nuancier des codes hex).
 - 🗂️ **Tri par familles de couleurs** — Jaune, Ambre, Rouge, Rose, Violet, Bleu, Vert.
 - 🔘 **Filtres** par couleur en un clic.
 - 🍵 **Sachet illustré** et nuancier hex sur chaque carte.
-- ⚡ Stack légère : React 19 + Bun, sans bundler externe.
+- ⚡ Stack légère : React 19 + esbuild, serveur Node sans dépendance.
 
 ## Démarrer
 
 ```bash
-bun install
-bun dev      # serveur de dev avec hot reload  →  http://localhost:3000
+npm install
+npm run dev   # serveur esbuild + watch  →  http://localhost:3000
 ```
 
 ## Autres commandes
 
 ```bash
-bun start    # sert l'app sans hot reload
-bun build    # build de production dans ./dist
+npm run build # build de production dans ./dist
+npm start     # sert ./dist sur $PORT (défaut 3000)
 ```
+
+## Déploiement Heroku
+
+L'app fonctionne directement sur le **buildpack Node** de Heroku :
+
+```bash
+git push heroku main
+```
+
+Heroku exécute `npm run build` (esbuild → `./dist`) puis `npm start`
+(`server.js`, qui écoute sur `$PORT`). Un `Dockerfile` + `heroku.yml` sont
+aussi fournis si tu préfères un déploiement en *container stack*.
 
 ## Structure
 
 ```
-index.html        Point d'entrée HTML (importé par Bun)
+build.mjs         Build esbuild (et serveur de dev avec --serve)
+server.js         Serveur statique Node qui sert ./dist sur $PORT
+Procfile          web: npm start
 src/
   main.tsx        Montage React
   App.tsx         UI : groupes de couleurs + cartes
