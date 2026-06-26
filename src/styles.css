@@ -1,11 +1,26 @@
-:root {
+:root,
+:root[data-theme="dark"] {
   --bg: #0f1115;
+  --bg-glow: #1b2230;
   --panel: #161a22;
   --text: #eef1f6;
   --muted: #9aa3b2;
   --line: #262c38;
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f5f8;
+  --bg-glow: #ffffff;
+  --panel: #ffffff;
+  --text: #1b1f27;
+  --muted: #5d6675;
+  --line: #e2e5ec;
+}
+
+:root {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
+  color-scheme: dark light;
 }
 
 * {
@@ -16,9 +31,36 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(1200px 600px at 50% -10%, #1b2230, var(--bg));
+  background: radial-gradient(1200px 600px at 50% -10%, var(--bg-glow), var(--bg));
   color: var(--text);
   min-height: 100%;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Toggle de thème */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  border-color: #888;
 }
 
 .page {
@@ -88,9 +130,9 @@ body {
 }
 
 .chip--on {
-  background: #fff;
-  color: #11141a;
-  border-color: #fff;
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
 }
 
 .chip__dot {

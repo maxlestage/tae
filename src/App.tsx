@@ -144,9 +144,25 @@ function TeaModal({
   );
 }
 
+type Theme = "dark" | "light";
+
+function getInitialTheme(): Theme {
+  const saved = localStorage.getItem("tea-theme");
+  if (saved === "dark" || saved === "light") return saved;
+  return window.matchMedia("(prefers-color-scheme: light)").matches
+    ? "light"
+    : "dark";
+}
+
 export function App() {
   const [active, setActive] = useState<ColorFamily | "Toutes">("Toutes");
   const [selected, setSelected] = useState<TeaSachet | null>(null);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("tea-theme", theme);
+  }, [theme]);
 
   const groups = useMemo(() => {
     return FAMILY_ORDER.map((family) => ({
@@ -160,6 +176,17 @@ export function App() {
 
   return (
     <div className="page">
+      <button
+        type="button"
+        className="theme-toggle"
+        onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+        aria-label={
+          theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"
+        }
+      >
+        {theme === "dark" ? "☀️ Clair" : "🌙 Sombre"}
+      </button>
+
       <header className="hero">
         <p className="hero__kicker">Collection</p>
         <h1 className="hero__title">
