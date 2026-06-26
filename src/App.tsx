@@ -7,12 +7,15 @@ import {
   type TeaSachet,
 } from "./data.ts";
 
-/** Dégradé riche, propre à chaque thé : reflet radial + fond linéaire. */
+/**
+ * Dégradé fidèle aux boîtes : la couleur dominante (boîte) occupe l'essentiel
+ * de la carte, l'accent (bandeau / logo) n'apparaît qu'en bas à droite.
+ */
 function teaGradient([from, to]: [string, string]): string {
   return [
-    `radial-gradient(120% 90% at 18% 12%, ${from}cc 0%, transparent 55%)`,
-    `radial-gradient(130% 120% at 85% 100%, ${to} 0%, transparent 60%)`,
-    `linear-gradient(150deg, ${from} 0%, ${to} 100%)`,
+    `radial-gradient(140% 110% at 18% 10%, ${from} 0%, ${from} 45%, transparent 75%)`,
+    `radial-gradient(115% 130% at 92% 108%, ${to} 0%, ${to} 30%, transparent 62%)`,
+    `linear-gradient(150deg, ${from} 0%, ${from} 58%, ${to} 100%)`,
   ].join(", ");
 }
 
