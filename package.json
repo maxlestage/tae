@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun --hot ./index.html",
     "start": "bun ./index.html",
-    "build": "bun build ./index.html --outdir=dist --minify"
+    "build": "bun build ./index.html --outdir=dist --minify",
+    "serve": "bun server.ts"
   },
   "dependencies": {
     "react": "^19.0.0",
