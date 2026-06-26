@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   TEAS,
   FAMILY_ORDER,
@@ -7,15 +7,43 @@ import {
   type TeaSachet,
 } from "./data.ts";
 
-function TeaCard({ tea }: { tea: TeaSachet }) {
-  const [from, to] = tea.colors;
+/** Dégradé riche, propre à chaque thé : reflet radial + fond linéaire. */
+function teaGradient([from, to]: [string, string]): string {
+  return [
+    `radial-gradient(120% 90% at 18% 12%, ${from}cc 0%, transparent 55%)`,
+    `radial-gradient(130% 120% at 85% 100%, ${to} 0%, transparent 60%)`,
+    `linear-gradient(150deg, ${from} 0%, ${to} 100%)`,
+  ].join(", ");
+}
+
+function Sachet({ tea }: { tea: TeaSachet }) {
+  const [from] = tea.colors;
   return (
-    <article
+    <div className="sachet" aria-hidden="true">
+      <span className="sachet__string" style={{ background: tea.ink }} />
+      <span className="sachet__bag" style={{ borderColor: tea.ink }}>
+        <span className="sachet__tag" style={{ background: tea.ink, color: from }}>
+          Lipton
+        </span>
+      </span>
+    </div>
+  );
+}
+
+function TeaCard({
+  tea,
+  onOpen,
+}: {
+  tea: TeaSachet;
+  onOpen: (tea: TeaSachet) => void;
+}) {
+  return (
+    <button
+      type="button"
       className="card"
-      style={{
-        background: `linear-gradient(145deg, ${from}, ${to})`,
-        color: tea.ink,
-      }}
+      style={{ background: teaGradient(tea.colors), color: tea.ink }}
+      onClick={() => onOpen(tea)}
+      aria-label={`Ouvrir la fiche ${tea.name}`}
     >
       <div className="card__top">
         <span className="card__type">{tea.type}</span>
@@ -27,31 +55,98 @@ function TeaCard({ tea }: { tea: TeaSachet }) {
         </span>
       </div>
 
-      <div className="card__sachet" aria-hidden="true">
-        <span className="card__string" style={{ background: tea.ink }} />
-        <span className="card__bag" style={{ borderColor: tea.ink }}>
-          <span className="card__tag" style={{ background: tea.ink, color: from }}>
-            Lipton
-          </span>
-        </span>
-      </div>
+      <Sachet tea={tea} />
 
       <h3 className="card__name">{tea.name}</h3>
       <p className="card__desc">{tea.description}</p>
 
-      <div className="card__swatches">
-        {tea.colors.map((c) => (
-          <span key={c} className="card__swatch" style={{ background: c }}>
-            <code style={{ color: tea.ink }}>{c}</code>
-          </span>
-        ))}
+      <span className="card__open" style={{ borderColor: tea.ink }}>
+        Ouvrir la fiche →
+      </span>
+    </button>
+  );
+}
+
+function TeaModal({
+  tea,
+  onClose,
+}: {
+  tea: TeaSachet;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div className="modal" role="dialog" aria-modal="true" onClick={onClose}>
+      <div
+        className="modal__card"
+        style={{ background: teaGradient(tea.colors), color: tea.ink }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="modal__close"
+          style={{ color: tea.ink, borderColor: tea.ink }}
+          onClick={onClose}
+          aria-label="Fermer"
+        >
+          ✕
+        </button>
+
+        <div className="modal__head">
+          <Sachet tea={tea} />
+          <div>
+            <span className="card__type">{tea.type}</span>
+            <h2 className="modal__name">{tea.name}</h2>
+          </div>
+        </div>
+
+        <p className="modal__desc">{tea.description}</p>
+
+        <dl className="modal__facts">
+          <div className="fact">
+            <dt>Couleur</dt>
+            <dd>{tea.family}</dd>
+          </div>
+          <div className="fact">
+            <dt>Théine</dt>
+            <dd>{tea.caffeine}</dd>
+          </div>
+          <div className="fact">
+            <dt>Type</dt>
+            <dd>{tea.type}</dd>
+          </div>
+        </dl>
+
+        <div className="modal__palette">
+          <span className="modal__palette-label">Dégradé du thé</span>
+          <div className="modal__swatches">
+            {tea.colors.map((c) => (
+              <div key={c} className="modal__swatch">
+                <span className="modal__chip" style={{ background: c }} />
+                <code style={{ color: tea.ink }}>{c}</code>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </article>
+    </div>
   );
 }
 
 export function App() {
   const [active, setActive] = useState<ColorFamily | "Toutes">("Toutes");
+  const [selected, setSelected] = useState<TeaSachet | null>(null);
 
   const groups = useMemo(() => {
     return FAMILY_ORDER.map((family) => ({
@@ -71,8 +166,7 @@ export function App() {
           Sachets de thé <span className="hero__brand">Lipton</span>
         </h1>
         <p className="hero__subtitle">
-          Triés par couleurs — chaque fiche prend les teintes du thé ou de sa
-          boîte.
+          Triés par couleurs — clique sur un thé pour ouvrir sa fiche colorée.
         </p>
 
         <nav className="filters">
@@ -112,7 +206,7 @@ export function App() {
             </div>
             <div className="grid">
               {group.teas.map((tea) => (
-                <TeaCard key={tea.id} tea={tea} />
+                <TeaCard key={tea.id} tea={tea} onOpen={setSelected} />
               ))}
             </div>
           </section>
@@ -120,8 +214,12 @@ export function App() {
       </main>
 
       <footer className="footer">
-        Fiches couleurs · {TEAS.length} sachets · React + Bun
+        Fiches couleurs · {TEAS.length} sachets · React + Node
       </footer>
+
+      {selected && (
+        <TeaModal tea={selected} onClose={() => setSelected(null)} />
+      )}
     </div>
   );
 }
