@@ -5,7 +5,8 @@ export type ColorFamily =
   | "Bleu"
   | "Violet"
   | "Ambre"
-  | "Rose";
+  | "Rose"
+  | "Coffret";
 
 export type Lang = "fr" | "en" | "es";
 
@@ -21,7 +22,8 @@ export type TypeKey =
   | "whiteTea"
   | "rooibos"
   | "infusion"
-  | "infusionFruity";
+  | "infusionFruity"
+  | "coffret";
 
 export interface TeaSachet {
   id: string;
@@ -39,6 +41,8 @@ export interface TeaSachet {
   pyramid?: boolean;
   /** Gamme « Infuse à froid » (cold brew) */
   coldBrew?: boolean;
+  /** Coffret / assortiment de plusieurs parfums */
+  coffret?: boolean;
 }
 
 /**
@@ -1001,6 +1005,118 @@ export const TEAS: TeaSachet[] = [
     caffeineFree: true,
     pyramid: true,
   },
+
+  // === Coffrets / assortiments ===
+  {
+    id: "coffret-advent",
+    name: {
+      fr: "Calendrier de l'Avent",
+      en: "Advent Calendar",
+      es: "Calendario de Adviento",
+    },
+    description: {
+      fr: "24 thés et infusions à découvrir chaque jour de décembre.",
+      en: "24 teas and infusions to discover each day of December.",
+      es: "24 tés e infusiones para descubrir cada día de diciembre.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#2e9e4f"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
+  {
+    id: "coffret-metal",
+    name: {
+      fr: "Coffret Métal Pyramides",
+      en: "Metal Pyramid Gift Box",
+      es: "Estuche Metálico Pirámides",
+    },
+    description: {
+      fr: "Boîte métal, 56 sachets pyramides : thés noirs, verts et infusions.",
+      en: "Metal box, 56 pyramid bags: black, green teas and infusions.",
+      es: "Caja metálica, 56 pirámides: tés negros, verdes e infusiones.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#d98032"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
+  {
+    id: "coffret-exclusive",
+    name: {
+      fr: "Coffret Exclusive Selection",
+      en: "Exclusive Selection Box",
+      es: "Estuche Exclusive Selection",
+    },
+    description: {
+      fr: "108 sachets pyramides, 9 variétés de thés et infusions.",
+      en: "108 pyramid bags, 9 varieties of teas and infusions.",
+      es: "108 pirámides, 9 variedades de tés e infusiones.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#7b2d8e"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
+  {
+    id: "coffret-feelgood",
+    name: { fr: "Coffret Feel Good", en: "Feel Good Box", es: "Estuche Feel Good" },
+    description: {
+      fr: "180 sachets, 12 parfums de thés noirs, verts et infusions.",
+      en: "180 bags, 12 flavours of black, green teas and infusions.",
+      es: "180 bolsitas, 12 sabores de tés negros, verdes e infusiones.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#e20025"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
+  {
+    id: "coffret-flavored",
+    name: {
+      fr: "Coffret Thés Parfumés",
+      en: "Flavoured Teas Box",
+      es: "Estuche Tés Aromatizados",
+    },
+    description: {
+      fr: "Assortiment de thés parfumés, 50 sachets.",
+      en: "Assortment of flavoured teas, 50 bags.",
+      es: "Surtido de tés aromatizados, 50 bolsitas.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#ffe105"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
+  {
+    id: "coffret-relax",
+    name: {
+      fr: "Coffret Sélection Détente",
+      en: "Relax Selection Box",
+      es: "Estuche Selección Relax",
+    },
+    description: {
+      fr: "Assortiment d'infusions du soir, 48 sachets.",
+      en: "Assortment of evening infusions, 48 bags.",
+      es: "Surtido de infusiones de la noche, 48 bolsitas.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#9b7bc4"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+  },
 ];
 
 export const FAMILY_ORDER: ColorFamily[] = [
@@ -1011,6 +1127,7 @@ export const FAMILY_ORDER: ColorFamily[] = [
   "Violet",
   "Bleu",
   "Vert",
+  "Coffret",
 ];
 
 export const FAMILY_SWATCH: Record<ColorFamily, string> = {
@@ -1021,4 +1138,5 @@ export const FAMILY_SWATCH: Record<ColorFamily, string> = {
   Violet: "#7b2d8e",
   Bleu: "#3a6ea5",
   Vert: "#2e9e4f",
+  Coffret: "#888f9c",
 };
