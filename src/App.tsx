@@ -323,6 +323,14 @@ function TeaModal({
 
   return (
     <div className="modal" role="dialog" aria-modal="true" onClick={onClose}>
+      <button
+        type="button"
+        className="modal__close"
+        onClick={onClose}
+        aria-label={t.close}
+      >
+        ✕
+      </button>
       <div
         className="modal__card"
         style={{
@@ -331,16 +339,6 @@ function TeaModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          className="modal__close"
-          style={{ color: tea.ink, borderColor: tea.ink }}
-          onClick={onClose}
-          aria-label={t.close}
-        >
-          ✕
-        </button>
-
         <div className="modal__head">
           <Sachet tea={tea} />
           <div>
