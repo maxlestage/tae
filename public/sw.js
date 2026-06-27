@@ -1,5 +1,5 @@
 /* Service worker — Lipton · Sachets de thé (PWA) */
-const CACHE = "lipton-v1";
+const CACHE = "lipton-v2";
 const ASSETS = [
   "/",
   "/index.html",
@@ -32,36 +32,48 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+function networkFirst(req, fallbackPath) {
+  return fetch(req)
+    .then((res) => {
+      if (res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(fallbackPath || req, copy));
+      }
+      return res;
+    })
+    .catch(() => caches.match(fallbackPath || req).then((c) => c || caches.match("/index.html")));
+}
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
+  if (new URL(req.url).origin !== self.location.origin) return;
 
-  // Navigations : réseau d'abord, repli sur l'index en cache (hors-ligne).
-  if (req.mode === "navigate") {
+  // Pages et code de l'app : réseau d'abord (toujours à jour en ligne),
+  // repli sur le cache hors-ligne. Évite de servir une vieille version.
+  if (
+    req.mode === "navigate" ||
+    /\.(?:js|css|webmanifest)$/.test(new URL(req.url).pathname)
+  ) {
     event.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put("/index.html", copy));
-          return res;
-        })
-        .catch(() => caches.match("/index.html")),
+      networkFirst(req, req.mode === "navigate" ? "/index.html" : undefined),
     );
     return;
   }
 
-  // Autres ressources : cache d'abord, puis réseau (et on met en cache).
+  // Images / icônes : cache d'abord puis réseau (mise à jour en arrière-plan).
   event.respondWith(
-    caches.match(req).then(
-      (cached) =>
-        cached ||
-        fetch(req).then((res) => {
-          if (res.ok && new URL(req.url).origin === self.location.origin) {
+    caches.match(req).then((cached) => {
+      const network = fetch(req)
+        .then((res) => {
+          if (res.ok) {
             const copy = res.clone();
             caches.open(CACHE).then((c) => c.put(req, copy));
           }
           return res;
-        }),
-    ),
+        })
+        .catch(() => cached);
+      return cached || network;
+    }),
   );
 });
