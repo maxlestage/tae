@@ -23,6 +23,19 @@ export interface UiStrings {
   caffeineLabel: string;
   typeLabel: string;
   gradient: string;
+  formatLabel: string;
+  brewLabel: string;
+  momentLabel: string;
+  certificationLabel: string;
+  certificationValue: string;
+  momentDay: string;
+  momentEvening: string;
+  variedValue: string;
+  coldWater: string;
+  fmtBag: string;
+  fmtPyramid: string;
+  fmtCold: string;
+  fmtBox: string;
   footer: (count: number) => string;
   openAria: (name: string) => string;
   langAria: string;
@@ -44,6 +57,19 @@ export const UI: Record<Lang, UiStrings> = {
     caffeineLabel: "Théine",
     typeLabel: "Type",
     gradient: "Dégradé du thé",
+    formatLabel: "Format",
+    brewLabel: "Infusion",
+    momentLabel: "Moment",
+    certificationLabel: "Certification",
+    certificationValue: "Rainforest Alliance",
+    momentDay: "Matin & journée",
+    momentEvening: "Le soir",
+    variedValue: "Varié",
+    coldWater: "Eau froide",
+    fmtBag: "Sachet",
+    fmtPyramid: "Sachet pyramide",
+    fmtCold: "Infuse à froid",
+    fmtBox: "Assortiment",
     footer: (n) => `Fiches couleurs · ${n} sachets · React + Node`,
     openAria: (name) => `Ouvrir la fiche ${name}`,
     langAria: "Choisir la langue",
@@ -63,6 +89,19 @@ export const UI: Record<Lang, UiStrings> = {
     caffeineLabel: "Caffeine",
     typeLabel: "Type",
     gradient: "Tea gradient",
+    formatLabel: "Format",
+    brewLabel: "Brewing",
+    momentLabel: "Time of day",
+    certificationLabel: "Certification",
+    certificationValue: "Rainforest Alliance",
+    momentDay: "Morning & day",
+    momentEvening: "Evening",
+    variedValue: "Varies",
+    coldWater: "Cold water",
+    fmtBag: "Tea bag",
+    fmtPyramid: "Pyramid bag",
+    fmtCold: "Cold brew",
+    fmtBox: "Assortment",
     footer: (n) => `Colour cards · ${n} tea bags · React + Node`,
     openAria: (name) => `Open the ${name} card`,
     langAria: "Choose language",
@@ -82,6 +121,19 @@ export const UI: Record<Lang, UiStrings> = {
     caffeineLabel: "Teína",
     typeLabel: "Tipo",
     gradient: "Degradado del té",
+    formatLabel: "Formato",
+    brewLabel: "Infusión",
+    momentLabel: "Momento",
+    certificationLabel: "Certificación",
+    certificationValue: "Rainforest Alliance",
+    momentDay: "Mañana y día",
+    momentEvening: "Por la noche",
+    variedValue: "Variado",
+    coldWater: "Agua fría",
+    fmtBag: "Bolsita",
+    fmtPyramid: "Pirámide",
+    fmtCold: "Infusión en frío",
+    fmtBox: "Surtido",
     footer: (n) => `Fichas de color · ${n} bolsitas · React + Node`,
     openAria: (name) => `Abrir la ficha ${name}`,
     langAria: "Elegir idioma",
