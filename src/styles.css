@@ -486,6 +486,20 @@ body {
   font-weight: 700;
 }
 
+.intensity {
+  display: flex;
+  align-items: center;
+  gap: 0.22rem;
+  margin-top: 0.2rem;
+}
+
+.intensity__dot {
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 50%;
+  border: 1.5px solid;
+}
+
 .modal__cert {
   display: flex;
   align-items: center;
