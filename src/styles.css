@@ -128,6 +128,14 @@ body {
   letter-spacing: -0.02em;
 }
 
+/* Vrai logo Lipton (image) dans le titre */
+.hero__logo {
+  height: 1.7em;
+  width: auto;
+  vertical-align: -0.5em;
+  margin-left: 0.05em;
+}
+
 /* Logo Lipton — champ jaune + bandeau rouge + texte blanc (couleurs de marque) */
 .lipton-logo {
   display: inline-block;
