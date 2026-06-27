@@ -136,42 +136,6 @@ body {
   margin-left: 0.05em;
 }
 
-/* Logo Lipton — champ jaune + bandeau rouge + texte blanc (couleurs de marque) */
-.lipton-logo {
-  display: inline-block;
-  background: #ffe105;
-  padding: 0.16em 0.2em;
-  border-radius: 0.32em;
-  vertical-align: baseline;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
-.lipton-logo__banner {
-  display: inline-block;
-  background: #e20025;
-  color: #fff;
-  font-weight: 800;
-  font-style: normal;
-  letter-spacing: 0.01em;
-  padding: 0.02em 0.4em;
-  border-radius: 0.18em;
-}
-
-.lipton-logo--hero {
-  font-size: 0.85em;
-  transform: translateY(-0.04em);
-}
-
-.lipton-logo--mini {
-  font-size: 0.5rem;
-  border-radius: 4px;
-  box-shadow: none;
-}
-
-.lipton-logo--mini .lipton-logo__banner {
-  padding: 0.02em 0.25em;
-}
-
 .hero__subtitle {
   color: var(--muted);
   max-width: 36rem;
@@ -544,9 +508,14 @@ body {
   border-radius: 6px 6px 8px 8px;
   background: rgba(255, 255, 255, 0.18);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 4px;
+}
+
+.sachet__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 

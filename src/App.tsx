@@ -217,21 +217,12 @@ function intensityValue(tea: TeaSachet): number {
   }
 }
 
-/** Logo Lipton aux vraies couleurs : bandeau rouge + texte blanc sur champ jaune. */
-function LiptonLogo({ className = "" }: { className?: string }) {
-  return (
-    <span className={`lipton-logo ${className}`}>
-      <span className="lipton-logo__banner">Lipton</span>
-    </span>
-  );
-}
-
 function Sachet({ tea }: { tea: TeaSachet }) {
   return (
     <div className="sachet" aria-hidden="true">
       <span className="sachet__string" style={{ background: tea.ink }} />
       <span className="sachet__bag" style={{ borderColor: tea.ink }}>
-        <LiptonLogo className="lipton-logo--mini" />
+        <img className="sachet__logo" src="/lipton-logo.png" alt="" />
       </span>
     </div>
   );
