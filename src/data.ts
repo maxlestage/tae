@@ -37,6 +37,8 @@ export interface TeaSachet {
   caffeineFree: boolean;
   /** Gamme premium « Exclusive Selection » (sachets pyramides) */
   pyramid?: boolean;
+  /** Gamme « Infuse à froid » (cold brew) */
+  coldBrew?: boolean;
 }
 
 /**
@@ -550,6 +552,279 @@ export const TEAS: TeaSachet[] = [
     colors: ["#bcd860", "#6f9a23"],
     ink: "#27330a",
     caffeineFree: true,
+  },
+  {
+    id: "green-tchae-mint",
+    name: {
+      fr: "Thé Vert Tchaé Menthe",
+      en: "Tchaé Mint Green Tea",
+      es: "Té Verde Tchaé Menta",
+    },
+    description: {
+      fr: "Thé vert Tchaé et menthe, frais et léger.",
+      en: "Tchaé green tea and mint, fresh and light.",
+      es: "Té verde Tchaé y menta, fresco y ligero.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#86d35a", "#178a4c"],
+    ink: "#0d2e1b",
+    caffeineFree: false,
+  },
+  {
+    id: "green-detox-fr",
+    name: { fr: "Thé Vert Détox", en: "Detox Green Tea", es: "Té Verde Detox" },
+    description: {
+      fr: "Thé vert détox, agrumes et plantes.",
+      en: "Detox green tea, citrus and herbs.",
+      es: "Té verde detox, cítricos y plantas.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#9ccb5a", "#5a9a2e"],
+    ink: "#13280c",
+    caffeineFree: false,
+  },
+  {
+    id: "moroccan-mint",
+    name: {
+      fr: "Infusion Menthe Maroc",
+      en: "Moroccan Mint Infusion",
+      es: "Infusión Menta Marroquí",
+    },
+    description: {
+      fr: "Menthe et épices à la marocaine, sans théine.",
+      en: "Moroccan-style mint and spices, caffeine-free.",
+      es: "Menta y especias al estilo marroquí, sin teína.",
+    },
+    typeKey: "infusion",
+    family: "Vert",
+    colors: ["#56c596", "#1b8a5a"],
+    ink: "#06291c",
+    caffeineFree: true,
+  },
+  {
+    id: "digestion",
+    name: { fr: "Pause Digestion", en: "Digestion", es: "Digestión" },
+    description: {
+      fr: "Menthe, fenouil et gingembre, après le repas.",
+      en: "Mint, fennel and ginger, after meals.",
+      es: "Menta, hinojo y jengibre, después de comer.",
+    },
+    typeKey: "infusion",
+    family: "Vert",
+    colors: ["#7cc89a", "#2f8a5a"],
+    ink: "#06291c",
+    caffeineFree: true,
+  },
+  {
+    id: "green-lemon-honey",
+    name: {
+      fr: "Thé Vert Citron Miel",
+      en: "Green Tea Lemon Honey",
+      es: "Té Verde Limón Miel",
+    },
+    description: {
+      fr: "Thé vert, citron et miel, doux et frais.",
+      en: "Green tea, lemon and honey, soft and fresh.",
+      es: "Té verde, limón y miel, suave y fresco.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#bcd84a", "#8a9a2e"],
+    ink: "#1e2a08",
+    caffeineFree: false,
+  },
+  {
+    id: "green-ginger",
+    name: { fr: "Thé Vert Gingembre", en: "Green Tea Ginger", es: "Té Verde Jengibre" },
+    description: {
+      fr: "Thé vert et gingembre, tonique et épicé.",
+      en: "Green tea and ginger, invigorating and spicy.",
+      es: "Té verde y jengibre, tonificante y especiado.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#a6d44f", "#5a8a2e"],
+    ink: "#13280c",
+    caffeineFree: false,
+  },
+  {
+    id: "green-pomegranate",
+    name: { fr: "Thé Vert Grenade", en: "Green Tea Pomegranate", es: "Té Verde Granada" },
+    description: {
+      fr: "Thé vert et grenade, fruité et acidulé.",
+      en: "Green tea and pomegranate, fruity and tangy.",
+      es: "Té verde y granada, afrutado y ácido.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#9abf52", "#8a2f4a"],
+    ink: "#12260c",
+    caffeineFree: false,
+  },
+  {
+    id: "verbena-mint",
+    name: {
+      fr: "Infusion Verveine Menthe",
+      en: "Verbena Mint Infusion",
+      es: "Infusión Verbena Menta",
+    },
+    description: {
+      fr: "Verveine et menthe, infusion fraîche et digeste.",
+      en: "Verbena and mint, a fresh, light infusion.",
+      es: "Verbena y menta, infusión fresca y ligera.",
+    },
+    typeKey: "infusion",
+    family: "Vert",
+    colors: ["#a8d46a", "#5a9a3a"],
+    ink: "#1e2e0c",
+    caffeineFree: true,
+  },
+  {
+    id: "white-tea",
+    name: { fr: "Thé Blanc", en: "White Tea", es: "Té Blanco" },
+    description: {
+      fr: "Thé blanc délicat, subtil et léger.",
+      en: "Delicate white tea, subtle and light.",
+      es: "Té blanco delicado, sutil y ligero.",
+    },
+    typeKey: "whiteTea",
+    family: "Vert",
+    colors: ["#e3ead0", "#9bb37a"],
+    ink: "#2c3a1c",
+    caffeineFree: false,
+  },
+
+  // === Rouge — infusion fruitée ===
+  {
+    id: "red-fruits-infusion",
+    name: { fr: "Infusion Fruits Rouges", en: "Red Fruits Infusion", es: "Infusión Frutos Rojos" },
+    description: {
+      fr: "Hibiscus et fruits rouges, sans théine.",
+      en: "Hibiscus and red fruits, caffeine-free.",
+      es: "Hibisco y frutos rojos, sin teína.",
+    },
+    typeKey: "infusionFruity",
+    family: "Rouge",
+    colors: ["#d81b3f", "#8e0e2a"],
+    ink: "#fff0f3",
+    caffeineFree: true,
+  },
+
+  // === Violet — infusions du soir / bien-être ===
+  {
+    id: "relax",
+    name: { fr: "Pause Détente", en: "Relax", es: "Pausa Relax" },
+    description: {
+      fr: "Camomille, lavande, tilleul et vanille, relaxant.",
+      en: "Chamomile, lavender, linden and vanilla, relaxing.",
+      es: "Manzanilla, lavanda, tilo y vainilla, relajante.",
+    },
+    typeKey: "infusion",
+    family: "Violet",
+    colors: ["#9b7bc4", "#5b3d8a"],
+    ink: "#f3ecff",
+    caffeineFree: true,
+  },
+  {
+    id: "evening-mint-licorice",
+    name: {
+      fr: "Saveurs du Soir Menthe Réglisse",
+      en: "Evening Mint Licorice",
+      es: "Sabores de Noche Menta Regaliz",
+    },
+    description: {
+      fr: "Menthe et réglisse, infusion du soir.",
+      en: "Mint and licorice, an evening infusion.",
+      es: "Menta y regaliz, infusión de la noche.",
+    },
+    typeKey: "infusion",
+    family: "Violet",
+    colors: ["#6f5aa0", "#3d2a6e"],
+    ink: "#f1e8ff",
+    caffeineFree: true,
+  },
+
+  // === Infuse à froid (cold brew) ===
+  {
+    id: "cold-lemon-chamomile",
+    name: { fr: "Citron & Camomille", en: "Lemon & Chamomile", es: "Limón y Manzanilla" },
+    description: {
+      fr: "Infusion à froid citron et camomille.",
+      en: "Cold-brew lemon and chamomile.",
+      es: "Infusión en frío limón y manzanilla.",
+    },
+    typeKey: "infusion",
+    family: "Ambre",
+    colors: ["#f3d04a", "#d99a1e"],
+    ink: "#4a3500",
+    caffeineFree: true,
+    coldBrew: true,
+  },
+  {
+    id: "cold-hibiscus-pomegranate",
+    name: {
+      fr: "Hibiscus & Grenade",
+      en: "Hibiscus & Pomegranate",
+      es: "Hibisco y Granada",
+    },
+    description: {
+      fr: "Infusion à froid hibiscus et grenade.",
+      en: "Cold-brew hibiscus and pomegranate.",
+      es: "Infusión en frío hibisco y granada.",
+    },
+    typeKey: "infusionFruity",
+    family: "Rouge",
+    colors: ["#d6224a", "#8a0f30"],
+    ink: "#fff0f3",
+    caffeineFree: true,
+    coldBrew: true,
+  },
+  {
+    id: "cold-peach-raspberry",
+    name: { fr: "Pêche & Framboise", en: "Peach & Raspberry", es: "Melocotón y Frambuesa" },
+    description: {
+      fr: "Infusion à froid pêche et framboise.",
+      en: "Cold-brew peach and raspberry.",
+      es: "Infusión en frío melocotón y frambuesa.",
+    },
+    typeKey: "infusionFruity",
+    family: "Rose",
+    colors: ["#f58aa6", "#e0594a"],
+    ink: "#4a1208",
+    caffeineFree: true,
+    coldBrew: true,
+  },
+  {
+    id: "cold-mango-rooibos",
+    name: { fr: "Mangue & Rooibos", en: "Mango & Rooibos", es: "Mango y Rooibos" },
+    description: {
+      fr: "Infusion à froid mangue et rooibos.",
+      en: "Cold-brew mango and rooibos.",
+      es: "Infusión en frío mango y rooibos.",
+    },
+    typeKey: "rooibos",
+    family: "Ambre",
+    colors: ["#e8913c", "#b05216"],
+    ink: "#3d1f00",
+    caffeineFree: true,
+    coldBrew: true,
+  },
+  {
+    id: "cold-mint-lime",
+    name: { fr: "Menthe & Citron Vert", en: "Mint & Lime", es: "Menta y Lima" },
+    description: {
+      fr: "Infusion à froid menthe et citron vert.",
+      en: "Cold-brew mint and lime.",
+      es: "Infusión en frío menta y lima.",
+    },
+    typeKey: "infusion",
+    family: "Vert",
+    colors: ["#56c596", "#3aa06a"],
+    ink: "#06291c",
+    caffeineFree: true,
+    coldBrew: true,
   },
 
   // === Exclusive Selection (sachets pyramides, gamme premium FR) ===
