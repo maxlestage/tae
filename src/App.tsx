@@ -444,8 +444,25 @@ function TeaModal({
 
 type Theme = "dark" | "light";
 
+/** Accès localStorage sûrs (certains contextes le bloquent). */
+function loadStored(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function saveStored(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* ignoré */
+  }
+}
+
 function getInitialTheme(): Theme {
-  const saved = localStorage.getItem("tea-theme");
+  const saved = loadStored("tea-theme");
   if (saved === "dark" || saved === "light") return saved;
   return window.matchMedia("(prefers-color-scheme: light)").matches
     ? "light"
@@ -453,32 +470,52 @@ function getInitialTheme(): Theme {
 }
 
 function getInitialLang(): Lang {
-  const saved = localStorage.getItem("tea-lang");
+  const saved = loadStored("tea-lang");
   if (saved === "fr" || saved === "en" || saved === "es") return saved;
   const nav = navigator.language.slice(0, 2);
   return nav === "en" || nav === "es" ? nav : "fr";
 }
 
+function getInitialActive(): ColorFamily | "all" {
+  const saved = loadStored("tea-active");
+  if (saved === "all" || (saved && FAMILY_ORDER.includes(saved as ColorFamily))) {
+    return saved as ColorFamily | "all";
+  }
+  return "all";
+}
+
+function getInitialSort(): SortMode {
+  return loadStored("tea-sort") === "intensity" ? "intensity" : "color";
+}
+
 type SortMode = "color" | "intensity";
 
 export function App() {
-  const [active, setActive] = useState<ColorFamily | "all">("all");
+  const [active, setActive] = useState<ColorFamily | "all">(getInitialActive);
   const [selected, setSelected] = useState<TeaSachet | null>(null);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [lang, setLang] = useState<Lang>(getInitialLang);
-  const [sortMode, setSortMode] = useState<SortMode>("color");
+  const [sortMode, setSortMode] = useState<SortMode>(getInitialSort);
 
   const t = UI[lang];
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem("tea-theme", theme);
+    saveStored("tea-theme", theme);
   }, [theme]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    localStorage.setItem("tea-lang", lang);
+    saveStored("tea-lang", lang);
   }, [lang]);
+
+  useEffect(() => {
+    saveStored("tea-active", active);
+  }, [active]);
+
+  useEffect(() => {
+    saveStored("tea-sort", sortMode);
+  }, [sortMode]);
 
   const presentFamilies = useMemo(
     () => FAMILY_ORDER.filter((f) => TEAS.some((t) => t.family === f)),
