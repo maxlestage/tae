@@ -606,6 +606,17 @@ export function App() {
     return out;
   }, [filtered, sortMode]);
 
+  const allCollapsed =
+    sections.length > 0 && sections.every((s) => collapsed.has(s.key));
+
+  const toggleAll = () =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (allCollapsed) sections.forEach((s) => next.delete(s.key));
+      else sections.forEach((s) => next.add(s.key));
+      return next;
+    });
+
   return (
     <div className="page">
       <div className="toolbar">
@@ -698,6 +709,13 @@ export function App() {
       </header>
 
       <main className="content">
+        {sections.length > 0 && (
+          <div className="content__tools">
+            <button type="button" className="tool-btn" onClick={toggleAll}>
+              {allCollapsed ? `⊞ ${t.expandAll}` : `⊟ ${t.collapseAll}`}
+            </button>
+          </div>
+        )}
         {sections.map((group) => {
           const isOpen = !collapsed.has(group.key);
           return (
