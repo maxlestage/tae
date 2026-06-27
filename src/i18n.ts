@@ -45,7 +45,7 @@ export interface UiStrings {
   collapseAll: string;
   expandAll: string;
   country: string;
-  footer: (count: number) => string;
+  footer: (count: number, year: number) => string;
   openAria: (name: string) => string;
   langAria: string;
 }
@@ -88,7 +88,7 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Tout réduire",
     expandAll: "Tout déplier",
     country: "Gamme vendue en France",
-    footer: (n) => `Fiches couleurs · ${n} sachets · React + Node`,
+    footer: (n, year) => `© ${year} @maxlestage · ${n} sachets`,
     openAria: (name) => `Ouvrir la fiche ${name}`,
     langAria: "Choisir la langue",
   },
@@ -129,7 +129,7 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Collapse all",
     expandAll: "Expand all",
     country: "Range sold in France",
-    footer: (n) => `Colour cards · ${n} tea bags · React + Node`,
+    footer: (n, year) => `© ${year} @maxlestage · ${n} tea bags`,
     openAria: (name) => `Open the ${name} card`,
     langAria: "Choose language",
   },
@@ -170,7 +170,7 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Contraer todo",
     expandAll: "Expandir todo",
     country: "Gama vendida en Francia",
-    footer: (n) => `Fichas de color · ${n} bolsitas · React + Node`,
+    footer: (n, year) => `© ${year} @maxlestage · ${n} bolsitas`,
     openAria: (name) => `Abrir la ficha ${name}`,
     langAria: "Elegir idioma",
   },
