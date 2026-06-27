@@ -38,6 +38,9 @@ export interface UiStrings {
   fmtPyramid: string;
   fmtCold: string;
   fmtBox: string;
+  sortLabel: string;
+  sortColour: string;
+  sortIntensity: string;
   footer: (count: number) => string;
   openAria: (name: string) => string;
   langAria: string;
@@ -74,6 +77,9 @@ export const UI: Record<Lang, UiStrings> = {
     fmtPyramid: "Sachet pyramide",
     fmtCold: "Infuse à froid",
     fmtBox: "Assortiment",
+    sortLabel: "Trier par",
+    sortColour: "Couleur",
+    sortIntensity: "Intensité",
     footer: (n) => `Fiches couleurs · ${n} sachets · React + Node`,
     openAria: (name) => `Ouvrir la fiche ${name}`,
     langAria: "Choisir la langue",
@@ -108,6 +114,9 @@ export const UI: Record<Lang, UiStrings> = {
     fmtPyramid: "Pyramid bag",
     fmtCold: "Cold brew",
     fmtBox: "Assortment",
+    sortLabel: "Sort by",
+    sortColour: "Colour",
+    sortIntensity: "Intensity",
     footer: (n) => `Colour cards · ${n} tea bags · React + Node`,
     openAria: (name) => `Open the ${name} card`,
     langAria: "Choose language",
@@ -142,6 +151,9 @@ export const UI: Record<Lang, UiStrings> = {
     fmtPyramid: "Pirámide",
     fmtCold: "Infusión en frío",
     fmtBox: "Surtido",
+    sortLabel: "Ordenar por",
+    sortColour: "Color",
+    sortIntensity: "Intensidad",
     footer: (n) => `Fichas de color · ${n} bolsitas · React + Node`,
     openAria: (name) => `Abrir la ficha ${name}`,
     langAria: "Elegir idioma",

@@ -459,11 +459,14 @@ function getInitialLang(): Lang {
   return nav === "en" || nav === "es" ? nav : "fr";
 }
 
+type SortMode = "color" | "intensity";
+
 export function App() {
   const [active, setActive] = useState<ColorFamily | "all">("all");
   const [selected, setSelected] = useState<TeaSachet | null>(null);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [lang, setLang] = useState<Lang>(getInitialLang);
+  const [sortMode, setSortMode] = useState<SortMode>("color");
 
   const t = UI[lang];
 
@@ -477,20 +480,44 @@ export function App() {
     localStorage.setItem("tea-lang", lang);
   }, [lang]);
 
-  const groups = useMemo(() => {
-    return FAMILY_ORDER.map((family) => ({
-      family,
-      teas: TEAS.filter((t) => t.family === family),
-    })).filter((g) => g.teas.length > 0);
-  }, []);
-
   const presentFamilies = useMemo(
     () => FAMILY_ORDER.filter((f) => TEAS.some((t) => t.family === f)),
     [],
   );
 
-  const visibleGroups =
-    active === "all" ? groups : groups.filter((g) => g.family === active);
+  const filtered = useMemo(
+    () => (active === "all" ? TEAS : TEAS.filter((x) => x.family === active)),
+    [active],
+  );
+
+  /** Sections affichées : par couleur (famille) ou par intensité (niveau 5→1). */
+  const sections = useMemo<
+    Array<{ key: string; family?: ColorFamily; level?: number; teas: TeaSachet[] }>
+  >(() => {
+    if (sortMode === "color") {
+      return FAMILY_ORDER.map((family) => ({
+        key: family,
+        family,
+        teas: filtered.filter((x) => x.family === family),
+      })).filter((g) => g.teas.length > 0);
+    }
+    const levels = [5, 4, 3, 2, 1].map((level) => ({
+      key: `i${level}`,
+      level,
+      teas: filtered.filter((x) => !x.coffret && intensityValue(x) === level),
+    }));
+    const out = levels.filter((g) => g.teas.length > 0) as Array<{
+      key: string;
+      family?: ColorFamily;
+      level?: number;
+      teas: TeaSachet[];
+    }>;
+    const coffrets = filtered.filter((x) => x.coffret);
+    if (coffrets.length > 0) {
+      out.push({ key: "coffret", family: "Coffret", teas: coffrets });
+    }
+    return out;
+  }, [filtered, sortMode]);
 
   return (
     <div className="page">
@@ -547,21 +574,65 @@ export function App() {
             </button>
           ))}
         </nav>
+
+        <div className="sort">
+          <span className="sort__label">{t.sortLabel}</span>
+          <div className="sort__seg" role="group">
+            <button
+              type="button"
+              className={`seg ${sortMode === "color" ? "seg--on" : ""}`}
+              onClick={() => setSortMode("color")}
+              aria-pressed={sortMode === "color"}
+            >
+              {t.sortColour}
+            </button>
+            <button
+              type="button"
+              className={`seg ${sortMode === "intensity" ? "seg--on" : ""}`}
+              onClick={() => setSortMode("intensity")}
+              aria-pressed={sortMode === "intensity"}
+            >
+              {t.sortIntensity}
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="content">
-        {visibleGroups.map((group) => (
-          <section key={group.family} className="group">
+        {sections.map((group) => (
+          <section key={group.key} className="group">
             <div className="group__head">
-              <span
-                className={`group__dot ${group.family === "Coffret" ? "chip__dot--all" : ""}`}
-                style={
-                  group.family === "Coffret"
-                    ? undefined
-                    : { background: FAMILY_SWATCH[group.family] }
-                }
-              />
-              <h2 className="group__title">{FAMILY_LABEL[lang][group.family]}</h2>
+              {group.level !== undefined ? (
+                <>
+                  <span className="group__dots intensity" aria-hidden="true">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <span
+                        key={i}
+                        className="intensity__dot"
+                        style={{
+                          background: i <= group.level! ? "currentColor" : "transparent",
+                          borderColor: "currentColor",
+                        }}
+                      />
+                    ))}
+                  </span>
+                  <h2 className="group__title">{t.intensityLabel}</h2>
+                </>
+              ) : (
+                <>
+                  <span
+                    className={`group__dot ${group.family === "Coffret" ? "chip__dot--all" : ""}`}
+                    style={
+                      group.family === "Coffret"
+                        ? undefined
+                        : { background: FAMILY_SWATCH[group.family!] }
+                    }
+                  />
+                  <h2 className="group__title">
+                    {FAMILY_LABEL[lang][group.family!]}
+                  </h2>
+                </>
+              )}
               <span className="group__count">{group.teas.length}</span>
             </div>
             <div className="grid">
