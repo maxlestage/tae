@@ -487,6 +487,16 @@ function getInitialSort(): SortMode {
   return v === "intensity" || v === "moment" ? v : "color";
 }
 
+function getInitialCollapsed(): Set<string> {
+  try {
+    const raw = loadStored("tea-collapsed");
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    /* ignoré */
+  }
+  return new Set();
+}
+
 type SortMode = "color" | "intensity" | "moment";
 
 export function App() {
@@ -495,8 +505,17 @@ export function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [lang, setLang] = useState<Lang>(getInitialLang);
   const [sortMode, setSortMode] = useState<SortMode>(getInitialSort);
+  const [collapsed, setCollapsed] = useState<Set<string>>(getInitialCollapsed);
 
   const t = UI[lang];
+
+  const toggleCollapsed = (key: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -515,6 +534,10 @@ export function App() {
   useEffect(() => {
     saveStored("tea-sort", sortMode);
   }, [sortMode]);
+
+  useEffect(() => {
+    saveStored("tea-collapsed", JSON.stringify([...collapsed]));
+  }, [collapsed]);
 
   const presentFamilies = useMemo(
     () => FAMILY_ORDER.filter((f) => TEAS.some((t) => t.family === f)),
@@ -675,64 +698,78 @@ export function App() {
       </header>
 
       <main className="content">
-        {sections.map((group) => (
-          <section key={group.key} className="group">
-            <div className="group__head">
-              {group.level !== undefined ? (
-                <>
-                  <span className="group__dots intensity" aria-hidden="true">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <span
-                        key={i}
-                        className="intensity__dot"
-                        style={{
-                          background: i <= group.level! ? "currentColor" : "transparent",
-                          borderColor: "currentColor",
-                        }}
-                      />
-                    ))}
-                  </span>
-                  <h2 className="group__title">{t.intensityLabel}</h2>
-                </>
-              ) : group.moment !== undefined ? (
-                <>
-                  <span className="group__moment" aria-hidden="true">
-                    {group.moment === "day" ? "☀️" : "🌙"}
-                  </span>
-                  <h2 className="group__title">
-                    {group.moment === "day" ? t.momentDay : t.momentEvening}
-                  </h2>
-                </>
-              ) : (
-                <>
-                  <span
-                    className={`group__dot ${group.family === "Coffret" ? "chip__dot--all" : ""}`}
-                    style={
-                      group.family === "Coffret"
-                        ? undefined
-                        : { background: FAMILY_SWATCH[group.family!] }
-                    }
-                  />
-                  <h2 className="group__title">
-                    {FAMILY_LABEL[lang][group.family!]}
-                  </h2>
-                </>
+        {sections.map((group) => {
+          const isOpen = !collapsed.has(group.key);
+          return (
+            <section key={group.key} className="group">
+              <button
+                type="button"
+                className="group__head"
+                onClick={() => toggleCollapsed(group.key)}
+                aria-expanded={isOpen}
+              >
+                {group.level !== undefined ? (
+                  <>
+                    <span className="group__dots intensity" aria-hidden="true">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <span
+                          key={i}
+                          className="intensity__dot"
+                          style={{
+                            background:
+                              i <= group.level! ? "currentColor" : "transparent",
+                            borderColor: "currentColor",
+                          }}
+                        />
+                      ))}
+                    </span>
+                    <span className="group__title">{t.intensityLabel}</span>
+                  </>
+                ) : group.moment !== undefined ? (
+                  <>
+                    <span className="group__moment" aria-hidden="true">
+                      {group.moment === "day" ? "☀️" : "🌙"}
+                    </span>
+                    <span className="group__title">
+                      {group.moment === "day" ? t.momentDay : t.momentEvening}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={`group__dot ${group.family === "Coffret" ? "chip__dot--all" : ""}`}
+                      style={
+                        group.family === "Coffret"
+                          ? undefined
+                          : { background: FAMILY_SWATCH[group.family!] }
+                      }
+                    />
+                    <span className="group__title">
+                      {FAMILY_LABEL[lang][group.family!]}
+                    </span>
+                  </>
+                )}
+                <span className="group__count">{group.teas.length}</span>
+                <span className="group__chevron" data-open={isOpen} aria-hidden="true">
+                  ▾
+                </span>
+              </button>
+              {isOpen && (
+                <div className="grid">
+                  {group.teas.map((tea) => (
+                    <TeaCard
+                      key={tea.id}
+                      tea={tea}
+                      lang={lang}
+                      t={t}
+                      onOpen={setSelected}
+                    />
+                  ))}
+                </div>
               )}
-              <span className="group__count">{group.teas.length}</span>
-            </div>
-            <div className="grid">
-              {group.teas.map((tea) => (
-                <TeaCard
-                  key={tea.id}
-                  tea={tea}
-                  lang={lang}
-                  t={t}
-                  onOpen={setSelected}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+            </section>
+          );
+        })}
       </main>
 
       <footer className="footer">{t.footer(TEAS.length)}</footer>

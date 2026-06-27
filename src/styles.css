@@ -317,10 +317,33 @@ body {
 }
 
 .group__head {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin-bottom: 1rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
+
+.group__chevron {
+  margin-left: 0.1rem;
+  font-size: 1rem;
+  color: var(--muted);
+  transition: transform 0.18s ease;
+}
+
+.group__chevron[data-open="false"] {
+  transform: rotate(-90deg);
+}
+
+.group__head:hover .group__chevron {
+  color: var(--text);
 }
 
 .group__dot {
