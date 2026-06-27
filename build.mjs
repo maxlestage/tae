@@ -19,7 +19,13 @@ const HTML = `<!DOCTYPE html>
     <meta name="description" content="${DESC}" />
     <meta name="theme-color" content="#ffe105" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Lipton Thés" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Lipton · Sachets de thé" />
