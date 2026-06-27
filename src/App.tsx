@@ -36,6 +36,39 @@ function coffretGradient(): string {
   ].join(", ");
 }
 
+/** Conseil d'infusion (température · temps) dérivé du type de thé. */
+function brewInfo(tea: TeaSachet, t: UiStrings): string | null {
+  if (tea.coffret) return null;
+  if (tea.coldBrew) return `${t.coldWater} · 5–10 min`;
+  switch (tea.typeKey) {
+    case "blackTea":
+    case "blackTeaFlavored":
+    case "blackTeaSpiced":
+      return "90–95 °C · 3–4 min";
+    case "greenTea":
+    case "greenTeaFlavored":
+      return "75–80 °C · 2–3 min";
+    case "whiteTea":
+      return "70–75 °C · 2–3 min";
+    case "rooibos":
+      return "95–100 °C · 5–7 min";
+    default:
+      return "95–100 °C · 5–6 min";
+  }
+}
+
+function formatValue(tea: TeaSachet, t: UiStrings): string {
+  if (tea.coffret) return t.fmtBox;
+  if (tea.coldBrew) return t.fmtCold;
+  if (tea.pyramid) return t.fmtPyramid;
+  return t.fmtBag;
+}
+
+function momentValue(tea: TeaSachet, t: UiStrings): string {
+  if (tea.coffret) return t.variedValue;
+  return tea.caffeineFree ? t.momentEvening : t.momentDay;
+}
+
 /** Logo Lipton aux vraies couleurs : bandeau rouge + texte blanc sur champ jaune. */
 function LiptonLogo({ className = "" }: { className?: string }) {
   return (
@@ -181,18 +214,45 @@ function TeaModal({
 
         <dl className="modal__facts">
           <div className="fact">
+            <dt>{t.typeLabel}</dt>
+            <dd>{TYPE_LABEL[lang][tea.typeKey]}</dd>
+          </div>
+          <div className="fact">
             <dt>{t.colour}</dt>
             <dd>{FAMILY_LABEL[lang][tea.family]}</dd>
           </div>
           <div className="fact">
             <dt>{t.caffeineLabel}</dt>
-            <dd>{tea.caffeineFree ? t.caffeineFree : t.caffeinated}</dd>
+            <dd>
+              {tea.coffret
+                ? t.variedValue
+                : tea.caffeineFree
+                  ? t.caffeineFree
+                  : t.caffeinated}
+            </dd>
           </div>
           <div className="fact">
-            <dt>{t.typeLabel}</dt>
-            <dd>{TYPE_LABEL[lang][tea.typeKey]}</dd>
+            <dt>{t.formatLabel}</dt>
+            <dd>{formatValue(tea, t)}</dd>
           </div>
+          <div className="fact">
+            <dt>{t.momentLabel}</dt>
+            <dd>{momentValue(tea, t)}</dd>
+          </div>
+          {brewInfo(tea, t) && (
+            <div className="fact">
+              <dt>{t.brewLabel}</dt>
+              <dd>{brewInfo(tea, t)}</dd>
+            </div>
+          )}
         </dl>
+
+        <p className="modal__cert">
+          <span className="modal__cert-leaf" aria-hidden="true">
+            🌿
+          </span>
+          {t.certificationLabel} · {t.certificationValue}
+        </p>
 
         <div className="modal__palette">
           <span className="modal__palette-label">{t.gradient}</span>
