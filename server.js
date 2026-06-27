@@ -39,6 +39,16 @@ const server = createServer(async (req, res) => {
       body = await readFile(filePath);
     }
 
+    // Pour le HTML, on remplace __BASE_URL__ par l'URL absolue du site,
+    // afin que les aperçus de lien (Open Graph) pointent vers la bonne image.
+    if (extname(filePath) === ".html") {
+      const proto =
+        req.headers["x-forwarded-proto"]?.split(",")[0] ?? "https";
+      const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+      const base = host ? `${proto}://${host}` : "";
+      body = Buffer.from(body.toString("utf8").replaceAll("__BASE_URL__", base));
+    }
+
     res.writeHead(200, {
       "content-type": MIME[extname(filePath)] || "application/octet-stream",
     });
