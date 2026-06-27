@@ -102,6 +102,11 @@ function TeaCard({
           ❄ Infuse à froid
         </span>
       )}
+      {tea.limited && (
+        <span className="card__line" style={{ borderColor: tea.ink }}>
+          ★ Édition limitée
+        </span>
+      )}
       <h3 className="card__name">{tea.name[lang]}</h3>
       <p className="card__desc">{tea.description[lang]}</p>
 
@@ -164,6 +169,9 @@ function TeaModal({
             )}
             {tea.coldBrew && (
               <span className="modal__line">❄ Infuse à froid</span>
+            )}
+            {tea.limited && (
+              <span className="modal__line">★ Édition limitée</span>
             )}
             <h2 className="modal__name">{tea.name[lang]}</h2>
           </div>
