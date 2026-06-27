@@ -299,6 +299,30 @@ body {
   }
 }
 
+/* Outils (tout réduire / déplier) */
+.content__tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.tool-btn {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.12s ease, transform 0.12s ease;
+}
+
+.tool-btn:hover {
+  border-color: #9aa3b2;
+  transform: translateY(-1px);
+}
+
 /* Groupes */
 .group {
   margin-top: 1rem;
