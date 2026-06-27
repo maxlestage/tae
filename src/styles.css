@@ -468,18 +468,23 @@ body {
   background: rgba(6, 8, 12, 0.65);
   backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 1.25rem;
   z-index: 50;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: fade 0.18s ease;
 }
 
 .modal__card {
   position: relative;
   width: min(460px, 100%);
+  /* margin auto : centre verticalement quand ça tient, sans couper le haut
+     (donc la croix) quand la fiche est plus haute que l'écran. */
+  margin: auto;
   border-radius: 24px;
-  padding: 1.6rem 1.5rem 1.75rem;
+  padding: 2.6rem 1.5rem 1.75rem;
   overflow: hidden;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
   animation: pop 0.2s ease;
@@ -487,16 +492,19 @@ body {
 
 .modal__close {
   position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
-  width: 2rem;
-  height: 2rem;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 2;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
-  border: 1px solid;
-  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid;
+  background: rgba(255, 255, 255, 0.28);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 700;
   line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 .modal__head {
