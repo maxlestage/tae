@@ -26,14 +26,14 @@ const HTML = `<!DOCTYPE html>
     <meta property="og:title" content="${TITLE}" />
     <meta property="og:description" content="${DESC}" />
     <meta property="og:url" content="__BASE_URL__/" />
-    <meta property="og:image" content="__BASE_URL__/og-image.png?v=2" />
+    <meta property="og:image" content="__BASE_URL__/og-image.png?v=3" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${TITLE}" />
     <meta name="twitter:description" content="${DESC}" />
-    <meta name="twitter:image" content="__BASE_URL__/og-image.png?v=2" />
+    <meta name="twitter:image" content="__BASE_URL__/og-image.png?v=3" />
 
     <link rel="stylesheet" href="/main.css" />
   </head>
