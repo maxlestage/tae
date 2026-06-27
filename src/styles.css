@@ -490,11 +490,12 @@ body {
   animation: pop 0.2s ease;
 }
 
-/* Croix fixée à l'écran : reste en place quand la fiche défile. */
+/* Croix fixée à l'écran : reste en place quand la fiche défile.
+   Décalée sous la zone sûre (notch / dynamic island) et un peu en retrait. */
 .modal__close {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
+  right: calc(env(safe-area-inset-right, 0px) + 1.4rem);
   z-index: 60;
   width: 2.6rem;
   height: 2.6rem;
