@@ -782,7 +782,9 @@ export function App() {
         })}
       </main>
 
-      <footer className="footer">{t.footer(TEAS.length)}</footer>
+      <footer className="footer">
+        {t.footer(TEAS.length, new Date().getFullYear())}
+      </footer>
 
       {selected && (
         <TeaModal
