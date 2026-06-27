@@ -646,7 +646,8 @@ export function App() {
       <header className="hero">
         <p className="hero__kicker">{t.kicker}</p>
         <h1 className="hero__title">
-          {t.title} <LiptonLogo className="lipton-logo--hero" />
+          {t.title}{" "}
+          <img className="hero__logo" src="/lipton-logo.png" alt="Lipton" />
         </h1>
         <p className="hero__subtitle">{t.subtitle}</p>
 
