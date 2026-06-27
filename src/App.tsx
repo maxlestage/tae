@@ -589,6 +589,10 @@ export function App() {
         </h1>
         <p className="hero__subtitle">{t.subtitle}</p>
 
+        <p className="hero__country">
+          <span aria-hidden="true">🇫🇷</span> {t.country}
+        </p>
+
         <nav className="filters">
           <button
             className={`chip ${active === "all" ? "chip--on" : ""}`}

@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, rmSync, cpSync, existsSync } from "node:fs";
 
 const TITLE = "Lipton · Sachets de thé par couleurs";
 const DESC =
-  "78 sachets de thé Lipton triés par couleurs, avec fiche colorée, intensité et ingrédients. FR / EN / ES.";
+  "Gamme Lipton vendue en France 🇫🇷 — 78 sachets triés par couleurs, avec fiche colorée, intensité et ingrédients. FR / EN / ES.";
 
 // __BASE_URL__ est remplacé par l'URL absolue du site au moment de servir
 // (server.js), pour des aperçus de lien (Open Graph) corrects partout.

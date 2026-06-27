@@ -171,6 +171,20 @@ body {
   line-height: 1.5;
 }
 
+.hero__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.9rem auto 0;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
 /* Filtres */
 .filters {
   display: flex;
