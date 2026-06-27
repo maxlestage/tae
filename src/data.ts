@@ -43,6 +43,8 @@ export interface TeaSachet {
   coldBrew?: boolean;
   /** Coffret / assortiment de plusieurs parfums */
   coffret?: boolean;
+  /** Édition limitée / saisonnière */
+  limited?: boolean;
 }
 
 /**
@@ -1104,6 +1106,61 @@ export const TEAS: TeaSachet[] = [
     caffeineFree: true,
   },
 
+  // === Éditions limitées / saisonnières ===
+  {
+    id: "gingerbread",
+    name: {
+      fr: "Infusion Façon Pain d'Épices",
+      en: "Gingerbread Infusion",
+      es: "Infusión Pan de Especias",
+    },
+    description: {
+      fr: "Rooibos, cannelle, gingembre et orange, édition d'hiver.",
+      en: "Rooibos, cinnamon, ginger and orange, winter edition.",
+      es: "Rooibos, canela, jengibre y naranja, edición de invierno.",
+    },
+    typeKey: "infusion",
+    family: "Ambre",
+    colors: ["#c9742e", "#7e3d12"],
+    ink: "#fff1e6",
+    caffeineFree: true,
+    limited: true,
+  },
+  {
+    id: "christmas-shortbread",
+    name: { fr: "Sablé de Noël", en: "Christmas Shortbread", es: "Galleta de Navidad" },
+    description: {
+      fr: "Saveur biscuitée de Noël, vanille et caramel.",
+      en: "Christmas biscuit flavour, vanilla and caramel.",
+      es: "Sabor a galleta navideña, vainilla y caramelo.",
+    },
+    typeKey: "blackTeaFlavored",
+    family: "Jaune",
+    colors: ["#ffe105", "#b07d2e"],
+    ink: "#4a2400",
+    caffeineFree: false,
+    limited: true,
+  },
+  {
+    id: "christmas-black",
+    name: {
+      fr: "Thé de Noël Épices",
+      en: "Christmas Spice Black Tea",
+      es: "Té Negro Especias de Navidad",
+    },
+    description: {
+      fr: "Thé noir, orange, cannelle et épices de Noël.",
+      en: "Black tea, orange, cinnamon and Christmas spices.",
+      es: "Té negro, naranja, canela y especias navideñas.",
+    },
+    typeKey: "blackTeaFlavored",
+    family: "Jaune",
+    colors: ["#ffe105", "#c2641f"],
+    ink: "#4a2400",
+    caffeineFree: false,
+    limited: true,
+  },
+
   // === Coffrets / assortiments ===
   {
     id: "coffret-advent",
@@ -1214,6 +1271,26 @@ export const TEAS: TeaSachet[] = [
     ink: "#f4f4f5",
     caffeineFree: false,
     coffret: true,
+  },
+  {
+    id: "coffret-limited",
+    name: {
+      fr: "Coffret Édition Limitée",
+      en: "Limited Edition Box",
+      es: "Estuche Edición Limitada",
+    },
+    description: {
+      fr: "Assortiment édition limitée, 12 thés et infusions.",
+      en: "Limited edition assortment, 12 teas and infusions.",
+      es: "Surtido edición limitada, 12 tés e infusiones.",
+    },
+    typeKey: "coffret",
+    family: "Coffret",
+    colors: ["#222733", "#ffe105"],
+    ink: "#f4f4f5",
+    caffeineFree: false,
+    coffret: true,
+    limited: true,
   },
 ];
 
