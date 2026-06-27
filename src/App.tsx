@@ -212,6 +212,11 @@ export function App() {
     })).filter((g) => g.teas.length > 0);
   }, []);
 
+  const presentFamilies = useMemo(
+    () => FAMILY_ORDER.filter((f) => TEAS.some((t) => t.family === f)),
+    [],
+  );
+
   const visibleGroups =
     active === "all" ? groups : groups.filter((g) => g.family === active);
 
@@ -256,7 +261,7 @@ export function App() {
             <span className="chip__dot chip__dot--all" />
             {t.all} ({TEAS.length})
           </button>
-          {FAMILY_ORDER.map((family) => (
+          {presentFamilies.map((family) => (
             <button
               key={family}
               className={`chip ${active === family ? "chip--on" : ""}`}
