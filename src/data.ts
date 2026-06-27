@@ -35,6 +35,8 @@ export interface TeaSachet {
   /** Couleur du texte lisible sur le dégradé */
   ink: string;
   caffeineFree: boolean;
+  /** Gamme premium « Exclusive Selection » (sachets pyramides) */
+  pyramid?: boolean;
 }
 
 /**
@@ -358,6 +360,181 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6cc89a", "#1f8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+  },
+
+  // === Exclusive Selection (sachets pyramides, gamme premium FR) ===
+  {
+    id: "es-yellow-label",
+    name: {
+      fr: "Yellow Label Signature",
+      en: "Yellow Label Signature",
+      es: "Yellow Label Signature",
+    },
+    description: {
+      fr: "Thé noir signature en pyramide, riche et raffiné.",
+      en: "Signature black tea in a pyramid, rich and refined.",
+      es: "Té negro signature en pirámide, rico y refinado.",
+    },
+    typeKey: "blackTea",
+    family: "Jaune",
+    colors: ["#ffe105", "#e20025"],
+    ink: "#4a1206",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-english-breakfast",
+    name: { fr: "English Breakfast", en: "English Breakfast", es: "English Breakfast" },
+    description: {
+      fr: "Mélange corsé et malté en pyramide.",
+      en: "Bold, malty blend in a pyramid bag.",
+      es: "Mezcla intensa y maltosa en pirámide.",
+    },
+    typeKey: "blackTea",
+    family: "Jaune",
+    colors: ["#ffe105", "#c8102e"],
+    ink: "#4a1206",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-earl-grey",
+    name: { fr: "Earl Grey", en: "Earl Grey", es: "Earl Grey" },
+    description: {
+      fr: "Thé noir à la bergamote en pyramide, élégant.",
+      en: "Bergamot black tea in a pyramid, elegant.",
+      es: "Té negro a la bergamota en pirámide, elegante.",
+    },
+    typeKey: "blackTeaFlavored",
+    family: "Jaune",
+    colors: ["#ffe105", "#1d3c66"],
+    ink: "#3a2a00",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-red-fruits",
+    name: { fr: "Fruits Rouges", en: "Red Fruits", es: "Frutos Rojos" },
+    description: {
+      fr: "Thé noir et fruits rouges en pyramide.",
+      en: "Black tea and red fruits in a pyramid.",
+      es: "Té negro y frutos rojos en pirámide.",
+    },
+    typeKey: "blackTeaFlavored",
+    family: "Jaune",
+    colors: ["#ffe105", "#c8102e"],
+    ink: "#4a1206",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-lemon",
+    name: { fr: "Citron", en: "Lemon", es: "Limón" },
+    description: {
+      fr: "Thé noir et citron vif en pyramide.",
+      en: "Black tea and bright lemon in a pyramid.",
+      es: "Té negro y limón vivo en pirámide.",
+    },
+    typeKey: "blackTeaFlavored",
+    family: "Jaune",
+    colors: ["#ffe105", "#f5a623"],
+    ink: "#4a2a00",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-rooibos",
+    name: { fr: "Rooibos", en: "Rooibos", es: "Rooibos" },
+    description: {
+      fr: "Rooibos doux en pyramide, sans théine.",
+      en: "Smooth rooibos in a pyramid, caffeine-free.",
+      es: "Rooibos suave en pirámide, sin teína.",
+    },
+    typeKey: "rooibos",
+    family: "Ambre",
+    colors: ["#d9673a", "#9a2f16"],
+    ink: "#fff1e6",
+    caffeineFree: true,
+    pyramid: true,
+  },
+  {
+    id: "es-chamomile-linden",
+    name: { fr: "Camomille Tilleul", en: "Chamomile Linden", es: "Manzanilla Tilo" },
+    description: {
+      fr: "Camomille et tilleul en pyramide, apaisant.",
+      en: "Chamomile and linden in a pyramid, soothing.",
+      es: "Manzanilla y tilo en pirámide, calmante.",
+    },
+    typeKey: "infusion",
+    family: "Ambre",
+    colors: ["#f3d04a", "#cdbb3a"],
+    ink: "#4a3500",
+    caffeineFree: true,
+    pyramid: true,
+  },
+  {
+    id: "es-sencha",
+    name: { fr: "Thé Vert Sencha", en: "Sencha Green Tea", es: "Té Verde Sencha" },
+    description: {
+      fr: "Sencha japonais en pyramide, frais et herbacé.",
+      en: "Japanese sencha in a pyramid, fresh and grassy.",
+      es: "Sencha japonés en pirámide, fresco y herbáceo.",
+    },
+    typeKey: "greenTea",
+    family: "Vert",
+    colors: ["#8fce5a", "#2f7d3a"],
+    ink: "#0d2812",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-green-mandarin",
+    name: {
+      fr: "Thé Vert Mandarine Orange",
+      en: "Green Tea Mandarin Orange",
+      es: "Té Verde Mandarina Naranja",
+    },
+    description: {
+      fr: "Thé vert, mandarine et orange en pyramide.",
+      en: "Green tea, mandarin and orange in a pyramid.",
+      es: "Té verde, mandarina y naranja en pirámide.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#a8d44f", "#e08a2e"],
+    ink: "#13280c",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-mint-intense",
+    name: { fr: "Menthe Intense", en: "Intense Mint Green Tea", es: "Menta Intensa" },
+    description: {
+      fr: "Thé vert et menthe intense en pyramide.",
+      en: "Green tea and intense mint in a pyramid.",
+      es: "Té verde y menta intensa en pirámide.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#6cc85a", "#1f8a4c"],
+    ink: "#0d2e1b",
+    caffeineFree: false,
+    pyramid: true,
+  },
+  {
+    id: "es-mint-soft",
+    name: { fr: "Menthe Douce", en: "Sweet Mint", es: "Menta Suave" },
+    description: {
+      fr: "Infusion menthe douce en pyramide, fraîche.",
+      en: "Sweet mint infusion in a pyramid, fresh.",
+      es: "Infusión de menta suave en pirámide, fresca.",
+    },
+    typeKey: "infusion",
+    family: "Vert",
+    colors: ["#6cc89a", "#1f8a5a"],
+    ink: "#06291c",
+    caffeineFree: true,
+    pyramid: true,
   },
 ];
 
