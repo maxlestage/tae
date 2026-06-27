@@ -500,6 +500,23 @@ body {
   border: 1.5px solid;
 }
 
+.modal__ingredients {
+  margin: 0 0 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.95;
+}
+
+.modal__ing-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
 .modal__cert {
   display: flex;
   align-items: center;
