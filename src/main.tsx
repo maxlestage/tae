@@ -11,3 +11,12 @@ createRoot(root).render(
     <App />
   </StrictMode>,
 );
+
+// PWA : enregistre le service worker (hors-ligne + installable).
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {
+      /* ignoré */
+    });
+  });
+}
