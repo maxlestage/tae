@@ -128,12 +128,12 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* Vrai logo Lipton (image) dans le titre */
+/* Vrai logo Lipton (bandeau) dans le titre */
 .hero__logo {
-  height: 1.7em;
+  height: 1.15em;
   width: auto;
-  vertical-align: -0.5em;
-  margin-left: 0.05em;
+  vertical-align: -0.18em;
+  margin-left: 0.1em;
 }
 
 .hero__subtitle {
@@ -513,8 +513,8 @@ body {
 }
 
 .sachet__logo {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: auto;
   object-fit: contain;
 }
 
