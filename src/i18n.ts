@@ -41,6 +41,7 @@ export interface UiStrings {
   sortLabel: string;
   sortColour: string;
   sortIntensity: string;
+  sortMoment: string;
   country: string;
   footer: (count: number) => string;
   openAria: (name: string) => string;
@@ -81,6 +82,7 @@ export const UI: Record<Lang, UiStrings> = {
     sortLabel: "Trier par",
     sortColour: "Couleur",
     sortIntensity: "Intensité",
+    sortMoment: "Moment",
     country: "Gamme vendue en France",
     footer: (n) => `Fiches couleurs · ${n} sachets · React + Node`,
     openAria: (name) => `Ouvrir la fiche ${name}`,
@@ -119,6 +121,7 @@ export const UI: Record<Lang, UiStrings> = {
     sortLabel: "Sort by",
     sortColour: "Colour",
     sortIntensity: "Intensity",
+    sortMoment: "Time",
     country: "Range sold in France",
     footer: (n) => `Colour cards · ${n} tea bags · React + Node`,
     openAria: (name) => `Open the ${name} card`,
@@ -157,6 +160,7 @@ export const UI: Record<Lang, UiStrings> = {
     sortLabel: "Ordenar por",
     sortColour: "Color",
     sortIntensity: "Intensidad",
+    sortMoment: "Momento",
     country: "Gama vendida en Francia",
     footer: (n) => `Fichas de color · ${n} bolsitas · React + Node`,
     openAria: (name) => `Abrir la ficha ${name}`,

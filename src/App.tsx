@@ -483,10 +483,11 @@ function getInitialActive(): ColorFamily | "all" {
 }
 
 function getInitialSort(): SortMode {
-  return loadStored("tea-sort") === "intensity" ? "intensity" : "color";
+  const v = loadStored("tea-sort");
+  return v === "intensity" || v === "moment" ? v : "color";
 }
 
-type SortMode = "color" | "intensity";
+type SortMode = "color" | "intensity" | "moment";
 
 export function App() {
   const [active, setActive] = useState<ColorFamily | "all">(getInitialActive);
@@ -525,9 +526,15 @@ export function App() {
     [active],
   );
 
-  /** Sections affichées : par couleur (famille) ou par intensité (niveau 5→1). */
+  /** Sections affichées : par couleur, par intensité (5→1) ou par moment. */
   const sections = useMemo<
-    Array<{ key: string; family?: ColorFamily; level?: number; teas: TeaSachet[] }>
+    Array<{
+      key: string;
+      family?: ColorFamily;
+      level?: number;
+      moment?: "day" | "evening";
+      teas: TeaSachet[];
+    }>
   >(() => {
     if (sortMode === "color") {
       return FAMILY_ORDER.map((family) => ({
@@ -536,17 +543,39 @@ export function App() {
         teas: filtered.filter((x) => x.family === family),
       })).filter((g) => g.teas.length > 0);
     }
-    const levels = [5, 4, 3, 2, 1].map((level) => ({
-      key: `i${level}`,
-      level,
-      teas: filtered.filter((x) => !x.coffret && intensityValue(x) === level),
-    }));
-    const out = levels.filter((g) => g.teas.length > 0) as Array<{
+
+    type Section = {
       key: string;
       family?: ColorFamily;
       level?: number;
+      moment?: "day" | "evening";
       teas: TeaSachet[];
-    }>;
+    };
+    let out: Section[];
+
+    if (sortMode === "moment") {
+      out = [
+        {
+          key: "m-day",
+          moment: "day" as const,
+          teas: filtered.filter((x) => !x.coffret && !x.caffeineFree),
+        },
+        {
+          key: "m-evening",
+          moment: "evening" as const,
+          teas: filtered.filter((x) => !x.coffret && x.caffeineFree),
+        },
+      ].filter((g) => g.teas.length > 0);
+    } else {
+      out = [5, 4, 3, 2, 1]
+        .map((level) => ({
+          key: `i${level}`,
+          level,
+          teas: filtered.filter((x) => !x.coffret && intensityValue(x) === level),
+        }))
+        .filter((g) => g.teas.length > 0);
+    }
+
     const coffrets = filtered.filter((x) => x.coffret);
     if (coffrets.length > 0) {
       out.push({ key: "coffret", family: "Coffret", teas: coffrets });
@@ -633,6 +662,14 @@ export function App() {
             >
               {t.sortIntensity}
             </button>
+            <button
+              type="button"
+              className={`seg ${sortMode === "moment" ? "seg--on" : ""}`}
+              onClick={() => setSortMode("moment")}
+              aria-pressed={sortMode === "moment"}
+            >
+              {t.sortMoment}
+            </button>
           </div>
         </div>
       </header>
@@ -656,6 +693,15 @@ export function App() {
                     ))}
                   </span>
                   <h2 className="group__title">{t.intensityLabel}</h2>
+                </>
+              ) : group.moment !== undefined ? (
+                <>
+                  <span className="group__moment" aria-hidden="true">
+                    {group.moment === "day" ? "☀️" : "🌙"}
+                  </span>
+                  <h2 className="group__title">
+                    {group.moment === "day" ? t.momentDay : t.momentEvening}
+                  </h2>
                 </>
               ) : (
                 <>
