@@ -281,6 +281,24 @@ body {
   color: var(--bg);
 }
 
+/* Mobile : « Trier par » au-dessus, les 3 boutons sur toute la largeur. */
+@media (max-width: 540px) {
+  .sort {
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .sort__seg {
+    width: 100%;
+  }
+
+  .seg {
+    flex: 1;
+    padding: 0.5rem 0.4rem;
+    text-align: center;
+  }
+}
+
 /* Groupes */
 .group {
   margin-top: 2.5rem;
