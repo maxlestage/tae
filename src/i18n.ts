@@ -1,0 +1,155 @@
+import type { ColorFamily, Lang, TypeKey } from "./data.ts";
+
+export const LANGS: Lang[] = ["fr", "en", "es"];
+
+export const LANG_LABEL: Record<Lang, string> = {
+  fr: "FR",
+  en: "EN",
+  es: "ES",
+};
+
+export interface UiStrings {
+  kicker: string;
+  title: string;
+  subtitle: string;
+  all: string;
+  themeLight: string;
+  themeDark: string;
+  openCard: string;
+  close: string;
+  caffeinated: string;
+  caffeineFree: string;
+  colour: string;
+  caffeineLabel: string;
+  typeLabel: string;
+  gradient: string;
+  footer: (count: number) => string;
+  openAria: (name: string) => string;
+  langAria: string;
+}
+
+export const UI: Record<Lang, UiStrings> = {
+  fr: {
+    kicker: "Collection",
+    title: "Sachets de thé",
+    subtitle: "Triés par couleurs — clique sur un thé pour ouvrir sa fiche colorée.",
+    all: "Toutes",
+    themeLight: "Clair",
+    themeDark: "Sombre",
+    openCard: "Ouvrir la fiche →",
+    close: "Fermer",
+    caffeinated: "Théiné",
+    caffeineFree: "Sans théine",
+    colour: "Couleur",
+    caffeineLabel: "Théine",
+    typeLabel: "Type",
+    gradient: "Dégradé du thé",
+    footer: (n) => `Fiches couleurs · ${n} sachets · React + Node`,
+    openAria: (name) => `Ouvrir la fiche ${name}`,
+    langAria: "Choisir la langue",
+  },
+  en: {
+    kicker: "Collection",
+    title: "Tea bags",
+    subtitle: "Sorted by colour — click a tea to open its coloured card.",
+    all: "All",
+    themeLight: "Light",
+    themeDark: "Dark",
+    openCard: "Open card →",
+    close: "Close",
+    caffeinated: "Caffeinated",
+    caffeineFree: "Caffeine-free",
+    colour: "Colour",
+    caffeineLabel: "Caffeine",
+    typeLabel: "Type",
+    gradient: "Tea gradient",
+    footer: (n) => `Colour cards · ${n} tea bags · React + Node`,
+    openAria: (name) => `Open the ${name} card`,
+    langAria: "Choose language",
+  },
+  es: {
+    kicker: "Colección",
+    title: "Bolsitas de té",
+    subtitle: "Ordenados por color — haz clic en un té para abrir su ficha de color.",
+    all: "Todos",
+    themeLight: "Claro",
+    themeDark: "Oscuro",
+    openCard: "Abrir ficha →",
+    close: "Cerrar",
+    caffeinated: "Con teína",
+    caffeineFree: "Sin teína",
+    colour: "Color",
+    caffeineLabel: "Teína",
+    typeLabel: "Tipo",
+    gradient: "Degradado del té",
+    footer: (n) => `Fichas de color · ${n} bolsitas · React + Node`,
+    openAria: (name) => `Abrir la ficha ${name}`,
+    langAria: "Elegir idioma",
+  },
+};
+
+export const FAMILY_LABEL: Record<Lang, Record<ColorFamily, string>> = {
+  fr: {
+    Jaune: "Jaune",
+    Ambre: "Ambre",
+    Rouge: "Rouge",
+    Rose: "Rose",
+    Violet: "Violet",
+    Bleu: "Bleu",
+    Vert: "Vert",
+  },
+  en: {
+    Jaune: "Yellow",
+    Ambre: "Amber",
+    Rouge: "Red",
+    Rose: "Pink",
+    Violet: "Purple",
+    Bleu: "Blue",
+    Vert: "Green",
+  },
+  es: {
+    Jaune: "Amarillo",
+    Ambre: "Ámbar",
+    Rouge: "Rojo",
+    Rose: "Rosa",
+    Violet: "Morado",
+    Bleu: "Azul",
+    Vert: "Verde",
+  },
+};
+
+export const TYPE_LABEL: Record<Lang, Record<TypeKey, string>> = {
+  fr: {
+    blackTea: "Thé noir",
+    blackTeaFlavored: "Thé noir aromatisé",
+    blackTeaSpiced: "Thé noir épicé",
+    greenTea: "Thé vert",
+    greenTeaFlavored: "Thé vert aromatisé",
+    whiteTea: "Thé blanc",
+    rooibos: "Rooibos",
+    infusion: "Infusion",
+    infusionFruity: "Infusion fruitée",
+  },
+  en: {
+    blackTea: "Black tea",
+    blackTeaFlavored: "Flavoured black tea",
+    blackTeaSpiced: "Spiced black tea",
+    greenTea: "Green tea",
+    greenTeaFlavored: "Flavoured green tea",
+    whiteTea: "White tea",
+    rooibos: "Rooibos",
+    infusion: "Herbal infusion",
+    infusionFruity: "Fruit infusion",
+  },
+  es: {
+    blackTea: "Té negro",
+    blackTeaFlavored: "Té negro aromatizado",
+    blackTeaSpiced: "Té negro especiado",
+    greenTea: "Té verde",
+    greenTeaFlavored: "Té verde aromatizado",
+    whiteTea: "Té blanco",
+    rooibos: "Rooibos",
+    infusion: "Infusión",
+    infusionFruity: "Infusión de frutas",
+  },
+};
