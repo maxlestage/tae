@@ -225,9 +225,58 @@ body {
   );
 }
 
+/* Sélecteur de tri */
+.sort {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+}
+
+.sort__label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.sort__seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.seg {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.4rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.seg:hover {
+  color: var(--text);
+}
+
+.seg--on {
+  background: var(--text);
+  color: var(--bg);
+}
+
 /* Groupes */
 .group {
   margin-top: 2.5rem;
+}
+
+.group__dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--text);
 }
 
 .group__head {
