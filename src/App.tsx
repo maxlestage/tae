@@ -84,6 +84,11 @@ function TeaCard({
           ✦ Exclusive Selection
         </span>
       )}
+      {tea.coldBrew && (
+        <span className="card__line" style={{ borderColor: tea.ink }}>
+          ❄ Infuse à froid
+        </span>
+      )}
       <h3 className="card__name">{tea.name[lang]}</h3>
       <p className="card__desc">{tea.description[lang]}</p>
 
@@ -140,6 +145,9 @@ function TeaModal({
             <span className="card__type">{TYPE_LABEL[lang][tea.typeKey]}</span>
             {tea.pyramid && (
               <span className="modal__line">✦ Exclusive Selection</span>
+            )}
+            {tea.coldBrew && (
+              <span className="modal__line">❄ Infuse à froid</span>
             )}
             <h2 className="modal__name">{tea.name[lang]}</h2>
           </div>
