@@ -69,6 +69,52 @@ function momentValue(tea: TeaSachet, t: UiStrings): string {
   return tea.caffeineFree ? t.momentEvening : t.momentDay;
 }
 
+/** Ajustements d'intensité pour des références marquantes (sinon dérivé du type). */
+const INTENSITY_OVERRIDE: Record<string, number> = {
+  "yellow-label": 4,
+  "extra-bold": 5,
+  intense: 5,
+  "english-breakfast": 4,
+  darjeeling: 3,
+  "decaf-black": 3,
+  matcha: 4,
+  "matcha-japan": 4,
+  sencha: 2,
+  "es-sencha": 2,
+  "white-tea": 1,
+  "green-mint-intense": 3,
+  "es-mint-intense": 3,
+  "moroccan-mint": 3,
+  peppermint: 3,
+  ginger: 3,
+  "lemon-ginger": 3,
+  chai: 4,
+};
+
+/** Intensité 1–5 ; 0 = non applicable (coffret). */
+function intensityValue(tea: TeaSachet): number {
+  if (tea.coffret) return 0;
+  if (tea.intensity) return tea.intensity;
+  if (INTENSITY_OVERRIDE[tea.id]) return INTENSITY_OVERRIDE[tea.id];
+  switch (tea.typeKey) {
+    case "blackTea":
+    case "blackTeaSpiced":
+      return 4;
+    case "blackTeaFlavored":
+      return 3;
+    case "greenTea":
+    case "greenTeaFlavored":
+    case "rooibos":
+    case "infusion":
+    case "infusionFruity":
+      return 2;
+    case "whiteTea":
+      return 1;
+    default:
+      return 2;
+  }
+}
+
 /** Logo Lipton aux vraies couleurs : bandeau rouge + texte blanc sur champ jaune. */
 function LiptonLogo({ className = "" }: { className?: string }) {
   return (
@@ -243,6 +289,23 @@ function TeaModal({
             <div className="fact">
               <dt>{t.brewLabel}</dt>
               <dd>{brewInfo(tea, t)}</dd>
+            </div>
+          )}
+          {intensityValue(tea) > 0 && (
+            <div className="fact">
+              <dt>{t.intensityLabel}</dt>
+              <dd className="intensity" aria-label={`${intensityValue(tea)}/5`}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className="intensity__dot"
+                    style={{
+                      background: i <= intensityValue(tea) ? tea.ink : "transparent",
+                      borderColor: tea.ink,
+                    }}
+                  />
+                ))}
+              </dd>
             </div>
           )}
         </dl>

@@ -26,6 +26,7 @@ export interface UiStrings {
   formatLabel: string;
   brewLabel: string;
   momentLabel: string;
+  intensityLabel: string;
   certificationLabel: string;
   certificationValue: string;
   momentDay: string;
@@ -60,6 +61,7 @@ export const UI: Record<Lang, UiStrings> = {
     formatLabel: "Format",
     brewLabel: "Infusion",
     momentLabel: "Moment",
+    intensityLabel: "Intensité",
     certificationLabel: "Certification",
     certificationValue: "Rainforest Alliance",
     momentDay: "Matin & journée",
@@ -92,6 +94,7 @@ export const UI: Record<Lang, UiStrings> = {
     formatLabel: "Format",
     brewLabel: "Brewing",
     momentLabel: "Time of day",
+    intensityLabel: "Intensity",
     certificationLabel: "Certification",
     certificationValue: "Rainforest Alliance",
     momentDay: "Morning & day",
@@ -124,6 +127,7 @@ export const UI: Record<Lang, UiStrings> = {
     formatLabel: "Formato",
     brewLabel: "Infusión",
     momentLabel: "Momento",
+    intensityLabel: "Intensidad",
     certificationLabel: "Certificación",
     certificationValue: "Rainforest Alliance",
     momentDay: "Mañana y día",

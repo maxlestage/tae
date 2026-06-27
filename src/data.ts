@@ -45,6 +45,8 @@ export interface TeaSachet {
   coffret?: boolean;
   /** Édition limitée / saisonnière */
   limited?: boolean;
+  /** Intensité 1–5 (sinon dérivée du type de thé) */
+  intensity?: number;
 }
 
 /**
