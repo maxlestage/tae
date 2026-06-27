@@ -293,6 +293,11 @@ body {
   color: var(--text);
 }
 
+.group__moment {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .group__head {
   display: flex;
   align-items: center;
