@@ -4,8 +4,17 @@ import {
   FAMILY_ORDER,
   FAMILY_SWATCH,
   type ColorFamily,
+  type Lang,
   type TeaSachet,
 } from "./data.ts";
+import {
+  UI,
+  LANGS,
+  LANG_LABEL,
+  FAMILY_LABEL,
+  TYPE_LABEL,
+  type UiStrings,
+} from "./i18n.ts";
 
 /**
  * Dégradé fidèle aux boîtes : la couleur dominante (boîte) occupe l'essentiel
@@ -41,9 +50,13 @@ function Sachet({ tea }: { tea: TeaSachet }) {
 
 function TeaCard({
   tea,
+  lang,
+  t,
   onOpen,
 }: {
   tea: TeaSachet;
+  lang: Lang;
+  t: UiStrings;
   onOpen: (tea: TeaSachet) => void;
 }) {
   return (
@@ -52,25 +65,25 @@ function TeaCard({
       className="card"
       style={{ background: teaGradient(tea.colors), color: tea.ink }}
       onClick={() => onOpen(tea)}
-      aria-label={`Ouvrir la fiche ${tea.name}`}
+      aria-label={t.openAria(tea.name[lang])}
     >
       <div className="card__top">
-        <span className="card__type">{tea.type}</span>
+        <span className="card__type">{TYPE_LABEL[lang][tea.typeKey]}</span>
         <span
           className="card__caffeine"
           style={{ borderColor: tea.ink, color: tea.ink }}
         >
-          {tea.caffeine}
+          {tea.caffeineFree ? t.caffeineFree : t.caffeinated}
         </span>
       </div>
 
       <Sachet tea={tea} />
 
-      <h3 className="card__name">{tea.name}</h3>
-      <p className="card__desc">{tea.description}</p>
+      <h3 className="card__name">{tea.name[lang]}</h3>
+      <p className="card__desc">{tea.description[lang]}</p>
 
       <span className="card__open" style={{ borderColor: tea.ink }}>
-        Ouvrir la fiche →
+        {t.openCard}
       </span>
     </button>
   );
@@ -78,9 +91,13 @@ function TeaCard({
 
 function TeaModal({
   tea,
+  lang,
+  t,
   onClose,
 }: {
   tea: TeaSachet;
+  lang: Lang;
+  t: UiStrings;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -107,7 +124,7 @@ function TeaModal({
           className="modal__close"
           style={{ color: tea.ink, borderColor: tea.ink }}
           onClick={onClose}
-          aria-label="Fermer"
+          aria-label={t.close}
         >
           ✕
         </button>
@@ -115,30 +132,30 @@ function TeaModal({
         <div className="modal__head">
           <Sachet tea={tea} />
           <div>
-            <span className="card__type">{tea.type}</span>
-            <h2 className="modal__name">{tea.name}</h2>
+            <span className="card__type">{TYPE_LABEL[lang][tea.typeKey]}</span>
+            <h2 className="modal__name">{tea.name[lang]}</h2>
           </div>
         </div>
 
-        <p className="modal__desc">{tea.description}</p>
+        <p className="modal__desc">{tea.description[lang]}</p>
 
         <dl className="modal__facts">
           <div className="fact">
-            <dt>Couleur</dt>
-            <dd>{tea.family}</dd>
+            <dt>{t.colour}</dt>
+            <dd>{FAMILY_LABEL[lang][tea.family]}</dd>
           </div>
           <div className="fact">
-            <dt>Théine</dt>
-            <dd>{tea.caffeine}</dd>
+            <dt>{t.caffeineLabel}</dt>
+            <dd>{tea.caffeineFree ? t.caffeineFree : t.caffeinated}</dd>
           </div>
           <div className="fact">
-            <dt>Type</dt>
-            <dd>{tea.type}</dd>
+            <dt>{t.typeLabel}</dt>
+            <dd>{TYPE_LABEL[lang][tea.typeKey]}</dd>
           </div>
         </dl>
 
         <div className="modal__palette">
-          <span className="modal__palette-label">Dégradé du thé</span>
+          <span className="modal__palette-label">{t.gradient}</span>
           <div className="modal__swatches">
             {tea.colors.map((c) => (
               <div key={c} className="modal__swatch">
@@ -163,15 +180,30 @@ function getInitialTheme(): Theme {
     : "dark";
 }
 
+function getInitialLang(): Lang {
+  const saved = localStorage.getItem("tea-lang");
+  if (saved === "fr" || saved === "en" || saved === "es") return saved;
+  const nav = navigator.language.slice(0, 2);
+  return nav === "en" || nav === "es" ? nav : "fr";
+}
+
 export function App() {
-  const [active, setActive] = useState<ColorFamily | "Toutes">("Toutes");
+  const [active, setActive] = useState<ColorFamily | "all">("all");
   const [selected, setSelected] = useState<TeaSachet | null>(null);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [lang, setLang] = useState<Lang>(getInitialLang);
+
+  const t = UI[lang];
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("tea-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    localStorage.setItem("tea-lang", lang);
+  }, [lang]);
 
   const groups = useMemo(() => {
     return FAMILY_ORDER.map((family) => ({
@@ -181,37 +213,48 @@ export function App() {
   }, []);
 
   const visibleGroups =
-    active === "Toutes" ? groups : groups.filter((g) => g.family === active);
+    active === "all" ? groups : groups.filter((g) => g.family === active);
 
   return (
     <div className="page">
-      <button
-        type="button"
-        className="theme-toggle"
-        onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-        aria-label={
-          theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"
-        }
-      >
-        {theme === "dark" ? "☀️ Clair" : "🌙 Sombre"}
-      </button>
+      <div className="toolbar">
+        <div className="lang-switch" role="group" aria-label={t.langAria}>
+          {LANGS.map((l) => (
+            <button
+              key={l}
+              type="button"
+              className={`lang ${lang === l ? "lang--on" : ""}`}
+              onClick={() => setLang(l)}
+              aria-pressed={lang === l}
+            >
+              {LANG_LABEL[l]}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={() => setTheme((x) => (x === "dark" ? "light" : "dark"))}
+          aria-label={theme === "dark" ? t.themeLight : t.themeDark}
+        >
+          {theme === "dark" ? `☀️ ${t.themeLight}` : `🌙 ${t.themeDark}`}
+        </button>
+      </div>
 
       <header className="hero">
-        <p className="hero__kicker">Collection</p>
+        <p className="hero__kicker">{t.kicker}</p>
         <h1 className="hero__title">
-          Sachets de thé <LiptonLogo className="lipton-logo--hero" />
+          {t.title} <LiptonLogo className="lipton-logo--hero" />
         </h1>
-        <p className="hero__subtitle">
-          Triés par couleurs — clique sur un thé pour ouvrir sa fiche colorée.
-        </p>
+        <p className="hero__subtitle">{t.subtitle}</p>
 
         <nav className="filters">
           <button
-            className={`chip ${active === "Toutes" ? "chip--on" : ""}`}
-            onClick={() => setActive("Toutes")}
+            className={`chip ${active === "all" ? "chip--on" : ""}`}
+            onClick={() => setActive("all")}
           >
             <span className="chip__dot chip__dot--all" />
-            Toutes ({TEAS.length})
+            {t.all} ({TEAS.length})
           </button>
           {FAMILY_ORDER.map((family) => (
             <button
@@ -223,7 +266,7 @@ export function App() {
                 className="chip__dot"
                 style={{ background: FAMILY_SWATCH[family] }}
               />
-              {family}
+              {FAMILY_LABEL[lang][family]}
             </button>
           ))}
         </nav>
@@ -237,24 +280,33 @@ export function App() {
                 className="group__dot"
                 style={{ background: FAMILY_SWATCH[group.family] }}
               />
-              <h2 className="group__title">{group.family}</h2>
+              <h2 className="group__title">{FAMILY_LABEL[lang][group.family]}</h2>
               <span className="group__count">{group.teas.length}</span>
             </div>
             <div className="grid">
               {group.teas.map((tea) => (
-                <TeaCard key={tea.id} tea={tea} onOpen={setSelected} />
+                <TeaCard
+                  key={tea.id}
+                  tea={tea}
+                  lang={lang}
+                  t={t}
+                  onOpen={setSelected}
+                />
               ))}
             </div>
           </section>
         ))}
       </main>
 
-      <footer className="footer">
-        Fiches couleurs · {TEAS.length} sachets · React + Node
-      </footer>
+      <footer className="footer">{t.footer(TEAS.length)}</footer>
 
       {selected && (
-        <TeaModal tea={selected} onClose={() => setSelected(null)} />
+        <TeaModal
+          tea={selected}
+          lang={lang}
+          t={t}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );
