@@ -79,6 +79,11 @@ function TeaCard({
 
       <Sachet tea={tea} />
 
+      {tea.pyramid && (
+        <span className="card__line" style={{ borderColor: tea.ink }}>
+          ✦ Exclusive Selection
+        </span>
+      )}
       <h3 className="card__name">{tea.name[lang]}</h3>
       <p className="card__desc">{tea.description[lang]}</p>
 
@@ -133,6 +138,9 @@ function TeaModal({
           <Sachet tea={tea} />
           <div>
             <span className="card__type">{TYPE_LABEL[lang][tea.typeKey]}</span>
+            {tea.pyramid && (
+              <span className="modal__line">✦ Exclusive Selection</span>
+            )}
             <h2 className="modal__name">{tea.name[lang]}</h2>
           </div>
         </div>
