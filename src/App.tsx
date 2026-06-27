@@ -28,6 +28,14 @@ function teaGradient([from, to]: [string, string]): string {
   ].join(", ");
 }
 
+/** Dégradé arc-en-ciel pour un coffret (assortiment de plusieurs parfums). */
+function coffretGradient(): string {
+  return [
+    "radial-gradient(120% 100% at 12% 8%, rgba(255,255,255,0.12) 0%, transparent 45%)",
+    "linear-gradient(160deg, #1b1f27 0%, #222733 52%, #ffe105 62%, #e08a2e 72%, #d81b3f 80%, #7b2d8e 90%, #2e9e4f 100%)",
+  ].join(", ");
+}
+
 /** Logo Lipton aux vraies couleurs : bandeau rouge + texte blanc sur champ jaune. */
 function LiptonLogo({ className = "" }: { className?: string }) {
   return (
@@ -63,18 +71,23 @@ function TeaCard({
     <button
       type="button"
       className="card"
-      style={{ background: teaGradient(tea.colors), color: tea.ink }}
+      style={{
+        background: tea.coffret ? coffretGradient() : teaGradient(tea.colors),
+        color: tea.ink,
+      }}
       onClick={() => onOpen(tea)}
       aria-label={t.openAria(tea.name[lang])}
     >
       <div className="card__top">
         <span className="card__type">{TYPE_LABEL[lang][tea.typeKey]}</span>
-        <span
-          className="card__caffeine"
-          style={{ borderColor: tea.ink, color: tea.ink }}
-        >
-          {tea.caffeineFree ? t.caffeineFree : t.caffeinated}
-        </span>
+        {!tea.coffret && (
+          <span
+            className="card__caffeine"
+            style={{ borderColor: tea.ink, color: tea.ink }}
+          >
+            {tea.caffeineFree ? t.caffeineFree : t.caffeinated}
+          </span>
+        )}
       </div>
 
       <Sachet tea={tea} />
@@ -126,7 +139,10 @@ function TeaModal({
     <div className="modal" role="dialog" aria-modal="true" onClick={onClose}>
       <div
         className="modal__card"
-        style={{ background: teaGradient(tea.colors), color: tea.ink }}
+        style={{
+          background: tea.coffret ? coffretGradient() : teaGradient(tea.colors),
+          color: tea.ink,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -284,8 +300,8 @@ export function App() {
               onClick={() => setActive(family)}
             >
               <span
-                className="chip__dot"
-                style={{ background: FAMILY_SWATCH[family] }}
+                className={`chip__dot ${family === "Coffret" ? "chip__dot--all" : ""}`}
+                style={family === "Coffret" ? undefined : { background: FAMILY_SWATCH[family] }}
               />
               {FAMILY_LABEL[lang][family]}
             </button>
@@ -298,8 +314,12 @@ export function App() {
           <section key={group.family} className="group">
             <div className="group__head">
               <span
-                className="group__dot"
-                style={{ background: FAMILY_SWATCH[group.family] }}
+                className={`group__dot ${group.family === "Coffret" ? "chip__dot--all" : ""}`}
+                style={
+                  group.family === "Coffret"
+                    ? undefined
+                    : { background: FAMILY_SWATCH[group.family] }
+                }
               />
               <h2 className="group__title">{FAMILY_LABEL[lang][group.family]}</h2>
               <span className="group__count">{group.teas.length}</span>

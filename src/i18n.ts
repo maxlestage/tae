@@ -97,6 +97,7 @@ export const FAMILY_LABEL: Record<Lang, Record<ColorFamily, string>> = {
     Violet: "Violet",
     Bleu: "Bleu",
     Vert: "Vert",
+    Coffret: "Coffrets",
   },
   en: {
     Jaune: "Yellow",
@@ -106,6 +107,7 @@ export const FAMILY_LABEL: Record<Lang, Record<ColorFamily, string>> = {
     Violet: "Purple",
     Bleu: "Blue",
     Vert: "Green",
+    Coffret: "Gift Sets",
   },
   es: {
     Jaune: "Amarillo",
@@ -115,6 +117,7 @@ export const FAMILY_LABEL: Record<Lang, Record<ColorFamily, string>> = {
     Violet: "Morado",
     Bleu: "Azul",
     Vert: "Verde",
+    Coffret: "Estuches",
   },
 };
 
@@ -129,6 +132,7 @@ export const TYPE_LABEL: Record<Lang, Record<TypeKey, string>> = {
     rooibos: "Rooibos",
     infusion: "Infusion",
     infusionFruity: "Infusion fruitée",
+    coffret: "Coffret",
   },
   en: {
     blackTea: "Black tea",
@@ -140,6 +144,7 @@ export const TYPE_LABEL: Record<Lang, Record<TypeKey, string>> = {
     rooibos: "Rooibos",
     infusion: "Herbal infusion",
     infusionFruity: "Fruit infusion",
+    coffret: "Gift set",
   },
   es: {
     blackTea: "Té negro",
@@ -151,5 +156,6 @@ export const TYPE_LABEL: Record<Lang, Record<TypeKey, string>> = {
     rooibos: "Rooibos",
     infusion: "Infusión",
     infusionFruity: "Infusión de frutas",
+    coffret: "Estuche",
   },
 };
