@@ -1006,6 +1006,104 @@ export const TEAS: TeaSachet[] = [
     pyramid: true,
   },
 
+  // === Vert + Ambre — références FR supplémentaires ===
+  {
+    id: "green-mango-apricot",
+    name: {
+      fr: "Thé Vert Mangue Abricot",
+      en: "Green Tea Mango Apricot",
+      es: "Té Verde Mango Albaricoque",
+    },
+    description: {
+      fr: "Thé vert, mangue et abricot, fruité et doux.",
+      en: "Green tea, mango and apricot, fruity and soft.",
+      es: "Té verde, mango y albaricoque, afrutado y suave.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#a6d45a", "#e0a93f"],
+    ink: "#13280c",
+    caffeineFree: false,
+  },
+  {
+    id: "green-tchae",
+    name: { fr: "Thé Vert Tchaé", en: "Tchaé Green Tea", es: "Té Verde Tchaé" },
+    description: {
+      fr: "Thé vert Tchaé, mélange signature doux.",
+      en: "Tchaé green tea, a smooth signature blend.",
+      es: "Té verde Tchaé, mezcla signature suave.",
+    },
+    typeKey: "greenTea",
+    family: "Vert",
+    colors: ["#7cc243", "#2f8a3a"],
+    ink: "#0d2e12",
+    caffeineFree: false,
+  },
+  {
+    id: "green-marrakech-mint-bio",
+    name: {
+      fr: "Thé Vert Menthe Marrakech Bio",
+      en: "Organic Marrakech Mint Green Tea",
+      es: "Té Verde Menta Marrakech Bio",
+    },
+    description: {
+      fr: "Thé vert bio et menthe de Marrakech.",
+      en: "Organic green tea and Marrakech mint.",
+      es: "Té verde bio y menta de Marrakech.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#86d35a", "#1f8a4c"],
+    ink: "#0d2e1b",
+    caffeineFree: false,
+  },
+  {
+    id: "green-tropical",
+    name: { fr: "Thé Vert Tropical", en: "Tropical Green Tea", es: "Té Verde Tropical" },
+    description: {
+      fr: "Thé vert et fruits exotiques, doux et estival.",
+      en: "Green tea and exotic fruits, soft and summery.",
+      es: "Té verde y frutas exóticas, suave y veraniego.",
+    },
+    typeKey: "greenTeaFlavored",
+    family: "Vert",
+    colors: ["#9ad36a", "#e0a93f"],
+    ink: "#13280c",
+    caffeineFree: false,
+  },
+  {
+    id: "organic-lemon-ginger",
+    name: {
+      fr: "Infusion Bio Citron Gingembre",
+      en: "Organic Lemon Ginger Infusion",
+      es: "Infusión Bio Limón Jengibre",
+    },
+    description: {
+      fr: "Citronnelle, gingembre et menthe, infusion bio.",
+      en: "Lemongrass, ginger and mint, organic infusion.",
+      es: "Hierba limón, jengibre y menta, infusión bio.",
+    },
+    typeKey: "infusion",
+    family: "Ambre",
+    colors: ["#e8c24a", "#bf8a2e"],
+    ink: "#4a3500",
+    caffeineFree: true,
+  },
+  {
+    id: "rooibos-vanilla",
+    name: { fr: "Rooibos Vanille", en: "Vanilla Rooibos", es: "Rooibos Vainilla" },
+    description: {
+      fr: "Rooibos et vanille douce, rond et sans théine.",
+      en: "Rooibos and sweet vanilla, round and caffeine-free.",
+      es: "Rooibos y vainilla dulce, redondo y sin teína.",
+    },
+    typeKey: "rooibos",
+    family: "Ambre",
+    colors: ["#d9673a", "#9a4a16"],
+    ink: "#fff1e6",
+    caffeineFree: true,
+  },
+
   // === Coffrets / assortiments ===
   {
     id: "coffret-advent",
