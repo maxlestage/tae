@@ -341,6 +341,7 @@ function TeaModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="modal__scroll">
         <div className="modal__head">
           <Sachet tea={tea} />
           <div>
@@ -436,6 +437,7 @@ function TeaModal({
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </div>
