@@ -431,6 +431,11 @@ body {
   pointer-events: none;
 }
 
+/* Fiche produit : même papier tourné à 90° pour varier l'orientation du grain. */
+.modal__card::before {
+  background-image: url("/paper-emboss-90.png");
+}
+
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
