@@ -414,8 +414,9 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Effet papier froissé (vraie texture) — uniquement sur les sachets (cartes) */
-.card::before {
+/* Effet papier froissé (vraie texture) — sur les cartes-sachets et la fiche */
+.card::before,
+.modal__card::before {
   content: "";
   position: absolute;
   inset: 0;
