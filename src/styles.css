@@ -400,6 +400,9 @@ body {
 /* Carte */
 .card {
   position: relative;
+  /* isole le mix-blend-mode du papier froissé pour qu'il ne se mélange
+     qu'avec la carte (et pas l'arrière-plan) — corrige le rendu sur iOS. */
+  isolation: isolate;
   border: none;
   text-align: left;
   font: inherit;
@@ -566,6 +569,7 @@ body {
 
 .modal__card {
   position: relative;
+  isolation: isolate;
   width: min(460px, 100%);
   /* La carte défile en interne quand elle dépasse l'écran ; l'overlay, lui,
      ne bouge pas — la croix fixée reste donc toujours en place. */
