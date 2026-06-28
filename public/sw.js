@@ -1,11 +1,12 @@
 /* Service worker — Lipton · Sachets de thé (PWA) */
-const CACHE = "lipton-v4";
+const CACHE = "lipton-v5";
 const ASSETS = [
   "/",
   "/index.html",
   "/main.js",
   "/main.css",
   "/paper-emboss.png",
+  "/paper-emboss-90.png",
   "/lipton-logo.png",
   "/favicon.svg",
   "/manifest.webmanifest",
