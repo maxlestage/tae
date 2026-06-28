@@ -431,15 +431,14 @@ body {
   pointer-events: none;
 }
 
-/* Fiche produit : même papier tourné à 90°, mais répété en petit grain et très
-   atténué — sur cette grande surface, « cover » étirerait la texture en énormes
-   taches qui masquent les couleurs. */
+/* Fiche produit : papier tourné à 90°, fixé sur toute la carte (le contenu
+   défile par-dessus) et très atténué — grain fin, uniforme, sans zone vide. */
 .modal__card::before {
   background-image: url("/paper-emboss-90.png");
   background-size: 380px auto;
   background-repeat: repeat;
   background-position: top center;
-  opacity: 0.32;
+  opacity: 0.2;
 }
 
 .card:hover {
@@ -580,17 +579,28 @@ body {
 .modal__card {
   position: relative;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
   width: min(460px, 100%);
-  /* La carte défile en interne quand elle dépasse l'écran ; l'overlay, lui,
-     ne bouge pas — la croix fixée reste donc toujours en place. */
+  /* La carte elle-même ne défile pas : la texture (::before) reste donc fixe et
+     couvre toute la fiche, sans laisser de zone sans effet. C'est le contenu
+     (.modal__scroll) qui défile par-dessus. */
   max-height: calc(100dvh - 2rem);
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  animation: pop 0.2s ease;
+}
+
+/* Couche de contenu qui défile au-dessus de la texture fixe. */
+.modal__scroll {
+  position: relative;
+  z-index: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  border-radius: 24px;
+  min-height: 0;
   padding: 1.75rem 1.5rem;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
-  animation: pop 0.2s ease;
 }
 
 /* Croix fixée à l'écran : reste en place quand la fiche défile.
