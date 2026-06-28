@@ -431,9 +431,15 @@ body {
   pointer-events: none;
 }
 
-/* Fiche produit : même papier tourné à 90° pour varier l'orientation du grain. */
+/* Fiche produit : même papier tourné à 90°, mais répété en petit grain et très
+   atténué — sur cette grande surface, « cover » étirerait la texture en énormes
+   taches qui masquent les couleurs. */
 .modal__card::before {
   background-image: url("/paper-emboss-90.png");
+  background-size: 380px auto;
+  background-repeat: repeat;
+  background-position: top center;
+  opacity: 0.32;
 }
 
 .card:hover {
