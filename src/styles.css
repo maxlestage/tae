@@ -431,15 +431,10 @@ body {
   pointer-events: none;
 }
 
-/* Fiche produit : papier tourné à 90°, fixé sur toute la carte (le contenu
-   défile par-dessus) et très atténué — grain fin, uniforme, sans zone vide. */
-.modal__card::before {
-  background-image: url("/paper-emboss-90.png");
-  background-size: 380px auto;
-  background-repeat: repeat;
-  background-position: top center;
-  opacity: 0.2;
-}
+/* La fiche produit utilise exactement le même effet froissé que les sachets.
+   La texture est fixée sur la carte (qui ne défile pas) : elle couvre donc
+   toute la fiche sans laisser de zone sans effet, et le contenu défile
+   par-dessus (.modal__scroll). */
 
 .card:hover {
   transform: translateY(-4px);
