@@ -424,8 +424,8 @@ body {
   background-size: cover;
   background-position: center;
   mix-blend-mode: multiply;
-  opacity: 1;
-  filter: contrast(1.4) brightness(0.92);
+  opacity: 0.5;
+  filter: contrast(1.15);
   pointer-events: none;
 }
 
