@@ -579,12 +579,11 @@ body {
 .modal__card {
   position: relative;
   isolation: isolate;
-  display: flex;
-  flex-direction: column;
   width: min(460px, 100%);
   /* La carte elle-même ne défile pas : la texture (::before) reste donc fixe et
      couvre toute la fiche, sans laisser de zone sans effet. C'est le contenu
-     (.modal__scroll) qui défile par-dessus. */
+     (.modal__scroll) qui défile par-dessus. La hauteur de la carte épouse celle
+     du contenu défilant (même max-height), donc la texture couvre tout. */
   max-height: calc(100dvh - 2rem);
   overflow: hidden;
   border-radius: 24px;
@@ -592,14 +591,17 @@ body {
   animation: pop 0.2s ease;
 }
 
-/* Couche de contenu qui défile au-dessus de la texture fixe. */
+/* Couche de contenu qui défile au-dessus de la texture fixe.
+   On lui donne directement la même max-height (plutôt que de compter sur
+   flex-shrink) : iOS Safari ne déclenche le défilement de façon fiable que
+   lorsque l'élément a une contrainte de hauteur explicite. */
 .modal__scroll {
   position: relative;
   z-index: 1;
+  max-height: calc(100dvh - 2rem);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  min-height: 0;
   padding: 1.75rem 1.5rem;
 }
 
