@@ -422,8 +422,9 @@ body {
   background-image: url("/paper.jpg");
   background-size: cover;
   background-position: center;
-  mix-blend-mode: overlay;
-  opacity: 0.85;
+  mix-blend-mode: multiply;
+  opacity: 1;
+  filter: contrast(1.4) brightness(0.92);
   pointer-events: none;
 }
 
