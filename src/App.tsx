@@ -18,15 +18,26 @@ import {
   type UiStrings,
 } from "./i18n.ts";
 
+/** Éclaircit une couleur hex vers le blanc (0–1). */
+function lighten(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
 /**
- * Dégradé fidèle aux boîtes : la couleur dominante (boîte) occupe l'essentiel
- * de la carte, l'accent (bandeau / logo) n'apparaît qu'en bas à droite.
+ * Dégradé à 3 couleurs fidèle aux boîtes : reflet clair (haut gauche) →
+ * couleur dominante de la boîte → accent du parfum (bas droite).
  */
 function teaGradient([from, to]: [string, string]): string {
+  const hi = lighten(from, 0.32);
   return [
-    `radial-gradient(140% 110% at 18% 10%, ${from} 0%, ${from} 45%, transparent 75%)`,
-    `radial-gradient(115% 130% at 92% 108%, ${to} 0%, ${to} 30%, transparent 62%)`,
-    `linear-gradient(150deg, ${from} 0%, ${from} 58%, ${to} 100%)`,
+    `radial-gradient(130% 100% at 16% 8%, ${hi} 0%, transparent 50%)`,
+    `radial-gradient(115% 130% at 92% 108%, ${to} 0%, ${to} 28%, transparent 62%)`,
+    `linear-gradient(150deg, ${hi} 0%, ${from} 32%, ${from} 60%, ${to} 100%)`,
   ].join(", ");
 }
 
