@@ -58,7 +58,7 @@ const options = {
   jsx: "automatic",
   loader: { ".css": "css" },
   // Assets publics servis au runtime (pas résolus au build).
-  external: ["/paper.jpg", "/paper-emboss.png"],
+  external: ["/paper-emboss.png", "/paper-emboss-90.png"],
   outdir: "dist",
   entryNames: "[name]",
   logLevel: "info",
