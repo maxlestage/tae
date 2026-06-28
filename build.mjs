@@ -57,6 +57,8 @@ const options = {
   format: "esm",
   jsx: "automatic",
   loader: { ".css": "css" },
+  // /paper.jpg est servi au runtime (asset public), pas résolu au build.
+  external: ["/paper.jpg"],
   outdir: "dist",
   entryNames: "[name]",
   logLevel: "info",
