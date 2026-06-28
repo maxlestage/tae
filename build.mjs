@@ -57,8 +57,8 @@ const options = {
   format: "esm",
   jsx: "automatic",
   loader: { ".css": "css" },
-  // /paper.jpg est servi au runtime (asset public), pas résolu au build.
-  external: ["/paper.jpg"],
+  // Assets publics servis au runtime (pas résolus au build).
+  external: ["/paper.jpg", "/paper-emboss.png"],
   outdir: "dist",
   entryNames: "[name]",
   logLevel: "info",
