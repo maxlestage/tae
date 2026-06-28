@@ -417,18 +417,17 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Effet papier froissé (vraie texture) — sur les cartes-sachets et la fiche */
+/* Effet papier froissé — texture pré-calculée en transparence (ombres + reliefs),
+   compositing normal (sans mix-blend-mode) → rendu fiable sur tous les mobiles. */
 .card::before,
 .modal__card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("/paper.jpg");
+  background-image: url("/paper-emboss.png");
   background-size: cover;
   background-position: center;
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-  filter: contrast(1.15);
+  opacity: 0.85;
   pointer-events: none;
 }
 
