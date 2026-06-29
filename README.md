@@ -61,9 +61,17 @@ tout le catalogue. Les données sont générées au build depuis `src/data.ts`
 - `caffeineFree`, `pyramid`, `coldBrew`, `coffret`, `limited` — `true` / `false`
 - `lang` — `fr` | `en` | `es` : aplatit `name`/`description` dans cette langue
 
+**Tri, pagination & format** :
+
+- `sort` — `id` | `name` | `family` | `type` ; `order` — `asc` (défaut) | `desc`
+- `limit`, `offset` — entiers ≥ 0 ; la réponse JSON inclut `total`, `count`, `offset`, `limit`
+- `format` — `json` (défaut) | `csv` (export tableur, aussi dispo sur `/api/teas/:id`)
+
 ```bash
-curl https://<app>.herokuapp.com/api/teas?family=Vert&lang=en
-curl https://<app>.herokuapp.com/api/teas/english-breakfast
+curl "https://<app>.herokuapp.com/api/teas?family=Vert&lang=en"
+curl "https://<app>.herokuapp.com/api/teas?sort=name&order=desc&limit=10"
+curl "https://<app>.herokuapp.com/api/teas?format=csv" -o sachets.csv
+curl "https://<app>.herokuapp.com/api/teas/english-breakfast"
 ```
 
 ## Structure
