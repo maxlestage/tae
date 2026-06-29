@@ -417,7 +417,7 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Effet papier froissé — texture pré-calculée en transparence (ombres + reliefs),
+/* Effet toile tissée — texture pré-calculée en transparence (ombres + reliefs),
    compositing normal (sans mix-blend-mode) → rendu fiable sur tous les mobiles. */
 .card::before,
 .modal__card::before {
@@ -427,7 +427,7 @@ body {
   background-image: url("/paper-emboss.png");
   background-size: cover;
   background-position: center;
-  opacity: 0.85;
+  opacity: 0.5;
   pointer-events: none;
 }
 
