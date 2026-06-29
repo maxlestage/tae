@@ -80,23 +80,34 @@ if (existsSync("public")) {
 // (source unique : aucune duplication du catalogue). On compile data.ts vers un
 // module temporaire, on l'importe, puis on écrit dist/api/teas.json.
 {
+  // derive.ts réexporte TEAS et fournit l'intensité / les ingrédients dérivés,
+  // partagés avec l'app (aucune duplication de logique).
   const compiled = await esbuild.build({
-    entryPoints: ["src/data.ts"],
+    entryPoints: ["src/derive.ts"],
     bundle: true,
     format: "esm",
     write: false,
   });
   const tmp = join(tmpdir(), `lipton-teas-${process.pid}.mjs`);
   writeFileSync(tmp, compiled.outputFiles[0].text);
-  const { TEAS } = await import(pathToFileURL(tmp).href);
+  const { TEAS, intensityValue, ingredientsFor } = await import(
+    pathToFileURL(tmp).href
+  );
   rmSync(tmp, { force: true });
+
+  // Chaque sachet est enrichi des champs dérivés affichés par l'app.
+  const teas = TEAS.map((t) => ({
+    ...t,
+    intensity: intensityValue(t),
+    ingredients: ingredientsFor(t),
+  }));
 
   mkdirSync("dist/api", { recursive: true });
   writeFileSync(
     "dist/api/teas.json",
-    JSON.stringify({ count: TEAS.length, teas: TEAS }),
+    JSON.stringify({ count: teas.length, teas }),
   );
-  console.log(`api    →  ${TEAS.length} sachets`);
+  console.log(`api    →  ${teas.length} sachets`);
 }
 
 if (process.argv.includes("--serve")) {
