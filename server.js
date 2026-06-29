@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join, normalize, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { BREWING, GLOSSARY, EXERCISES } from "./api-content.js";
 
 const DIST = join(fileURLToPath(new URL(".", import.meta.url)), "dist");
 const PORT = process.env.PORT || 3000;
@@ -268,10 +269,11 @@ function buildDocsHtml(base) {
 
   <h2>Bases</h2>
   <ul>
-    <li>URL racine : <code>${base || "(même origine)"}/api</code></li>
+    <li>URL racine : <code>${base || "(même origine)"}/api</code> — versionnée : <code>${base || ""}/api/v1</code> (alias).</li>
     <li>Toutes les routes sont en <code>GET</code>. Réponses <code>application/json</code> (ou <code>text/csv</code>).</li>
     <li>CORS : <code>Access-Control-Allow-Origin: *</code> — utilisable depuis n'importe quel site.</li>
     <li>Cache : chaque réponse porte un <code>ETag</code> ; un <code>If-None-Match</code> renvoie <code>304 Not Modified</code>.</li>
+    <li>Hypermedia : les listes incluent <code>meta</code> (page, pages, perPage) et <code>_links</code> (self, next, prev…) ; chaque sachet a <code>_links.self</code>.</li>
     <li>Erreurs : <code>400</code> (paramètre invalide, avec les valeurs permises), <code>404</code> (introuvable).</li>
   </ul>
 
@@ -297,6 +299,13 @@ function buildDocsHtml(base) {
   ${endpoint("GET", "/api/stats", "Statistiques : total, répartition par famille et par type, compteurs d'options.")}
   ${endpoint("GET", "/api/openapi.json", "Spécification OpenAPI 3.1 (génération de clients, import dans Postman/Insomnia).")}
   ${endpoint("GET", "/api/swagger", "Documentation interactive Swagger UI.")}
+
+  <h2>Pour apprendre 🎓</h2>
+  <p>Endpoints pédagogiques pour s'entraîner à consommer une API.</p>
+  ${endpoint("GET", "/api/brewing", "Guide d'infusion par type : température (°C), durée (min) et conseils. Paramètres <code>type</code>, <code>lang</code>.")}
+  ${endpoint("GET", "/api/glossary", "Glossaire des termes (théine, rooibos, pyramide, cold brew…). Paramètre <code>lang</code>.")}
+  ${endpoint("GET", "/api/quiz", "Une question générée depuis le catalogue, avec <code>options</code> et <code>answer</code>. Paramètre <code>lang</code>.")}
+  ${endpoint("GET", "/api/exercises", "Une série d'exercices guidés (but, endpoint à appeler, indice). Paramètre <code>lang</code>.")}
 
   <h2>Objet « sachet »</h2>
   <table><thead><tr><th>Champ</th><th>Type</th><th>Description</th></tr></thead><tbody>
@@ -404,6 +413,19 @@ function buildOpenApi(base) {
       "/api/families": { get: { summary: "Familles de couleur et compteurs", responses: { 200: { description: "OK" } } } },
       "/api/types": { get: { summary: "Types de thé et compteurs", responses: { 200: { description: "OK" } } } },
       "/api/stats": { get: { summary: "Statistiques du catalogue", responses: { 200: { description: "OK" } } } },
+      "/api/brewing": {
+        get: {
+          summary: "Guide d'infusion par type (température, durée, conseils)",
+          parameters: [
+            { name: "type", in: "query", schema: { type: "string", enum: Object.keys(BREWING) } },
+            langParam,
+          ],
+          responses: { 200: { description: "OK" } },
+        },
+      },
+      "/api/glossary": { get: { summary: "Glossaire des termes", parameters: [langParam], responses: { 200: { description: "OK" } } } },
+      "/api/quiz": { get: { summary: "Une question de quiz générée depuis le catalogue", parameters: [langParam], responses: { 200: { description: "OK" } } } },
+      "/api/exercises": { get: { summary: "Exercices pratiques", parameters: [langParam], responses: { 200: { description: "OK" } } } },
     },
     components: {
       schemas: {
@@ -455,6 +477,13 @@ function handleApi(req, res, pathname, searchParams) {
     return jsonResponse(req, res, 405, { error: "Method not allowed" });
   }
 
+  // Versionnage : /api/v1/... est un alias de /api/... On conserve le préfixe
+  // utilisé par le client pour construire des liens hypermedia cohérents.
+  const versioned = pathname === "/api/v1" || pathname.startsWith("/api/v1/");
+  const apiPrefix = versioned ? "/api/v1" : "/api";
+  if (versioned) pathname = "/api" + pathname.slice("/api/v1".length);
+  const apiBase = `${baseUrl(req)}${apiPrefix}`;
+
   const lang = searchParams.get("lang");
   if (lang && !LANGS.includes(lang)) {
     return jsonResponse(req, res, 400, {
@@ -484,17 +513,24 @@ function handleApi(req, res, pathname, searchParams) {
       description: "API publique en lecture seule du catalogue Lipton vendu en France.",
       count: TEAS.length,
       languages: LANGS,
+      version: "v1",
+      versionedBase: "/api/v1",
       endpoints: {
-        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited. Tri: sort (id|name|family|type), order (asc|desc). Pagination: limit, offset. Format: format (json|csv). Champs: fields.",
+        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited. Tri: sort (id|name|family|type), order (asc|desc). Pagination: limit, offset (réponse avec meta + _links). Format: format (json|csv). Champs: fields.",
         "GET /api/teas/random": "Un sachet au hasard (respecte les filtres et lang/fields).",
         "GET /api/teas/:id": "Un sachet par identifiant (ex: /api/teas/yellow-label). Format: format (json|csv). Champs: fields.",
         "GET /api/families": "Familles de couleur et leur nombre de sachets.",
         "GET /api/types": "Types de thé et leur nombre de sachets.",
         "GET /api/stats": "Statistiques du catalogue (totaux par famille, type, options).",
+        "GET /api/brewing": "Guide d'infusion par type (température, durée, conseils). ?type=, ?lang=.",
+        "GET /api/glossary": "Glossaire des termes (théine, rooibos, pyramide…). ?lang=.",
+        "GET /api/quiz": "Une question de quiz générée depuis le catalogue. ?lang=.",
+        "GET /api/exercises": "Exercices pratiques pour apprendre à consommer l'API. ?lang=.",
         "GET /api/openapi.json": "Spécification OpenAPI 3.1 de l'API.",
         "GET /api/docs": "Documentation écrite et complète (page HTML).",
         "GET /api/swagger": "Documentation interactive (Swagger UI).",
       },
+      note: "Toutes les routes existent aussi sous /api/v1/… (versionnage).",
     });
   }
 
@@ -607,14 +643,42 @@ function handleApi(req, res, pathname, searchParams) {
       );
     }
 
+    // Liens hypermedia (HATEOAS) : navigation entre pages et vers chaque sachet.
+    const perPage = limit ?? total;
+    const pages = perPage > 0 ? Math.max(1, Math.ceil(total / perPage)) : 1;
+    const pageNo = perPage > 0 ? Math.floor(start / perPage) + 1 : 1;
+    const pageUrl = (off) => {
+      const sp = new URLSearchParams(searchParams);
+      sp.set("offset", String(off));
+      return `${apiBase}/teas?${sp.toString()}`;
+    };
+    const links = { self: pageUrl(start) };
+    if (limit !== undefined) {
+      links.first = pageUrl(0);
+      links.last = pageUrl(Math.max(0, (pages - 1) * perPage));
+      links.prev = start > 0 ? pageUrl(Math.max(0, start - limit)) : null;
+      links.next = start + limit < total ? pageUrl(start + limit) : null;
+    }
+
     return jsonResponse(req, res, 200, {
       total,
       count: page.length,
       offset: start,
       limit: limit ?? null,
-      teas: page.map((t) => projectFields(localize(t, lang), fields)),
+      meta: { page: pageNo, pages, perPage: limit ?? total },
+      _links: links,
+      teas: page.map((t) => ({
+        ...projectFields(localize(t, lang), fields),
+        _links: { self: `${apiBase}/teas/${t.id}` },
+      })),
     });
   }
+
+  // Réponse d'un sachet unique, avec ses liens hypermedia.
+  const teaResponse = (tea) => ({
+    ...projectFields(localize(tea, lang), fields),
+    _links: { self: `${apiBase}/teas/${tea.id}`, collection: `${apiBase}/teas` },
+  });
 
   // Un sachet au hasard (respecte les filtres). Avant le matcher :id.
   if (pathname === "/api/teas/random") {
@@ -623,7 +687,7 @@ function handleApi(req, res, pathname, searchParams) {
       return jsonResponse(req, res, 404, { error: "No tea matches the filters" });
     }
     const tea = pool[Math.floor(Math.random() * pool.length)];
-    return jsonResponse(req, res, 200, projectFields(localize(tea, lang), fields));
+    return jsonResponse(req, res, 200, teaResponse(tea));
   }
 
   // Un sachet par identifiant.
@@ -635,7 +699,7 @@ function handleApi(req, res, pathname, searchParams) {
     if (searchParams.get("format") === "csv") {
       return csvResponse(req, res, 200, toCsv([flattenTea(tea, lang)]), `${id}.csv`);
     }
-    return jsonResponse(req, res, 200, projectFields(localize(tea, lang), fields));
+    return jsonResponse(req, res, 200, teaResponse(tea));
   }
 
   // Agrégations.
@@ -651,6 +715,82 @@ function handleApi(req, res, pathname, searchParams) {
     for (const t of TEAS) counts[t.typeKey] = (counts[t.typeKey] ?? 0) + 1;
     return jsonResponse(req, res, 200, {
       types: Object.entries(counts).map(([type, count]) => ({ type, count })),
+    });
+  }
+
+  // === Contenu pédagogique (pour les étudiants) ===========================
+
+  // Guide d'infusion par type (température, durée, conseils). ?type= et ?lang=.
+  if (pathname === "/api/brewing") {
+    const type = searchParams.get("type");
+    if (type && !BREWING[type]) {
+      return jsonResponse(req, res, 400, {
+        error: `Unknown type '${type}'`,
+        allowed: Object.keys(BREWING),
+      });
+    }
+    const entries = (type ? [type] : Object.keys(BREWING)).map((k) => {
+      const g = BREWING[k];
+      return {
+        type: k,
+        tempC: g.tempC,
+        minutes: g.minutes,
+        tips: lang ? g.tips[lang] : g.tips,
+      };
+    });
+    return jsonResponse(req, res, 200, { brewing: entries });
+  }
+
+  // Glossaire des termes. ?lang= aplatit les définitions.
+  if (pathname === "/api/glossary") {
+    return jsonResponse(req, res, 200, {
+      glossary: GLOSSARY.map((g) => ({
+        term: g.term,
+        definition: lang ? g.definition[lang] : g.definition,
+      })),
+    });
+  }
+
+  // Exercices pratiques. ?lang= aplatit les textes.
+  if (pathname === "/api/exercises") {
+    const tr = (o) => (lang ? o[lang] : o);
+    return jsonResponse(req, res, 200, {
+      exercises: EXERCISES.map((e) => ({
+        id: e.id,
+        title: tr(e.title),
+        goal: tr(e.goal),
+        endpoint: `${apiBase}${e.endpoint.replace(/^\/api\/v1/, "")}`,
+        hint: tr(e.hint),
+      })),
+    });
+  }
+
+  // Quiz : une question générée depuis le catalogue. ?lang= pour la langue.
+  if (pathname === "/api/quiz") {
+    const ql = lang ?? "fr";
+    const tea = TEAS[Math.floor(Math.random() * TEAS.length)];
+    const families = [...new Set(TEAS.map((t) => t.family))];
+    // 4 options : la bonne + 3 autres familles au hasard.
+    const others = families.filter((f) => f !== tea.family);
+    for (let i = others.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [others[i], others[j]] = [others[j], others[i]];
+    }
+    const options = [tea.family, ...others.slice(0, 3)];
+    for (let i = options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    const prompt = {
+      fr: `À quelle famille de couleur appartient « ${tea.name.fr} » ?`,
+      en: `Which colour family does "${tea.name.en}" belong to?`,
+      es: `¿A qué familia de color pertenece «${tea.name.es}»?`,
+    };
+    return jsonResponse(req, res, 200, {
+      teaId: tea.id,
+      question: lang ? prompt[ql] : prompt,
+      options,
+      answer: tea.family,
     });
   }
 
