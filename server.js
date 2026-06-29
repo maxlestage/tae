@@ -196,6 +196,149 @@ function baseUrl(req) {
   return host ? `${proto}://${host}` : "";
 }
 
+/** Page de documentation écrite, autonome (sans CDN), décrivant tout l'API. */
+function buildDocsHtml(base) {
+  const families = [...new Set(TEAS.map((t) => t.family))];
+  const types = [...new Set(TEAS.map((t) => t.typeKey))];
+  const sample = TEAS[0]?.id ?? "yellow-label";
+  const u = (p) => `${base}${p}`;
+
+  const row = (name, values, desc) =>
+    `<tr><td><code>${name}</code></td><td>${values}</td><td>${desc}</td></tr>`;
+
+  const endpoint = (method, path, desc, body = "") => `
+    <section class="ep">
+      <h3><span class="method">${method}</span> <code>${path}</code></h3>
+      <p>${desc}</p>
+      ${body}
+    </section>`;
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lipton — API publique · Documentation</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<style>
+  :root { color-scheme: light dark; --bg:#fff; --fg:#1b1f27; --muted:#5d6675; --line:#e2e5ec; --card:#f7f8fa; --code:#f0eede; --accent:#e20025; --yellow:#ffe105; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1115; --fg:#eef1f6; --muted:#9aa3b2; --line:#262c38; --card:#161a22; --code:#1d2230; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--fg); line-height:1.6; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  header { border-bottom: 4px solid var(--yellow); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+  h1 { margin:.2rem 0; font-size: clamp(1.6rem,4vw,2.4rem); }
+  h1 .dot { color: var(--accent); }
+  .lede { color: var(--muted); margin:.25rem 0 0; }
+  a { color: var(--accent); }
+  .badges { margin:.9rem 0 0; display:flex; gap:.4rem; flex-wrap:wrap; }
+  .badge { font-size:.75rem; font-weight:700; border:1px solid var(--line); border-radius:999px; padding:.2rem .6rem; color:var(--muted); }
+  h2 { margin-top:2.2rem; font-size:1.3rem; border-bottom:1px solid var(--line); padding-bottom:.3rem; }
+  code { background:var(--code); padding:.1rem .35rem; border-radius:6px; font-size:.88em; }
+  pre { background:var(--code); padding:.9rem 1rem; border-radius:12px; overflow:auto; }
+  pre code { background:none; padding:0; }
+  table { width:100%; border-collapse:collapse; margin:.6rem 0 0; font-size:.92rem; }
+  th,td { text-align:left; padding:.45rem .5rem; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
+  .ep { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1rem 1.15rem; margin:1rem 0; }
+  .ep h3 { margin:0 0 .35rem; font-size:1.05rem; }
+  .method { display:inline-block; background:var(--accent); color:#fff; font-size:.72rem; font-weight:800; padding:.15rem .5rem; border-radius:6px; vertical-align:middle; }
+  .links a { display:inline-block; margin-right:1rem; font-weight:700; }
+  footer { margin-top:3rem; color:var(--muted); font-size:.82rem; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>API Lipton<span class="dot">.</span> <small style="font-weight:400;font-size:.5em;color:var(--muted)">Sachets de thé</small></h1>
+    <p class="lede">API JSON <strong>publique</strong> et en lecture seule du catalogue Lipton vendu en France — ${TEAS.length} sachets.</p>
+    <div class="badges">
+      <span class="badge">Lecture seule</span>
+      <span class="badge">CORS ouvert</span>
+      <span class="badge">Sans clé / sans auth</span>
+      <span class="badge">ETag · 304</span>
+      <span class="badge">FR · EN · ES</span>
+    </div>
+    <p class="links" style="margin-top:1rem">
+      <a href="${u("/api/swagger")}">Explorer (Swagger UI) →</a>
+      <a href="${u("/api/openapi.json")}">openapi.json</a>
+      <a href="/">← Retour à l'app</a>
+    </p>
+  </header>
+
+  <h2>Bases</h2>
+  <ul>
+    <li>URL racine : <code>${base || "(même origine)"}/api</code></li>
+    <li>Toutes les routes sont en <code>GET</code>. Réponses <code>application/json</code> (ou <code>text/csv</code>).</li>
+    <li>CORS : <code>Access-Control-Allow-Origin: *</code> — utilisable depuis n'importe quel site.</li>
+    <li>Cache : chaque réponse porte un <code>ETag</code> ; un <code>If-None-Match</code> renvoie <code>304 Not Modified</code>.</li>
+    <li>Erreurs : <code>400</code> (paramètre invalide, avec les valeurs permises), <code>404</code> (introuvable).</li>
+  </ul>
+
+  <h2>Endpoints</h2>
+  ${endpoint("GET", "/api", "Index auto-documenté : liste des endpoints et nombre de sachets.")}
+  ${endpoint("GET", "/api/teas", "Liste des sachets — filtrable, triable, paginée, en JSON ou CSV.",
+    `<table><thead><tr><th>Paramètre</th><th>Valeurs</th><th>Rôle</th></tr></thead><tbody>
+      ${row("family", families.join(" · "), "Filtre par famille de couleur")}
+      ${row("type", types.join(" · "), "Filtre par type de thé")}
+      ${row("search", "texte libre", "Cherche dans le nom ET la description (3 langues)")}
+      ${row("caffeineFree, pyramid,<br>coldBrew, coffret, limited", "true · false", "Filtres booléens")}
+      ${row("sort", "id · name · family · type", "Champ de tri")}
+      ${row("order", "asc · desc", "Sens du tri (défaut asc)")}
+      ${row("limit, offset", "entiers ≥ 0", "Pagination (réponse : total, count, offset, limit)")}
+      ${row("lang", LANGS.join(" · "), "Aplatit name/description/ingredients dans cette langue")}
+      ${row("fields", "ex. id,name,colors", "Ne renvoie que ces champs (id toujours inclus)")}
+      ${row("format", "json · csv", "Format de sortie (CSV = export tableur)")}
+    </tbody></table>`)}
+  ${endpoint("GET", "/api/teas/random", "Un sachet au hasard. Respecte tous les filtres ci-dessus, plus lang et fields.")}
+  ${endpoint("GET", "/api/teas/{id}", `Un sachet par identifiant (ex. <code>${sample}</code>). Accepte lang, fields et format=csv.`)}
+  ${endpoint("GET", "/api/families", "Familles de couleur et nombre de sachets dans chacune.")}
+  ${endpoint("GET", "/api/types", "Types de thé et nombre de sachets dans chacun.")}
+  ${endpoint("GET", "/api/stats", "Statistiques : total, répartition par famille et par type, compteurs d'options.")}
+  ${endpoint("GET", "/api/openapi.json", "Spécification OpenAPI 3.1 (génération de clients, import dans Postman/Insomnia).")}
+  ${endpoint("GET", "/api/swagger", "Documentation interactive Swagger UI.")}
+
+  <h2>Objet « sachet »</h2>
+  <table><thead><tr><th>Champ</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    ${row("id", "string", "Identifiant unique (slug)")}
+    ${row("name", "objet {fr,en,es} ou string", "Nom (aplati si ?lang=)")}
+    ${row("description", "objet {fr,en,es} ou string", "Description (aplatie si ?lang=)")}
+    ${row("typeKey", "string", "Type de thé")}
+    ${row("family", "string", "Famille de couleur")}
+    ${row("colors", "[string, string]", "Dégradé : [teinte, accent] en hex")}
+    ${row("ink", "string", "Couleur de texte lisible sur le dégradé")}
+    ${row("caffeineFree", "boolean", "Sans théine")}
+    ${row("pyramid, coldBrew,<br>coffret, limited", "boolean", "Gammes / options")}
+    ${row("intensity", "integer", "Intensité 1–5 (0 pour un coffret)")}
+    ${row("ingredients", "objet {fr,en,es}, string ou null", "Ingrédients (null pour un coffret)")}
+  </tbody></table>
+
+  <h2>Exemples</h2>
+  <pre><code># Tous les sachets, triés par nom (FR)
+curl "${u("/api/teas?sort=name&lang=fr")}"
+
+# Thés verts sans théine, 5 premiers, champs réduits
+curl "${u("/api/teas?family=Vert&caffeineFree=true&limit=5&fields=id,name,intensity")}"
+
+# Recherche « menthe » (nom + description, toutes langues)
+curl "${u("/api/teas?search=menthe&lang=fr")}"
+
+# Un sachet précis
+curl "${u(`/api/teas/${sample}?lang=en`)}"
+
+# Export CSV complet
+curl "${u("/api/teas?format=csv")}" -o sachets.csv
+
+# Un sachet au hasard, et les statistiques
+curl "${u("/api/teas/random")}"
+curl "${u("/api/stats")}"</code></pre>
+
+  <footer>Catalogue généré depuis la source unique de l'app · ${TEAS.length} sachets · lecture seule.</footer>
+</div>
+</body>
+</html>`;
+}
+
 /** Spécification OpenAPI 3.1 décrivant l'API (pour Swagger / génération de clients). */
 function buildOpenApi(base) {
   const langParam = {
@@ -349,7 +492,8 @@ function handleApi(req, res, pathname, searchParams) {
         "GET /api/types": "Types de thé et leur nombre de sachets.",
         "GET /api/stats": "Statistiques du catalogue (totaux par famille, type, options).",
         "GET /api/openapi.json": "Spécification OpenAPI 3.1 de l'API.",
-        "GET /api/docs": "Documentation interactive (Swagger UI).",
+        "GET /api/docs": "Documentation écrite et complète (page HTML).",
+        "GET /api/swagger": "Documentation interactive (Swagger UI).",
       },
     });
   }
@@ -359,8 +503,13 @@ function handleApi(req, res, pathname, searchParams) {
     return jsonResponse(req, res, 200, buildOpenApi(baseUrl(req)));
   }
 
-  // Documentation interactive Swagger UI (consomme /api/openapi.json).
+  // Documentation écrite (page autonome, sans dépendance externe).
   if (pathname === "/api/docs" || pathname === "/api/docs/") {
+    return htmlResponse(req, res, 200, buildDocsHtml(baseUrl(req)));
+  }
+
+  // Documentation interactive Swagger UI (consomme /api/openapi.json).
+  if (pathname === "/api/swagger" || pathname === "/api/swagger/") {
     const specUrl = `${baseUrl(req)}/api/openapi.json`;
     const html = `<!DOCTYPE html>
 <html lang="fr">
