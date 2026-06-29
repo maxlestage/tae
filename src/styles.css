@@ -427,7 +427,7 @@ body {
   background-image: url("/paper-emboss.png");
   background-size: cover;
   background-position: center;
-  opacity: 0.5;
+  opacity: 0.3;
   pointer-events: none;
 }
 
