@@ -46,6 +46,8 @@ export interface UiStrings {
   expandAll: string;
   country: string;
   footer: (count: number, year: number) => string;
+  apiLink: string;
+  apiTitle: string;
   openAria: (name: string) => string;
   langAria: string;
 }
@@ -89,6 +91,8 @@ export const UI: Record<Lang, UiStrings> = {
     expandAll: "Tout déplier",
     country: "Gamme vendue en France",
     footer: (n, year) => `© ${year} @maxlestage · ${n} sachets`,
+    apiLink: "API",
+    apiTitle: "API publique : documentation et catalogue JSON",
     openAria: (name) => `Ouvrir la fiche ${name}`,
     langAria: "Choisir la langue",
   },
@@ -130,6 +134,8 @@ export const UI: Record<Lang, UiStrings> = {
     expandAll: "Expand all",
     country: "Range sold in France",
     footer: (n, year) => `© ${year} @maxlestage · ${n} tea bags`,
+    apiLink: "API",
+    apiTitle: "Public API: documentation and JSON catalogue",
     openAria: (name) => `Open the ${name} card`,
     langAria: "Choose language",
   },
@@ -171,6 +177,8 @@ export const UI: Record<Lang, UiStrings> = {
     expandAll: "Expandir todo",
     country: "Gama vendida en Francia",
     footer: (n, year) => `© ${year} @maxlestage · ${n} bolsitas`,
+    apiLink: "API",
+    apiTitle: "API pública: documentación y catálogo JSON",
     openAria: (name) => `Abrir la ficha ${name}`,
     langAria: "Elegir idioma",
   },
