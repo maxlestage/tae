@@ -1,5 +1,8 @@
 import * as esbuild from "esbuild";
 import { mkdirSync, writeFileSync, rmSync, cpSync, existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const TITLE = "Lipton · Sachets de thé par couleurs";
 const DESC =
@@ -71,6 +74,29 @@ writeFileSync("dist/index.html", HTML);
 // Copie les assets statiques (favicon, image d'aperçu) dans dist
 if (existsSync("public")) {
   cpSync("public", "dist", { recursive: true });
+}
+
+// Génère les données de l'API publique en JSON à partir de src/data.ts
+// (source unique : aucune duplication du catalogue). On compile data.ts vers un
+// module temporaire, on l'importe, puis on écrit dist/api/teas.json.
+{
+  const compiled = await esbuild.build({
+    entryPoints: ["src/data.ts"],
+    bundle: true,
+    format: "esm",
+    write: false,
+  });
+  const tmp = join(tmpdir(), `lipton-teas-${process.pid}.mjs`);
+  writeFileSync(tmp, compiled.outputFiles[0].text);
+  const { TEAS } = await import(pathToFileURL(tmp).href);
+  rmSync(tmp, { force: true });
+
+  mkdirSync("dist/api", { recursive: true });
+  writeFileSync(
+    "dist/api/teas.json",
+    JSON.stringify({ count: TEAS.length, teas: TEAS }),
+  );
+  console.log(`api    →  ${TEAS.length} sachets`);
 }
 
 if (process.argv.includes("--serve")) {
