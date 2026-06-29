@@ -1,5 +1,5 @@
 /* Service worker — Lipton · Sachets de thé (PWA) */
-const CACHE = "lipton-v5";
+const CACHE = "lipton-v6";
 const ASSETS = [
   "/",
   "/index.html",
@@ -49,13 +49,20 @@ function networkFirst(req, fallbackPath) {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
+  const pathname = new URL(req.url).pathname;
   if (new URL(req.url).origin !== self.location.origin) return;
+
+  // API publique : toujours le réseau, jamais de cache (données à jour).
+  if (pathname.startsWith("/api/")) {
+    event.respondWith(fetch(req));
+    return;
+  }
 
   // Pages et code de l'app : réseau d'abord (toujours à jour en ligne),
   // repli sur le cache hors-ligne. Évite de servir une vieille version.
   if (
     req.mode === "navigate" ||
-    /\.(?:js|css|webmanifest)$/.test(new URL(req.url).pathname)
+    /\.(?:js|css|webmanifest)$/.test(pathname)
   ) {
     event.respondWith(
       networkFirst(req, req.mode === "navigate" ? "/index.html" : undefined),
