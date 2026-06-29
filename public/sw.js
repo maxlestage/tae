@@ -1,5 +1,5 @@
 /* Service worker — Lipton · Sachets de thé (PWA) */
-const CACHE = "lipton-v7";
+const CACHE = "lipton-v8";
 const ASSETS = [
   "/",
   "/index.html",
