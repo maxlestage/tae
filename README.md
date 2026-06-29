@@ -55,6 +55,11 @@ tout le catalogue. Les données sont générées au build depuis `src/data.ts`
 | `GET /api/types`        | Types de thé et leur nombre de sachets.                   |
 | `GET /api/stats`        | Statistiques (totaux par famille, type, options).         |
 | `GET /api/openapi.json` | Spécification OpenAPI 3.1 (Swagger, génération de clients).|
+| `GET /api/docs`         | Documentation interactive (Swagger UI).                   |
+
+Chaque sachet inclut aussi les champs dérivés affichés par l'app : `intensity`
+(0–5) et `ingredients` (objet par langue, ou `null` pour un coffret). Les
+réponses portent un **ETag** : un `If-None-Match` renvoie `304 Not Modified`.
 
 **Filtres de `/api/teas`** (combinables) :
 

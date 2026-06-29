@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { join, normalize, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const DIST = join(fileURLToPath(new URL(".", import.meta.url)), "dist");
 const PORT = process.env.PORT || 3000;
@@ -18,21 +19,49 @@ try {
 
 const LANGS = ["fr", "en", "es"];
 
-function jsonResponse(res, status, data) {
-  res.writeHead(status, {
+// Envoi bas niveau : calcule un ETag fort sur le contenu et répond 304 si le
+// client possède déjà la bonne version (If-None-Match).
+function sendBody(req, res, status, headers, body) {
+  if (status === 200) {
+    const etag = `"${createHash("sha1").update(body).digest("base64")}"`;
+    headers = { ...headers, etag };
+    if (req.headers["if-none-match"] === etag) {
+      res.writeHead(304, {
+        etag,
+        "access-control-allow-origin": "*",
+        "cache-control": headers["cache-control"],
+      });
+      return res.end();
+    }
+  }
+  res.writeHead(status, headers);
+  res.end(body);
+}
+
+function jsonResponse(req, res, status, data) {
+  sendBody(req, res, status, {
     "content-type": "application/json; charset=utf-8",
     // API publique : autorise la lecture depuis n'importe quel site.
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, OPTIONS",
     "cache-control": "public, max-age=300",
-  });
-  res.end(JSON.stringify(data));
+  }, JSON.stringify(data));
 }
 
-/** Aplati les champs traduits (name/description) vers une seule langue. */
+function htmlResponse(req, res, status, html) {
+  sendBody(req, res, status, {
+    "content-type": "text/html; charset=utf-8",
+    "access-control-allow-origin": "*",
+    "cache-control": "public, max-age=300",
+  }, html);
+}
+
+/** Aplati les champs traduits (name/description/ingredients) vers une langue. */
 function localize(tea, lang) {
   if (!lang) return tea;
-  return { ...tea, name: tea.name[lang], description: tea.description[lang] };
+  const out = { ...tea, name: tea.name[lang], description: tea.description[lang] };
+  if (tea.ingredients) out.ingredients = tea.ingredients[lang];
+  return out;
 }
 
 const BOOL_FILTERS = ["caffeineFree", "pyramid", "coldBrew", "coffret", "limited"];
@@ -73,6 +102,11 @@ function flattenTea(tea, lang) {
   flat.coffret = Boolean(tea.coffret);
   flat.limited = Boolean(tea.limited);
   flat.intensity = tea.intensity ?? "";
+  if (lang) {
+    flat.ingredients = tea.ingredients ? tea.ingredients[lang] : "";
+  } else {
+    for (const l of LANGS) flat[`ingredients_${l}`] = tea.ingredients ? tea.ingredients[l] : "";
+  }
   return flat;
 }
 
@@ -89,15 +123,14 @@ function toCsv(rows) {
   return lines.join("\n");
 }
 
-function csvResponse(res, status, csv, filename) {
-  res.writeHead(status, {
+function csvResponse(req, res, status, csv, filename) {
+  sendBody(req, res, status, {
     "content-type": "text/csv; charset=utf-8",
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, OPTIONS",
     "cache-control": "public, max-age=300",
     "content-disposition": `inline; filename="${filename}"`,
-  });
-  res.end(csv);
+  }, csv);
 }
 
 /** Lit un entier ≥ 0 depuis la query ; renvoie undefined si absent, NaN si invalide. */
@@ -111,6 +144,7 @@ function parseIntParam(value) {
 const TEA_FIELDS = [
   "id", "name", "description", "typeKey", "family", "colors", "ink",
   "caffeineFree", "pyramid", "coldBrew", "coffret", "limited", "intensity",
+  "ingredients",
 ];
 
 /** Applique les filtres de query (family, type, booléens, search) au catalogue.
@@ -249,9 +283,17 @@ function buildOpenApi(base) {
             coldBrew: { type: "boolean" },
             coffret: { type: "boolean" },
             limited: { type: "boolean" },
-            intensity: { type: "integer" },
+            intensity: { type: "integer", description: "Intensité 1–5 ; 0 pour un coffret." },
+            ingredients: {
+              description: "Ingrédients (objet par langue, chaîne si ?lang=, ou null pour un coffret).",
+              oneOf: [
+                { type: "string" },
+                { $ref: "#/components/schemas/Localized" },
+                { type: "null" },
+              ],
+            },
           },
-          required: ["id", "name", "description", "typeKey", "family", "colors", "ink", "caffeineFree"],
+          required: ["id", "name", "description", "typeKey", "family", "colors", "ink", "caffeineFree", "intensity"],
         },
       },
     },
@@ -267,12 +309,12 @@ function handleApi(req, res, pathname, searchParams) {
     return res.end();
   }
   if (req.method !== "GET") {
-    return jsonResponse(res, 405, { error: "Method not allowed" });
+    return jsonResponse(req, res, 405, { error: "Method not allowed" });
   }
 
   const lang = searchParams.get("lang");
   if (lang && !LANGS.includes(lang)) {
-    return jsonResponse(res, 400, {
+    return jsonResponse(req, res, 400, {
       error: `Unknown lang '${lang}'`,
       allowed: LANGS,
     });
@@ -285,7 +327,7 @@ function handleApi(req, res, pathname, searchParams) {
     fields = fieldsRaw.split(",").map((s) => s.trim()).filter(Boolean);
     const bad = fields.filter((f) => !TEA_FIELDS.includes(f));
     if (bad.length) {
-      return jsonResponse(res, 400, {
+      return jsonResponse(req, res, 400, {
         error: `Unknown field(s): ${bad.join(", ")}`,
         allowed: TEA_FIELDS,
       });
@@ -294,7 +336,7 @@ function handleApi(req, res, pathname, searchParams) {
 
   // Index / documentation de l'API.
   if (pathname === "/api" || pathname === "/api/") {
-    return jsonResponse(res, 200, {
+    return jsonResponse(req, res, 200, {
       name: "Lipton France — Sachets de thé",
       description: "API publique en lecture seule du catalogue Lipton vendu en France.",
       count: TEAS.length,
@@ -307,13 +349,41 @@ function handleApi(req, res, pathname, searchParams) {
         "GET /api/types": "Types de thé et leur nombre de sachets.",
         "GET /api/stats": "Statistiques du catalogue (totaux par famille, type, options).",
         "GET /api/openapi.json": "Spécification OpenAPI 3.1 de l'API.",
+        "GET /api/docs": "Documentation interactive (Swagger UI).",
       },
     });
   }
 
   // Spécification OpenAPI (avant les autres routes : chemin fixe).
   if (pathname === "/api/openapi.json") {
-    return jsonResponse(res, 200, buildOpenApi(baseUrl(req)));
+    return jsonResponse(req, res, 200, buildOpenApi(baseUrl(req)));
+  }
+
+  // Documentation interactive Swagger UI (consomme /api/openapi.json).
+  if (pathname === "/api/docs" || pathname === "/api/docs/") {
+    const specUrl = `${baseUrl(req)}/api/openapi.json`;
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lipton — API · Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+    <script>
+      window.ui = SwaggerUIBundle({
+        url: ${JSON.stringify(specUrl)},
+        dom_id: "#swagger-ui",
+        deepLinking: true,
+      });
+    </script>
+  </body>
+</html>`;
+    return htmlResponse(req, res, 200, html);
   }
 
   // Statistiques du catalogue.
@@ -326,14 +396,14 @@ function handleApi(req, res, pathname, searchParams) {
       byType[t.typeKey] = (byType[t.typeKey] ?? 0) + 1;
       for (const k of BOOL_FILTERS) if (t[k]) options[k] += 1;
     }
-    return jsonResponse(res, 200, { total: TEAS.length, byFamily, byType, options });
+    return jsonResponse(req, res, 200, { total: TEAS.length, byFamily, byType, options });
   }
 
   // Liste filtrée, triée, paginée, en JSON ou CSV.
   if (pathname === "/api/teas" || pathname === "/api/teas/") {
     const format = searchParams.get("format") ?? "json";
     if (format !== "json" && format !== "csv") {
-      return jsonResponse(res, 400, {
+      return jsonResponse(req, res, 400, {
         error: `Unknown format '${format}'`,
         allowed: ["json", "csv"],
       });
@@ -345,14 +415,14 @@ function handleApi(req, res, pathname, searchParams) {
     const sort = searchParams.get("sort");
     if (sort) {
       if (!SORT_FIELDS.includes(sort)) {
-        return jsonResponse(res, 400, {
+        return jsonResponse(req, res, 400, {
           error: `Unknown sort field '${sort}'`,
           allowed: SORT_FIELDS,
         });
       }
       const order = searchParams.get("order") ?? "asc";
       if (order !== "asc" && order !== "desc") {
-        return jsonResponse(res, 400, {
+        return jsonResponse(req, res, 400, {
           error: `Unknown order '${order}'`,
           allowed: ["asc", "desc"],
         });
@@ -370,7 +440,7 @@ function handleApi(req, res, pathname, searchParams) {
     const limit = parseIntParam(searchParams.get("limit"));
     const offset = parseIntParam(searchParams.get("offset"));
     if (Number.isNaN(limit) || Number.isNaN(offset)) {
-      return jsonResponse(res, 400, {
+      return jsonResponse(req, res, 400, {
         error: "limit and offset must be integers ≥ 0",
       });
     }
@@ -380,6 +450,7 @@ function handleApi(req, res, pathname, searchParams) {
 
     if (format === "csv") {
       return csvResponse(
+        req,
         res,
         200,
         toCsv(page.map((t) => flattenTea(t, lang))),
@@ -387,7 +458,7 @@ function handleApi(req, res, pathname, searchParams) {
       );
     }
 
-    return jsonResponse(res, 200, {
+    return jsonResponse(req, res, 200, {
       total,
       count: page.length,
       offset: start,
@@ -400,10 +471,10 @@ function handleApi(req, res, pathname, searchParams) {
   if (pathname === "/api/teas/random") {
     const pool = filterTeas(searchParams);
     if (pool.length === 0) {
-      return jsonResponse(res, 404, { error: "No tea matches the filters" });
+      return jsonResponse(req, res, 404, { error: "No tea matches the filters" });
     }
     const tea = pool[Math.floor(Math.random() * pool.length)];
-    return jsonResponse(res, 200, projectFields(localize(tea, lang), fields));
+    return jsonResponse(req, res, 200, projectFields(localize(tea, lang), fields));
   }
 
   // Un sachet par identifiant.
@@ -411,30 +482,30 @@ function handleApi(req, res, pathname, searchParams) {
   if (single) {
     const id = decodeURIComponent(single[1]);
     const tea = TEAS.find((t) => t.id === id);
-    if (!tea) return jsonResponse(res, 404, { error: `Tea '${id}' not found` });
+    if (!tea) return jsonResponse(req, res, 404, { error: `Tea '${id}' not found` });
     if (searchParams.get("format") === "csv") {
-      return csvResponse(res, 200, toCsv([flattenTea(tea, lang)]), `${id}.csv`);
+      return csvResponse(req, res, 200, toCsv([flattenTea(tea, lang)]), `${id}.csv`);
     }
-    return jsonResponse(res, 200, projectFields(localize(tea, lang), fields));
+    return jsonResponse(req, res, 200, projectFields(localize(tea, lang), fields));
   }
 
   // Agrégations.
   if (pathname === "/api/families") {
     const counts = {};
     for (const t of TEAS) counts[t.family] = (counts[t.family] ?? 0) + 1;
-    return jsonResponse(res, 200, {
+    return jsonResponse(req, res, 200, {
       families: Object.entries(counts).map(([family, count]) => ({ family, count })),
     });
   }
   if (pathname === "/api/types") {
     const counts = {};
     for (const t of TEAS) counts[t.typeKey] = (counts[t.typeKey] ?? 0) + 1;
-    return jsonResponse(res, 200, {
+    return jsonResponse(req, res, 200, {
       types: Object.entries(counts).map(([type, count]) => ({ type, count })),
     });
   }
 
-  return jsonResponse(res, 404, { error: "Unknown API endpoint" });
+  return jsonResponse(req, res, 404, { error: "Unknown API endpoint" });
 }
 
 const MIME = {
