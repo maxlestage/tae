@@ -107,6 +107,157 @@ function parseIntParam(value) {
   return Number.isInteger(n) && n >= 0 ? n : NaN;
 }
 
+/** Champs exposés pour un sachet (sélection via ?fields=). */
+const TEA_FIELDS = [
+  "id", "name", "description", "typeKey", "family", "colors", "ink",
+  "caffeineFree", "pyramid", "coldBrew", "coffret", "limited", "intensity",
+];
+
+/** Applique les filtres de query (family, type, booléens, search) au catalogue.
+   La recherche porte sur le nom ET la description, dans les trois langues. */
+function filterTeas(searchParams) {
+  let result = TEAS;
+  const family = searchParams.get("family");
+  if (family) {
+    result = result.filter(
+      (t) => t.family.toLowerCase() === family.toLowerCase(),
+    );
+  }
+  const type = searchParams.get("type");
+  if (type) result = result.filter((t) => t.typeKey === type);
+  for (const key of BOOL_FILTERS) {
+    const v = searchParams.get(key);
+    if (v === "true" || v === "false") {
+      const want = v === "true";
+      result = result.filter((t) => Boolean(t[key]) === want);
+    }
+  }
+  const search = searchParams.get("search");
+  if (search) {
+    const q = search.toLowerCase();
+    result = result.filter((t) =>
+      LANGS.some(
+        (l) =>
+          t.name[l].toLowerCase().includes(q) ||
+          t.description[l].toLowerCase().includes(q),
+      ),
+    );
+  }
+  return result;
+}
+
+/** Restreint un objet aux champs demandés (l'id est toujours conservé). */
+function projectFields(obj, fields) {
+  if (!fields) return obj;
+  const out = {};
+  if ("id" in obj) out.id = obj.id;
+  for (const f of fields) if (f in obj) out[f] = obj[f];
+  return out;
+}
+
+/** URL absolue du serveur, déduite des en-têtes (proxy Heroku inclus). */
+function baseUrl(req) {
+  const proto = req.headers["x-forwarded-proto"]?.split(",")[0] ?? "http";
+  const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+  return host ? `${proto}://${host}` : "";
+}
+
+/** Spécification OpenAPI 3.1 décrivant l'API (pour Swagger / génération de clients). */
+function buildOpenApi(base) {
+  const langParam = {
+    name: "lang", in: "query", required: false,
+    schema: { type: "string", enum: LANGS },
+    description: "Aplatit name/description dans cette langue.",
+  };
+  const fieldsParam = {
+    name: "fields", in: "query", required: false,
+    schema: { type: "string" },
+    description: "Liste de champs séparés par des virgules à conserver.",
+  };
+  return {
+    openapi: "3.1.0",
+    info: {
+      title: "Lipton France — Sachets de thé",
+      version: "1.0.0",
+      description: "API publique en lecture seule du catalogue Lipton vendu en France.",
+    },
+    servers: [{ url: base || "/" }],
+    paths: {
+      "/api/teas": {
+        get: {
+          summary: "Liste des sachets (filtrée, triée, paginée, JSON ou CSV)",
+          parameters: [
+            { name: "family", in: "query", schema: { type: "string" } },
+            { name: "type", in: "query", schema: { type: "string" } },
+            { name: "search", in: "query", schema: { type: "string" } },
+            ...BOOL_FILTERS.map((b) => ({
+              name: b, in: "query", schema: { type: "boolean" },
+            })),
+            { name: "sort", in: "query", schema: { type: "string", enum: SORT_FIELDS } },
+            { name: "order", in: "query", schema: { type: "string", enum: ["asc", "desc"] } },
+            { name: "limit", in: "query", schema: { type: "integer", minimum: 0 } },
+            { name: "offset", in: "query", schema: { type: "integer", minimum: 0 } },
+            { name: "format", in: "query", schema: { type: "string", enum: ["json", "csv"] } },
+            langParam, fieldsParam,
+          ],
+          responses: { 200: { description: "Liste paginée des sachets." } },
+        },
+      },
+      "/api/teas/random": {
+        get: {
+          summary: "Un sachet au hasard (respecte les filtres)",
+          parameters: [langParam, fieldsParam],
+          responses: { 200: { description: "Un sachet." }, 404: { description: "Aucun sachet ne correspond." } },
+        },
+      },
+      "/api/teas/{id}": {
+        get: {
+          summary: "Un sachet par identifiant",
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string" } },
+            { name: "format", in: "query", schema: { type: "string", enum: ["json", "csv"] } },
+            langParam, fieldsParam,
+          ],
+          responses: {
+            200: { description: "Le sachet.", content: { "application/json": { schema: { $ref: "#/components/schemas/Tea" } } } },
+            404: { description: "Sachet introuvable." },
+          },
+        },
+      },
+      "/api/families": { get: { summary: "Familles de couleur et compteurs", responses: { 200: { description: "OK" } } } },
+      "/api/types": { get: { summary: "Types de thé et compteurs", responses: { 200: { description: "OK" } } } },
+      "/api/stats": { get: { summary: "Statistiques du catalogue", responses: { 200: { description: "OK" } } } },
+    },
+    components: {
+      schemas: {
+        Localized: {
+          type: "object",
+          properties: Object.fromEntries(LANGS.map((l) => [l, { type: "string" }])),
+        },
+        Tea: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            name: { oneOf: [{ type: "string" }, { $ref: "#/components/schemas/Localized" }] },
+            description: { oneOf: [{ type: "string" }, { $ref: "#/components/schemas/Localized" }] },
+            typeKey: { type: "string" },
+            family: { type: "string" },
+            colors: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 2 },
+            ink: { type: "string" },
+            caffeineFree: { type: "boolean" },
+            pyramid: { type: "boolean" },
+            coldBrew: { type: "boolean" },
+            coffret: { type: "boolean" },
+            limited: { type: "boolean" },
+            intensity: { type: "integer" },
+          },
+          required: ["id", "name", "description", "typeKey", "family", "colors", "ink", "caffeineFree"],
+        },
+      },
+    },
+  };
+}
+
 function handleApi(req, res, pathname, searchParams) {
   if (req.method === "OPTIONS") {
     res.writeHead(204, {
@@ -127,6 +278,20 @@ function handleApi(req, res, pathname, searchParams) {
     });
   }
 
+  // Sélection de champs (?fields=id,name,colors), validée pour aider aux typos.
+  let fields = null;
+  const fieldsRaw = searchParams.get("fields");
+  if (fieldsRaw) {
+    fields = fieldsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+    const bad = fields.filter((f) => !TEA_FIELDS.includes(f));
+    if (bad.length) {
+      return jsonResponse(res, 400, {
+        error: `Unknown field(s): ${bad.join(", ")}`,
+        allowed: TEA_FIELDS,
+      });
+    }
+  }
+
   // Index / documentation de l'API.
   if (pathname === "/api" || pathname === "/api/") {
     return jsonResponse(res, 200, {
@@ -135,12 +300,33 @@ function handleApi(req, res, pathname, searchParams) {
       count: TEAS.length,
       languages: LANGS,
       endpoints: {
-        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited. Tri: sort (id|name|family|type), order (asc|desc). Pagination: limit, offset. Format: format (json|csv).",
-        "GET /api/teas/:id": "Un sachet par identifiant (ex: /api/teas/yellow-label). Format: format (json|csv).",
+        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited. Tri: sort (id|name|family|type), order (asc|desc). Pagination: limit, offset. Format: format (json|csv). Champs: fields.",
+        "GET /api/teas/random": "Un sachet au hasard (respecte les filtres et lang/fields).",
+        "GET /api/teas/:id": "Un sachet par identifiant (ex: /api/teas/yellow-label). Format: format (json|csv). Champs: fields.",
         "GET /api/families": "Familles de couleur et leur nombre de sachets.",
         "GET /api/types": "Types de thé et leur nombre de sachets.",
+        "GET /api/stats": "Statistiques du catalogue (totaux par famille, type, options).",
+        "GET /api/openapi.json": "Spécification OpenAPI 3.1 de l'API.",
       },
     });
+  }
+
+  // Spécification OpenAPI (avant les autres routes : chemin fixe).
+  if (pathname === "/api/openapi.json") {
+    return jsonResponse(res, 200, buildOpenApi(baseUrl(req)));
+  }
+
+  // Statistiques du catalogue.
+  if (pathname === "/api/stats") {
+    const byFamily = {};
+    const byType = {};
+    const options = { caffeineFree: 0, pyramid: 0, coldBrew: 0, coffret: 0, limited: 0 };
+    for (const t of TEAS) {
+      byFamily[t.family] = (byFamily[t.family] ?? 0) + 1;
+      byType[t.typeKey] = (byType[t.typeKey] ?? 0) + 1;
+      for (const k of BOOL_FILTERS) if (t[k]) options[k] += 1;
+    }
+    return jsonResponse(res, 200, { total: TEAS.length, byFamily, byType, options });
   }
 
   // Liste filtrée, triée, paginée, en JSON ou CSV.
@@ -153,32 +339,7 @@ function handleApi(req, res, pathname, searchParams) {
       });
     }
 
-    let result = TEAS;
-
-    const family = searchParams.get("family");
-    if (family) {
-      result = result.filter(
-        (t) => t.family.toLowerCase() === family.toLowerCase(),
-      );
-    }
-    const type = searchParams.get("type");
-    if (type) {
-      result = result.filter((t) => t.typeKey === type);
-    }
-    for (const key of BOOL_FILTERS) {
-      const v = searchParams.get(key);
-      if (v === "true" || v === "false") {
-        const want = v === "true";
-        result = result.filter((t) => Boolean(t[key]) === want);
-      }
-    }
-    const search = searchParams.get("search");
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter((t) =>
-        LANGS.some((l) => t.name[l].toLowerCase().includes(q)),
-      );
-    }
+    let result = filterTeas(searchParams);
 
     // Tri.
     const sort = searchParams.get("sort");
@@ -231,8 +392,18 @@ function handleApi(req, res, pathname, searchParams) {
       count: page.length,
       offset: start,
       limit: limit ?? null,
-      teas: page.map((t) => localize(t, lang)),
+      teas: page.map((t) => projectFields(localize(t, lang), fields)),
     });
+  }
+
+  // Un sachet au hasard (respecte les filtres). Avant le matcher :id.
+  if (pathname === "/api/teas/random") {
+    const pool = filterTeas(searchParams);
+    if (pool.length === 0) {
+      return jsonResponse(res, 404, { error: "No tea matches the filters" });
+    }
+    const tea = pool[Math.floor(Math.random() * pool.length)];
+    return jsonResponse(res, 200, projectFields(localize(tea, lang), fields));
   }
 
   // Un sachet par identifiant.
@@ -244,7 +415,7 @@ function handleApi(req, res, pathname, searchParams) {
     if (searchParams.get("format") === "csv") {
       return csvResponse(res, 200, toCsv([flattenTea(tea, lang)]), `${id}.csv`);
     }
-    return jsonResponse(res, 200, localize(tea, lang));
+    return jsonResponse(res, 200, projectFields(localize(tea, lang), fields));
   }
 
   // Agrégations.

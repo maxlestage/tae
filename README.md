@@ -45,33 +45,39 @@ Le serveur expose une **API JSON publique** (lecture seule, CORS ouvert) avec
 tout le catalogue. Les données sont générées au build depuis `src/data.ts`
 (source unique) vers `dist/api/teas.json`.
 
-| Méthode & route        | Description                                                |
-| ---------------------- | --------------------------------------------------------- |
-| `GET /api`             | Index auto-documenté (endpoints, nombre de sachets).      |
-| `GET /api/teas`        | Liste des sachets. Filtres en query (voir ci-dessous).    |
-| `GET /api/teas/:id`    | Un sachet par identifiant (ex. `/api/teas/yellow-label`). |
-| `GET /api/families`    | Familles de couleur et leur nombre de sachets.            |
-| `GET /api/types`       | Types de thé et leur nombre de sachets.                   |
+| Méthode & route         | Description                                                |
+| ----------------------- | --------------------------------------------------------- |
+| `GET /api`              | Index auto-documenté (endpoints, nombre de sachets).      |
+| `GET /api/teas`         | Liste des sachets. Filtres/tri/pagination en query.       |
+| `GET /api/teas/random`  | Un sachet au hasard (respecte les filtres).               |
+| `GET /api/teas/:id`     | Un sachet par identifiant (ex. `/api/teas/yellow-label`). |
+| `GET /api/families`     | Familles de couleur et leur nombre de sachets.            |
+| `GET /api/types`        | Types de thé et leur nombre de sachets.                   |
+| `GET /api/stats`        | Statistiques (totaux par famille, type, options).         |
+| `GET /api/openapi.json` | Spécification OpenAPI 3.1 (Swagger, génération de clients).|
 
 **Filtres de `/api/teas`** (combinables) :
 
 - `family` — famille de couleur (`Jaune`, `Vert`, `Coffret`, …)
 - `type` — type de thé (`blackTea`, `greenTea`, `infusion`, …)
-- `search` — texte recherché dans le nom (toutes langues)
+- `search` — texte recherché dans le **nom et la description** (toutes langues)
 - `caffeineFree`, `pyramid`, `coldBrew`, `coffret`, `limited` — `true` / `false`
 - `lang` — `fr` | `en` | `es` : aplatit `name`/`description` dans cette langue
 
-**Tri, pagination & format** :
+**Tri, pagination, format & champs** :
 
 - `sort` — `id` | `name` | `family` | `type` ; `order` — `asc` (défaut) | `desc`
 - `limit`, `offset` — entiers ≥ 0 ; la réponse JSON inclut `total`, `count`, `offset`, `limit`
 - `format` — `json` (défaut) | `csv` (export tableur, aussi dispo sur `/api/teas/:id`)
+- `fields` — liste de champs séparés par des virgules à conserver (ex. `id,name,colors`)
 
 ```bash
 curl "https://<app>.herokuapp.com/api/teas?family=Vert&lang=en"
 curl "https://<app>.herokuapp.com/api/teas?sort=name&order=desc&limit=10"
+curl "https://<app>.herokuapp.com/api/teas?fields=id,name,colors&lang=fr"
 curl "https://<app>.herokuapp.com/api/teas?format=csv" -o sachets.csv
-curl "https://<app>.herokuapp.com/api/teas/english-breakfast"
+curl "https://<app>.herokuapp.com/api/teas/random"
+curl "https://<app>.herokuapp.com/api/stats"
 ```
 
 ## Structure
