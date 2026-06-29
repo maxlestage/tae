@@ -431,10 +431,14 @@ body {
   pointer-events: none;
 }
 
-/* La fiche produit utilise exactement le même effet froissé que les sachets.
-   La texture est fixée sur la carte (qui ne défile pas) : elle couvre donc
-   toute la fiche sans laisser de zone sans effet, et le contenu défile
-   par-dessus (.modal__scroll). */
+/* Fiche produit : texture fixée sur la carte (qui ne défile pas) ; le contenu
+   défile par-dessus (.modal__scroll). On utilise la version tournée à 90° :
+   sur cette carte au format portrait, « cover » l'agrandit beaucoup moins
+   (tissage « dézoomé »), et l'effet est un peu plus léger que sur les vignettes. */
+.modal__card::before {
+  background-image: url("/paper-emboss-90.png");
+  opacity: 0.12;
+}
 
 .card:hover {
   transform: translateY(-4px);
