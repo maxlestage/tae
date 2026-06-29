@@ -39,11 +39,38 @@ Heroku exécute `npm run build` (esbuild → `./dist`) puis `npm start`
 (`server.js`, qui écoute sur `$PORT`). Un `Dockerfile` + `heroku.yml` sont
 aussi fournis si tu préfères un déploiement en *container stack*.
 
+## API publique
+
+Le serveur expose une **API JSON publique** (lecture seule, CORS ouvert) avec
+tout le catalogue. Les données sont générées au build depuis `src/data.ts`
+(source unique) vers `dist/api/teas.json`.
+
+| Méthode & route        | Description                                                |
+| ---------------------- | --------------------------------------------------------- |
+| `GET /api`             | Index auto-documenté (endpoints, nombre de sachets).      |
+| `GET /api/teas`        | Liste des sachets. Filtres en query (voir ci-dessous).    |
+| `GET /api/teas/:id`    | Un sachet par identifiant (ex. `/api/teas/yellow-label`). |
+| `GET /api/families`    | Familles de couleur et leur nombre de sachets.            |
+| `GET /api/types`       | Types de thé et leur nombre de sachets.                   |
+
+**Filtres de `/api/teas`** (combinables) :
+
+- `family` — famille de couleur (`Jaune`, `Vert`, `Coffret`, …)
+- `type` — type de thé (`blackTea`, `greenTea`, `infusion`, …)
+- `search` — texte recherché dans le nom (toutes langues)
+- `caffeineFree`, `pyramid`, `coldBrew`, `coffret`, `limited` — `true` / `false`
+- `lang` — `fr` | `en` | `es` : aplatit `name`/`description` dans cette langue
+
+```bash
+curl https://<app>.herokuapp.com/api/teas?family=Vert&lang=en
+curl https://<app>.herokuapp.com/api/teas/english-breakfast
+```
+
 ## Structure
 
 ```
 build.mjs         Build esbuild (et serveur de dev avec --serve)
-server.js         Serveur statique Node qui sert ./dist sur $PORT
+server.js         Serveur statique Node + API JSON publique, sert ./dist sur $PORT
 Procfile          web: npm start
 src/
   main.tsx        Montage React
