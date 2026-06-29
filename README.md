@@ -54,12 +54,22 @@ tout le catalogue. Les données sont générées au build depuis `src/data.ts`
 | `GET /api/families`     | Familles de couleur et leur nombre de sachets.            |
 | `GET /api/types`        | Types de thé et leur nombre de sachets.                   |
 | `GET /api/stats`        | Statistiques (totaux par famille, type, options).         |
+| `GET /api/brewing`      | Guide d'infusion par type (`type`, `lang`).               |
+| `GET /api/glossary`     | Glossaire des termes (`lang`).                            |
+| `GET /api/quiz`         | Une question de quiz générée depuis le catalogue (`lang`).|
+| `GET /api/exercises`    | Exercices guidés pour apprendre l'API (`lang`).           |
 | `GET /api/openapi.json` | Spécification OpenAPI 3.1 (Swagger, génération de clients).|
-| `GET /api/docs`         | Documentation interactive (Swagger UI).                   |
+| `GET /api/docs`         | Documentation écrite et complète (page HTML).             |
+| `GET /api/swagger`      | Documentation interactive (Swagger UI).                   |
 
 Chaque sachet inclut aussi les champs dérivés affichés par l'app : `intensity`
 (0–5) et `ingredients` (objet par langue, ou `null` pour un coffret). Les
 réponses portent un **ETag** : un `If-None-Match` renvoie `304 Not Modified`.
+
+**Versionnage & hypermedia** (pratique pour les étudiants) — toutes les routes
+existent aussi sous **`/api/v1/…`**. Les listes incluent `meta` (page, pages,
+perPage) et `_links` (`self`, `next`, `prev`, `first`, `last`), et chaque
+sachet porte un `_links.self` vers sa fiche.
 
 **Filtres de `/api/teas`** (combinables) :
 
