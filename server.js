@@ -36,6 +36,76 @@ function localize(tea, lang) {
 }
 
 const BOOL_FILTERS = ["caffeineFree", "pyramid", "coldBrew", "coffret", "limited"];
+const SORT_FIELDS = ["id", "name", "family", "type"];
+
+/** Clé de tri pour un sachet selon le champ demandé. */
+function sortKey(tea, field, lang) {
+  switch (field) {
+    case "name":
+      return tea.name[lang || "fr"].toLowerCase();
+    case "family":
+      return tea.family.toLowerCase();
+    case "type":
+      return tea.typeKey;
+    default:
+      return tea.id;
+  }
+}
+
+/** Aplati un sachet en une ligne plate (pour l'export CSV). */
+function flattenTea(tea, lang) {
+  const flat = { id: tea.id };
+  if (lang) {
+    flat.name = tea.name[lang];
+    flat.description = tea.description[lang];
+  } else {
+    for (const l of LANGS) flat[`name_${l}`] = tea.name[l];
+    for (const l of LANGS) flat[`description_${l}`] = tea.description[l];
+  }
+  flat.type = tea.typeKey;
+  flat.family = tea.family;
+  flat.colorFrom = tea.colors[0];
+  flat.colorTo = tea.colors[1];
+  flat.ink = tea.ink;
+  flat.caffeineFree = Boolean(tea.caffeineFree);
+  flat.pyramid = Boolean(tea.pyramid);
+  flat.coldBrew = Boolean(tea.coldBrew);
+  flat.coffret = Boolean(tea.coffret);
+  flat.limited = Boolean(tea.limited);
+  flat.intensity = tea.intensity ?? "";
+  return flat;
+}
+
+/** Sérialise des lignes plates en CSV (RFC 4180 : guillemets si besoin). */
+function toCsv(rows) {
+  if (rows.length === 0) return "";
+  const cols = Object.keys(rows[0]);
+  const esc = (v) => {
+    const s = v == null ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+  };
+  const lines = [cols.join(",")];
+  for (const r of rows) lines.push(cols.map((c) => esc(r[c])).join(","));
+  return lines.join("\n");
+}
+
+function csvResponse(res, status, csv, filename) {
+  res.writeHead(status, {
+    "content-type": "text/csv; charset=utf-8",
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET, OPTIONS",
+    "cache-control": "public, max-age=300",
+    "content-disposition": `inline; filename="${filename}"`,
+  });
+  res.end(csv);
+}
+
+/** Lit un entier ≥ 0 depuis la query ; renvoie undefined si absent, NaN si invalide. */
+function parseIntParam(value) {
+  if (value == null) return undefined;
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0 ? n : NaN;
+}
 
 function handleApi(req, res, pathname, searchParams) {
   if (req.method === "OPTIONS") {
@@ -65,16 +135,24 @@ function handleApi(req, res, pathname, searchParams) {
       count: TEAS.length,
       languages: LANGS,
       endpoints: {
-        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited.",
-        "GET /api/teas/:id": "Un sachet par identifiant (ex: /api/teas/yellow-label).",
+        "GET /api/teas": "Liste des sachets. Filtres: family, type, search, lang, caffeineFree, pyramid, coldBrew, coffret, limited. Tri: sort (id|name|family|type), order (asc|desc). Pagination: limit, offset. Format: format (json|csv).",
+        "GET /api/teas/:id": "Un sachet par identifiant (ex: /api/teas/yellow-label). Format: format (json|csv).",
         "GET /api/families": "Familles de couleur et leur nombre de sachets.",
         "GET /api/types": "Types de thé et leur nombre de sachets.",
       },
     });
   }
 
-  // Liste filtrée.
+  // Liste filtrée, triée, paginée, en JSON ou CSV.
   if (pathname === "/api/teas" || pathname === "/api/teas/") {
+    const format = searchParams.get("format") ?? "json";
+    if (format !== "json" && format !== "csv") {
+      return jsonResponse(res, 400, {
+        error: `Unknown format '${format}'`,
+        allowed: ["json", "csv"],
+      });
+    }
+
     let result = TEAS;
 
     const family = searchParams.get("family");
@@ -102,9 +180,58 @@ function handleApi(req, res, pathname, searchParams) {
       );
     }
 
+    // Tri.
+    const sort = searchParams.get("sort");
+    if (sort) {
+      if (!SORT_FIELDS.includes(sort)) {
+        return jsonResponse(res, 400, {
+          error: `Unknown sort field '${sort}'`,
+          allowed: SORT_FIELDS,
+        });
+      }
+      const order = searchParams.get("order") ?? "asc";
+      if (order !== "asc" && order !== "desc") {
+        return jsonResponse(res, 400, {
+          error: `Unknown order '${order}'`,
+          allowed: ["asc", "desc"],
+        });
+      }
+      const dir = order === "desc" ? -1 : 1;
+      result = [...result].sort((a, b) => {
+        const ka = sortKey(a, sort, lang);
+        const kb = sortKey(b, sort, lang);
+        return ka < kb ? -dir : ka > kb ? dir : 0;
+      });
+    }
+
+    // Pagination.
+    const total = result.length;
+    const limit = parseIntParam(searchParams.get("limit"));
+    const offset = parseIntParam(searchParams.get("offset"));
+    if (Number.isNaN(limit) || Number.isNaN(offset)) {
+      return jsonResponse(res, 400, {
+        error: "limit and offset must be integers ≥ 0",
+      });
+    }
+    const start = offset ?? 0;
+    const page =
+      limit === undefined ? result.slice(start) : result.slice(start, start + limit);
+
+    if (format === "csv") {
+      return csvResponse(
+        res,
+        200,
+        toCsv(page.map((t) => flattenTea(t, lang))),
+        "lipton-teas.csv",
+      );
+    }
+
     return jsonResponse(res, 200, {
-      count: result.length,
-      teas: result.map((t) => localize(t, lang)),
+      total,
+      count: page.length,
+      offset: start,
+      limit: limit ?? null,
+      teas: page.map((t) => localize(t, lang)),
     });
   }
 
@@ -114,6 +241,9 @@ function handleApi(req, res, pathname, searchParams) {
     const id = decodeURIComponent(single[1]);
     const tea = TEAS.find((t) => t.id === id);
     if (!tea) return jsonResponse(res, 404, { error: `Tea '${id}' not found` });
+    if (searchParams.get("format") === "csv") {
+      return csvResponse(res, 200, toCsv([flattenTea(tea, lang)]), `${id}.csv`);
+    }
     return jsonResponse(res, 200, localize(tea, lang));
   }
 
