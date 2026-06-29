@@ -261,7 +261,8 @@ function buildDocsHtml(base) {
       <span class="badge">FR · EN · ES</span>
     </div>
     <p class="links" style="margin-top:1rem">
-      <a href="${u("/api/swagger")}">Explorer (Swagger UI) →</a>
+      <a href="${u("/api/playground")}">▶ Playground (tester en direct)</a>
+      <a href="${u("/api/swagger")}">Swagger UI</a>
       <a href="${u("/api/openapi.json")}">openapi.json</a>
       <a href="/">← Retour à l'app</a>
     </p>
@@ -344,6 +345,133 @@ curl "${u("/api/stats")}"</code></pre>
 
   <footer>Catalogue généré depuis la source unique de l'app · ${TEAS.length} sachets · lecture seule.</footer>
 </div>
+</body>
+</html>`;
+}
+
+/** Page « playground » : tester les requêtes en direct, et faire les exercices. */
+function buildPlaygroundHtml(base) {
+  const attr = (s) =>
+    String(s).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+
+  const card = (e, i) => `
+    <div class="ex">
+      <h3>${e.title.fr}</h3>
+      <p class="goal">${e.goal.fr}</p>
+      <p><code>GET ${attr(e.endpoint)}</code></p>
+      <div class="ex__bar">
+        <button class="run" data-path="${attr(e.endpoint)}" data-out="ex${i}">Exécuter ▶</button>
+        <details><summary>Indice</summary><p>${e.hint.fr}</p></details>
+      </div>
+      <pre id="ex${i}" class="out" hidden></pre>
+    </div>`;
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lipton — API · Playground</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<style>
+  :root { color-scheme: light dark; --bg:#fff; --fg:#1b1f27; --muted:#5d6675; --line:#e2e5ec; --card:#f7f8fa; --code:#f0eede; --accent:#e20025; --yellow:#ffe105; --ok:#2e9e4f; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1115; --fg:#eef1f6; --muted:#9aa3b2; --line:#262c38; --card:#161a22; --code:#1d2230; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--fg); line-height:1.55; }
+  .wrap { max-width: 880px; margin:0 auto; padding: 2rem 1.25rem 4rem; }
+  header { border-bottom: 4px solid var(--yellow); padding-bottom:1rem; margin-bottom:1.5rem; }
+  h1 { margin:.2rem 0; font-size: clamp(1.6rem,4vw,2.4rem); } h1 .dot{ color:var(--accent); }
+  .lede { color:var(--muted); margin:.25rem 0 0; }
+  a { color:var(--accent); font-weight:700; }
+  .links a { margin-right:1rem; display:inline-block; margin-top:.6rem; }
+  h2 { margin-top:2rem; font-size:1.25rem; border-bottom:1px solid var(--line); padding-bottom:.3rem; }
+  code { background:var(--code); padding:.1rem .35rem; border-radius:6px; font-size:.88em; }
+  button { font: inherit; font-weight:700; cursor:pointer; border:none; border-radius:10px; padding:.5rem .9rem; background:var(--accent); color:#fff; }
+  button:hover { filter:brightness(1.08); }
+  input { font: inherit; width:100%; padding:.6rem .7rem; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--fg); }
+  .bar { display:flex; gap:.5rem; margin:.6rem 0; }
+  .bar button { white-space:nowrap; }
+  .quick { display:flex; flex-wrap:wrap; gap:.4rem; margin:.4rem 0 0; }
+  .quick button { background:var(--card); color:var(--fg); border:1px solid var(--line); font-weight:600; font-size:.82rem; padding:.3rem .6rem; }
+  pre.out { background:var(--code); padding:.85rem 1rem; border-radius:12px; overflow:auto; max-height:360px; margin:.6rem 0 0; font-size:.85rem; }
+  .status { font-weight:800; } .status.ok{ color:var(--ok); } .status.err{ color:var(--accent); }
+  .ex { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1rem 1.15rem; margin:1rem 0; }
+  .ex h3 { margin:0 0 .25rem; font-size:1.05rem; }
+  .ex .goal { margin:.1rem 0 .5rem; }
+  .ex__bar { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  details summary { cursor:pointer; color:var(--muted); }
+  footer { margin-top:3rem; color:var(--muted); font-size:.82rem; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Playground API<span class="dot">.</span></h1>
+    <p class="lede">Teste les requêtes en direct et fais les exercices — tout s'exécute dans ton navigateur, sur la vraie API.</p>
+    <p class="links">
+      <a href="/api/docs">← Documentation</a>
+      <a href="/api/swagger">Swagger UI</a>
+      <a href="/">App</a>
+    </p>
+  </header>
+
+  <h2>Essai libre</h2>
+  <p>Écris un chemin d'API puis envoie. Exemple : <code>/api/v1/teas?family=Vert&amp;lang=fr&amp;limit=5</code></p>
+  <div class="bar">
+    <input id="freeUrl" value="/api/v1/teas?lang=fr&amp;limit=5" spellcheck="false" />
+    <button id="freeSend">Envoyer ▶</button>
+  </div>
+  <div class="quick">
+    <button data-q="/api/v1/teas?limit=5&amp;lang=fr">teas (5)</button>
+    <button data-q="/api/v1/teas/yellow-label?lang=fr">un sachet</button>
+    <button data-q="/api/v1/teas/random?lang=fr">au hasard</button>
+    <button data-q="/api/v1/stats">stats</button>
+    <button data-q="/api/v1/brewing?type=greenTea&amp;lang=fr">infusion</button>
+    <button data-q="/api/v1/glossary?lang=fr">glossaire</button>
+    <button data-q="/api/v1/quiz?lang=fr">quiz</button>
+  </div>
+  <pre id="freeOut" class="out" hidden></pre>
+
+  <h2>Exercices 🎓</h2>
+  ${EXERCISES.map(card).join("")}
+
+  <footer>API publique en lecture seule · ${TEAS.length} sachets · aucune clé requise.</footer>
+</div>
+<script>
+  async function run(path, outId) {
+    const out = document.getElementById(outId);
+    out.hidden = false;
+    out.textContent = "…";
+    try {
+      const t0 = performance.now();
+      const r = await fetch(path, { headers: { accept: "application/json" } });
+      const ms = Math.round(performance.now() - t0);
+      const ct = r.headers.get("content-type") || "";
+      let body = await r.text();
+      if (ct.includes("json")) { try { body = JSON.stringify(JSON.parse(body), null, 2); } catch (_) {} }
+      const cls = r.ok ? "ok" : "err";
+      out.innerHTML = "<span class='status " + cls + "'>GET " + path + "\\n" + r.status + " " + r.statusText + " · " + ms + " ms</span>\\n\\n";
+      out.appendChild(document.createTextNode(body));
+    } catch (e) {
+      out.textContent = "Erreur réseau : " + e.message;
+    }
+  }
+  document.querySelectorAll(".run").forEach((b) => {
+    b.addEventListener("click", () => run(b.dataset.path, b.dataset.out));
+  });
+  document.getElementById("freeSend").addEventListener("click", () => {
+    run(document.getElementById("freeUrl").value.trim(), "freeOut");
+  });
+  document.getElementById("freeUrl").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("freeSend").click();
+  });
+  document.querySelectorAll(".quick button").forEach((b) => {
+    b.addEventListener("click", () => {
+      document.getElementById("freeUrl").value = b.dataset.q;
+      document.getElementById("freeSend").click();
+    });
+  });
+</script>
 </body>
 </html>`;
 }
@@ -529,6 +657,7 @@ function handleApi(req, res, pathname, searchParams) {
         "GET /api/openapi.json": "Spécification OpenAPI 3.1 de l'API.",
         "GET /api/docs": "Documentation écrite et complète (page HTML).",
         "GET /api/swagger": "Documentation interactive (Swagger UI).",
+        "GET /api/playground": "Bac à sable : tester les requêtes en direct et faire les exercices.",
       },
       note: "Toutes les routes existent aussi sous /api/v1/… (versionnage).",
     });
@@ -542,6 +671,11 @@ function handleApi(req, res, pathname, searchParams) {
   // Documentation écrite (page autonome, sans dépendance externe).
   if (pathname === "/api/docs" || pathname === "/api/docs/") {
     return htmlResponse(req, res, 200, buildDocsHtml(baseUrl(req)));
+  }
+
+  // Playground : tester les requêtes en direct et faire les exercices.
+  if (pathname === "/api/playground" || pathname === "/api/playground/") {
+    return htmlResponse(req, res, 200, buildPlaygroundHtml(baseUrl(req)));
   }
 
   // Documentation interactive Swagger UI (consomme /api/openapi.json).
