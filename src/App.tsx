@@ -653,6 +653,10 @@ export function App() {
 
       <footer className="footer">
         {t.footer(TEAS.length, new Date().getFullYear())}
+        {" · "}
+        <a className="footer__link" href="/api/docs" title={t.apiTitle}>
+          {t.apiLink}
+        </a>
       </footer>
 
       {selected && (
