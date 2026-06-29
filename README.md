@@ -61,6 +61,7 @@ tout le catalogue. Les données sont générées au build depuis `src/data.ts`
 | `GET /api/openapi.json` | Spécification OpenAPI 3.1 (Swagger, génération de clients).|
 | `GET /api/docs`         | Documentation écrite et complète (page HTML).             |
 | `GET /api/swagger`      | Documentation interactive (Swagger UI).                   |
+| `GET /api/playground`   | Bac à sable : tester les requêtes en direct + exercices.  |
 
 Chaque sachet inclut aussi les champs dérivés affichés par l'app : `intensity`
 (0–5) et `ingredients` (objet par langue, ou `null` pour un coffret). Les
