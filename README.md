@@ -96,17 +96,46 @@ curl "https://<app>.herokuapp.com/api/teas/random"
 curl "https://<app>.herokuapp.com/api/stats"
 ```
 
+## App iOS native (Capacitor)
+
+Le **même code** alimente le site web **et** une vraie app iOS native :
+[Capacitor](https://capacitorjs.com) embarque le build web (`dist/`) dans une
+coquille **WKWebView** native (vrai projet Xcode, soumettable à l'App Store).
+Le catalogue des 78 thés étant inclus dans le bundle, l'app fonctionne
+**hors-ligne**.
+
+> La compilation et la publication d'une app iOS nécessitent **macOS + Xcode**
+> et un **compte Apple Developer** (99 $/an). Le projet est prêt ; ces étapes se
+> font sur un Mac.
+
+```bash
+# Sur un Mac, avec Xcode installé (+ CocoaPods : sudo gem install cocoapods)
+npm install
+npm run ios:sync     # build web + copie dans le projet iOS (pod install)
+npm run ios:open     # ouvre Xcode → Run (simulateur/appareil) ou Archive (App Store)
+```
+
+- `capacitor.config.ts` — id (`com.maxlestage.liptonteas`), nom (« Lipton Thés »), `webDir: dist`.
+- `ios/` — projet Xcode (versionné ; les artefacts de build sont ignorés).
+- `resources/logo.png` — source des icônes ; régénère avec `npm run ios:assets`.
+- Après toute modif du code web : `npm run ios:sync`.
+
 ## Structure
 
 ```
-build.mjs         Build esbuild (et serveur de dev avec --serve)
-server.js         Serveur statique Node + API JSON publique, sert ./dist sur $PORT
-Procfile          web: npm start
+build.mjs             Build esbuild (et serveur de dev avec --serve)
+server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
+api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
+capacitor.config.ts   Config de l'app iOS native (Capacitor)
+ios/                  Projet Xcode de l'app iOS
+resources/            Sources des icônes/splash de l'app
+Procfile              web: npm start
 src/
-  main.tsx        Montage React
-  App.tsx         UI : groupes de couleurs + cartes
-  data.ts         Données des sachets et leurs couleurs
-  styles.css      Styles
+  main.tsx            Montage React
+  App.tsx             UI : groupes de couleurs + cartes
+  data.ts             Données des sachets et leurs couleurs
+  derive.ts           Intensité / ingrédients dérivés (partagé app + API)
+  styles.css          Styles
 ```
 
 ## Ajouter un thé
