@@ -49,6 +49,31 @@ coche **Automatically manage signing** → choisis ton **Team**.
 2. Ajoute-toi comme **testeur interne** (Internal Testing → ton compte).
 3. Installe l'app **TestFlight** sur ton iPhone, accepte l'invitation, installe la build.
 
+## Option B — sans Mac, via GitHub Actions
+
+Si tu n'as pas de Mac, le workflow [`.github/workflows/testflight.yml`](../.github/workflows/testflight.yml)
+compile l'app sur un runner **macOS de GitHub** et l'envoie sur TestFlight. Il te
+faut seulement une **clé API App Store Connect** (et l'app créée à l'étape 1).
+
+1. **Créer la clé API** : App Store Connect → **Users and Access** → **Integrations** →
+   **App Store Connect API** → **+** (rôle *App Manager*). Télécharge le fichier
+   **`.p8`** (une seule fois) et note le **Key ID** et l'**Issuer ID**.
+2. **Trouver le Team ID** : [developer.apple.com](https://developer.apple.com) → *Membership*.
+3. **Ajouter les secrets GitHub** (repo → Settings → Secrets and variables → Actions → *New repository secret*) :
+   | Secret | Valeur |
+   | --- | --- |
+   | `ASC_API_KEY_ID` | le *Key ID* de la clé |
+   | `ASC_API_ISSUER_ID` | l'*Issuer ID* |
+   | `ASC_API_KEY_P8` | **le contenu** du fichier `.p8` (colle tout le texte) |
+   | `APPLE_TEAM_ID` | ton *Team ID* |
+4. **Lancer** : onglet **Actions** → *TestFlight (iOS)* → **Run workflow** (ou pousse un tag `ios-v1.0.1`).
+   Le job génère le projet, archive avec signature automatique (via la clé API),
+   exporte l'IPA et l'**envoie sur TestFlight**. Le numéro de build = le numéro de run (unique).
+5. Va dans App Store Connect → **TestFlight**, ajoute-toi en testeur interne, installe la build.
+
+> Même sans Mac, l'**Apple Developer Program** (99 $/an) reste nécessaire : c'est
+> lui qui donne accès à App Store Connect, à la clé API et à TestFlight.
+
 ## Bon à savoir
 
 - **Signature** : gérée automatiquement par Xcode Cloud (aucun certificat à exporter).
