@@ -25,6 +25,13 @@ xcodegen generate            # crée LiptonThes.xcodeproj
 open LiptonThes.xcodeproj     # Xcode → sélectionne ton équipe → Run / Archive
 ```
 
+## Tester sur TestFlight (Xcode Cloud)
+
+Le dépôt est prêt pour **Xcode Cloud** : signature auto, scheme partagé, et un
+script `ci_scripts/ci_post_clone.sh` qui régénère le projet dans le runner.
+Étapes détaillées (fiche App Store Connect, workflow, TestFlight) :
+**[TESTFLIGHT.md](TESTFLIGHT.md)**.
+
 ## Mettre à jour les données
 
 Le fichier `Resources/teas.json` est une copie de `dist/api/teas.json`
