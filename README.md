@@ -96,29 +96,27 @@ curl "https://<app>.herokuapp.com/api/teas/random"
 curl "https://<app>.herokuapp.com/api/stats"
 ```
 
-## App iOS native (Capacitor)
+## App iOS native (SwiftUI)
 
-Le **même code** alimente le site web **et** une vraie app iOS native :
-[Capacitor](https://capacitorjs.com) embarque le build web (`dist/`) dans une
-coquille **WKWebView** native (vrai projet Xcode, soumettable à l'App Store).
-Le catalogue des 78 thés étant inclus dans le bundle, l'app fonctionne
-**hors-ligne**.
+Une **vraie app iOS native**, écrite en **SwiftUI** (aucune WebView), vit dans
+[`native-ios/`](native-ios/). Elle **réutilise les mêmes données** que le site :
+le catalogue des 78 sachets y est embarqué (`teas.json`, copié depuis
+`dist/api/teas.json`), donc l'app fonctionne **hors-ligne**. Le site web reste
+inchangé.
 
 > La compilation et la publication d'une app iOS nécessitent **macOS + Xcode**
-> et un **compte Apple Developer** (99 $/an). Le projet est prêt ; ces étapes se
-> font sur un Mac.
+> et un **compte Apple Developer** (99 $/an) — impossible depuis un serveur
+> Linux. Le code et le projet sont prêts ; ces étapes se font sur un Mac.
 
 ```bash
-# Sur un Mac, avec Xcode installé (+ CocoaPods : sudo gem install cocoapods)
-npm install
-npm run ios:sync     # build web + copie dans le projet iOS (pod install)
-npm run ios:open     # ouvre Xcode → Run (simulateur/appareil) ou Archive (App Store)
+brew install xcodegen         # une fois
+cd native-ios
+xcodegen generate             # crée LiptonThes.xcodeproj
+open LiptonThes.xcodeproj      # Xcode → choisir l'équipe → Run / Archive
 ```
 
-- `capacitor.config.ts` — id (`com.maxlestage.liptonteas`), nom (« Lipton Thés »), `webDir: dist`.
-- `ios/` — projet Xcode (versionné ; les artefacts de build sont ignorés).
-- `resources/logo.png` — source des icônes ; régénère avec `npm run ios:assets`.
-- Après toute modif du code web : `npm run ios:sync`.
+Voir [`native-ios/README.md`](native-ios/README.md) pour le détail. Après une
+modif du catalogue web : `npm run native:data` (rebuild + copie du `teas.json`).
 
 ## Structure
 
@@ -126,9 +124,7 @@ npm run ios:open     # ouvre Xcode → Run (simulateur/appareil) ou Archive (App
 build.mjs             Build esbuild (et serveur de dev avec --serve)
 server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
 api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
-capacitor.config.ts   Config de l'app iOS native (Capacitor)
-ios/                  Projet Xcode de l'app iOS
-resources/            Sources des icônes/splash de l'app
+native-ios/           App iOS native SwiftUI (projet XcodeGen)
 Procfile              web: npm start
 src/
   main.tsx            Montage React
