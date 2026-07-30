@@ -37,6 +37,39 @@ enum Loc {
     }
     static func varied(_ l: Lang) -> String { [.fr: "Varié", .en: "Varies", .es: "Variado"][l]! }
 
+    // MARK: Écran « À propos » / crédits
+
+    static func aboutTitle(_ l: Lang) -> String {
+        [.fr: "À propos", .en: "About", .es: "Acerca de"][l]!
+    }
+    static func aboutCreditsTitle(_ l: Lang) -> String {
+        [.fr: "Crédits", .en: "Credits", .es: "Créditos"][l]!
+    }
+    static func aboutBy(_ l: Lang) -> String {
+        [.fr: "Application créée par", .en: "App created by", .es: "Aplicación creada por"][l]!
+    }
+    static func aboutVersion(_ l: Lang) -> String {
+        [.fr: "Version", .en: "Version", .es: "Versión"][l]!
+    }
+    static func aboutDataTitle(_ l: Lang) -> String {
+        [.fr: "Contenu", .en: "Content", .es: "Contenido"][l]!
+    }
+    static func aboutData(_ l: Lang, count: Int) -> String {
+        switch l {
+        case .fr: return "\(count) sachets de la gamme Lipton vendue en France, disponibles hors-ligne."
+        case .en: return "\(count) tea bags from the Lipton range sold in France, available offline."
+        case .es: return "\(count) bolsitas de la gama Lipton vendida en Francia, disponibles sin conexión."
+        }
+    }
+    static func aboutDisclaimer(_ l: Lang) -> String {
+        [.fr: "Projet personnel, sans lien officiel avec Lipton. Marques et logos appartiennent à leurs propriétaires.",
+         .en: "Personal project, not affiliated with Lipton. Trademarks and logos belong to their owners.",
+         .es: "Proyecto personal, sin vínculo oficial con Lipton. Marcas y logotipos pertenecen a sus propietarios."][l]!
+    }
+    static func close(_ l: Lang) -> String {
+        [.fr: "Fermer", .en: "Close", .es: "Cerrar"][l]!
+    }
+
     /// Crédits du pied de page (même formulation que le site).
     static func footer(_ count: Int, _ year: Int, _ l: Lang) -> String {
         switch l {
