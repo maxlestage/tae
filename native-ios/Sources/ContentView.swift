@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var family: String? = nil
     @State private var collapsed: Set<String> = []
     @State private var selected: Tea? = nil
+    @State private var showAbout = false
 
     var body: some View {
         ScrollView {
@@ -34,6 +35,9 @@ struct ContentView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .sheet(item: $selected) { tea in
             TeaDetailView(tea: tea, lang: lang)
+        }
+        .sheet(isPresented: $showAbout) {
+            AboutView(lang: lang)
         }
     }
 
@@ -76,6 +80,11 @@ struct ContentView: View {
             .pickerStyle(.segmented)
             .frame(width: 170)
             Spacer()
+            Button { showAbout = true } label: {
+                Image(systemName: "info.circle")
+                    .font(.title3)
+            }
+            .accessibilityLabel(Loc.aboutTitle(lang))
         }
     }
 

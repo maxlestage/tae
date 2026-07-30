@@ -12,6 +12,8 @@ settings:
     TARGETED_DEVICE_FAMILY: "1,2"
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_CFBundleDisplayName: "Lipton Thés"
+    # Crédits du bundle (visibles dans les infos de l'app / App Store).
+    INFOPLIST_KEY_NSHumanReadableCopyright: "© Maxime Nathan Lestage"
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown"
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
