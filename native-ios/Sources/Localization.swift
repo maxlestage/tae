@@ -37,6 +37,15 @@ enum Loc {
     }
     static func varied(_ l: Lang) -> String { [.fr: "Varié", .en: "Varies", .es: "Variado"][l]! }
 
+    /// Crédits du pied de page (même formulation que le site).
+    static func footer(_ count: Int, _ year: Int, _ l: Lang) -> String {
+        switch l {
+        case .fr: return "© \(year) par Maxime Nathan Lestage · @maxlestage · \(count) sachets"
+        case .en: return "© \(year) by Maxime Nathan Lestage · @maxlestage · \(count) tea bags"
+        case .es: return "© \(year) por Maxime Nathan Lestage · @maxlestage · \(count) bolsitas"
+        }
+    }
+
     static func fmt(_ tea: Tea, _ l: Lang) -> String {
         if tea.isCoffret { return [.fr: "Assortiment", .en: "Assortment", .es: "Surtido"][l]! }
         if tea.isColdBrew { return [.fr: "Infuse à froid", .en: "Cold brew", .es: "Infusión en frío"][l]! }

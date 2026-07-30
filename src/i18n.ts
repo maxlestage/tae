@@ -90,7 +90,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Tout réduire",
     expandAll: "Tout déplier",
     country: "Gamme vendue en France",
-    footer: (n, year) => `© ${year} @maxlestage · ${n} sachets`,
+    footer: (n, year) =>
+      `© ${year} par Maxime Nathan Lestage · @maxlestage · ${n} sachets`,
     apiLink: "API",
     apiTitle: "API publique : documentation et catalogue JSON",
     openAria: (name) => `Ouvrir la fiche ${name}`,
@@ -133,7 +134,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Collapse all",
     expandAll: "Expand all",
     country: "Range sold in France",
-    footer: (n, year) => `© ${year} @maxlestage · ${n} tea bags`,
+    footer: (n, year) =>
+      `© ${year} by Maxime Nathan Lestage · @maxlestage · ${n} tea bags`,
     apiLink: "API",
     apiTitle: "Public API: documentation and JSON catalogue",
     openAria: (name) => `Open the ${name} card`,
@@ -176,7 +178,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Contraer todo",
     expandAll: "Expandir todo",
     country: "Gama vendida en Francia",
-    footer: (n, year) => `© ${year} @maxlestage · ${n} bolsitas`,
+    footer: (n, year) =>
+      `© ${year} por Maxime Nathan Lestage · @maxlestage · ${n} bolsitas`,
     apiLink: "API",
     apiTitle: "API pública: documentación y catálogo JSON",
     openAria: (name) => `Abrir la ficha ${name}`,

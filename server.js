@@ -343,7 +343,7 @@ curl "${u("/api/teas?format=csv")}" -o sachets.csv
 curl "${u("/api/teas/random")}"
 curl "${u("/api/stats")}"</code></pre>
 
-  <footer>Catalogue généré depuis la source unique de l'app · ${TEAS.length} sachets · lecture seule.</footer>
+  <footer>Catalogue généré depuis la source unique de l'app · ${TEAS.length} sachets · lecture seule.<br />par Maxime Nathan Lestage · @maxlestage</footer>
 </div>
 </body>
 </html>`;
@@ -435,7 +435,7 @@ function buildPlaygroundHtml(base) {
   <h2>Exercices 🎓</h2>
   ${EXERCISES.map(card).join("")}
 
-  <footer>API publique en lecture seule · ${TEAS.length} sachets · aucune clé requise.</footer>
+  <footer>API publique en lecture seule · ${TEAS.length} sachets · aucune clé requise.<br />par Maxime Nathan Lestage · @maxlestage</footer>
 </div>
 <script>
   async function run(path, outId) {

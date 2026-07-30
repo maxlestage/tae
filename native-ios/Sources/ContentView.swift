@@ -180,8 +180,9 @@ struct ContentView: View {
     }
 
     private var footer: some View {
-        Text("© 2026 @maxlestage · \(DataStore.teas.count) sachets")
+        Text(Loc.footer(DataStore.teas.count, Calendar.current.component(.year, from: Date()), lang))
             .font(.footnote).foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
             .padding(.top, 8)
     }
 }
