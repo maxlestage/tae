@@ -24,7 +24,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Sélectionner Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+        run: |
+          # Prend le Xcode stable le plus récent présent sur le runner : les
+          # versions installées changent au fil des images, donc pas de version figée.
+          latest=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -vi beta | sort -V | tail -1)
+          if [ -n "$latest" ]; then sudo xcode-select -s "$latest"; fi
+          xcodebuild -version
 
       - name: Installer XcodeGen
         run: brew install xcodegen
