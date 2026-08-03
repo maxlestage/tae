@@ -96,10 +96,40 @@ curl "https://<app>.herokuapp.com/api/teas/random"
 curl "https://<app>.herokuapp.com/api/stats"
 ```
 
-## Applications natives
+## Applications natives (Tauri v2)
 
-Les applications natives (iOS, Android, desktop) sont construites avec
-**[Tauri v2](https://v2.tauri.app)** à partir de ce même front-end web.
+Les applications **iOS, Android et desktop** sont construites avec
+**[Tauri v2](https://v2.tauri.app)** à partir de ce même front-end : Tauri
+embarque le build web (`dist/`) et produit des binaires natifs légers. Le
+catalogue des 78 sachets étant inclus dans le bundle JS, les apps fonctionnent
+**hors-ligne**.
+
+La configuration vit dans [`src-tauri/`](src-tauri/) — identifiant
+`com.maxlestage.liptonthes`, icônes générées, permissions minimales.
+
+```bash
+npm install                # installe @tauri-apps/cli
+
+npm run tauri:dev          # app desktop en dev (recharge à chaud)
+npm run tauri:build        # binaire desktop
+
+npm run ios:init           # crée le projet iOS (une fois) — macOS + Xcode
+npm run ios:dev            # lance sur simulateur / iPhone
+npm run ios:build          # build iOS (IPA)
+
+npm run android:init       # crée le projet Android (une fois) — Android Studio
+npm run android:dev
+npm run android:build
+```
+
+Prérequis : [Rust](https://rustup.rs) et les
+[dépendances système](https://v2.tauri.app/start/prerequisites/) de ta
+plateforme. Pour iOS il faut **macOS + Xcode** ; Android fonctionne aussi
+depuis Linux/Windows. Les dossiers générés (`src-tauri/gen/`, `src-tauri/target/`)
+ne sont pas versionnés.
+
+> Icônes : `npm run tauri icon public/icon-512.png` régénère la série complète
+> (y compris `.icns` / `.ico` pour macOS et Windows) si tu changes le logo.
 
 ## Structure
 
@@ -107,6 +137,7 @@ Les applications natives (iOS, Android, desktop) sont construites avec
 build.mjs             Build esbuild (et serveur de dev avec --serve)
 server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
 api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
+src-tauri/            App native Tauri v2 (iOS / Android / desktop)
 Procfile              web: npm start
 src/
   main.tsx            Montage React
