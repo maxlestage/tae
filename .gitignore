@@ -3,3 +3,7 @@ dist/
 *.log
 .DS_Store
 shot*.mjs
+
+# Tauri (artefacts de build et projets natifs générés)
+src-tauri/target/
+src-tauri/gen/
