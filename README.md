@@ -96,27 +96,10 @@ curl "https://<app>.herokuapp.com/api/teas/random"
 curl "https://<app>.herokuapp.com/api/stats"
 ```
 
-## App iOS native (SwiftUI)
+## Applications natives
 
-Une **vraie app iOS native**, écrite en **SwiftUI** (aucune WebView), vit dans
-[`native-ios/`](native-ios/). Elle **réutilise les mêmes données** que le site :
-le catalogue des 78 sachets y est embarqué (`teas.json`, copié depuis
-`dist/api/teas.json`), donc l'app fonctionne **hors-ligne**. Le site web reste
-inchangé.
-
-> La compilation et la publication d'une app iOS nécessitent **macOS + Xcode**
-> et un **compte Apple Developer** (99 $/an) — impossible depuis un serveur
-> Linux. Le code et le projet sont prêts ; ces étapes se font sur un Mac.
-
-```bash
-brew install xcodegen         # une fois
-cd native-ios
-xcodegen generate             # crée LiptonThes.xcodeproj
-open LiptonThes.xcodeproj      # Xcode → choisir l'équipe → Run / Archive
-```
-
-Voir [`native-ios/README.md`](native-ios/README.md) pour le détail. Après une
-modif du catalogue web : `npm run native:data` (rebuild + copie du `teas.json`).
+Les applications natives (iOS, Android, desktop) sont construites avec
+**[Tauri v2](https://v2.tauri.app)** à partir de ce même front-end web.
 
 ## Structure
 
@@ -124,7 +107,6 @@ modif du catalogue web : `npm run native:data` (rebuild + copie du `teas.json`).
 build.mjs             Build esbuild (et serveur de dev avec --serve)
 server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
 api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
-native-ios/           App iOS native SwiftUI (projet XcodeGen)
 Procfile              web: npm start
 src/
   main.tsx            Montage React
