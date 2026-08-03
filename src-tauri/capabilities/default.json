@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions de base : l'app ne fait qu'afficher le front-end embarqué.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}
