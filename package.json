@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node build.mjs --serve",
     "build": "node build.mjs",
-    "start": "node server.js"
+    "start": "node server.js",
+    "native:data": "node build.mjs && cp dist/api/teas.json native-ios/Resources/teas.json"
   },
   "dependencies": {
     "esbuild": "^0.24.0",

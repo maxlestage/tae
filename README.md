@@ -96,12 +96,39 @@ curl "https://<app>.herokuapp.com/api/teas/random"
 curl "https://<app>.herokuapp.com/api/stats"
 ```
 
+## App iOS native (SwiftUI)
+
+Une **app iOS 100 % native** (SwiftUI, aucune WebView) vit dans
+[`native-ios/`](native-ios/). Elle **réutilise les mêmes données** que le site :
+le catalogue des 78 sachets y est embarqué (`teas.json`, copié depuis
+`dist/api/teas.json`), donc l'app fonctionne **hors-ligne**. Le site web reste
+inchangé.
+
+C'est aussi la base nécessaire pour un **widget iPhone** : WidgetKit impose une
+extension SwiftUI, qu'aucune coquille WebView ne peut fournir.
+
+> Compiler et publier une app iOS nécessite **macOS + Xcode** et un **compte
+> Apple Developer**. Le code et le projet sont prêts ; ces étapes se font sur un Mac.
+
+```bash
+brew install xcodegen         # une fois
+cd native-ios
+xcodegen generate             # crée LiptonThes.xcodeproj
+open LiptonThes.xcodeproj      # Xcode → choisir l'équipe → Run / Archive
+```
+
+Voir [`native-ios/README.md`](native-ios/README.md) et, pour la distribution,
+[`native-ios/TESTFLIGHT.md`](native-ios/TESTFLIGHT.md) (Xcode Cloud, ou le
+workflow GitHub Actions `.github/workflows/testflight.yml` qui compile sur un
+runner macOS — sans Mac). Après une modif du catalogue : `npm run native:data`.
+
 ## Structure
 
 ```
 build.mjs             Build esbuild (et serveur de dev avec --serve)
 server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
 api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
+native-ios/           App iOS native SwiftUI (projet XcodeGen)
 Procfile              web: npm start
 src/
   main.tsx            Montage React
