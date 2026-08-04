@@ -1,0 +1,7 @@
+# Généré par XcodeGen — ne pas versionner
+*.xcodeproj
+# Artefacts de build Xcode
+build/
+DerivedData/
+*.xcuserstate
+.DS_Store
