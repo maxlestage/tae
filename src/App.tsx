@@ -18,6 +18,7 @@ import {
   type UiStrings,
 } from "./i18n.ts";
 import { intensityValue, ingredientsText } from "./derive.ts";
+import { isTauri } from "./platform.ts";
 
 /** Éclaircit une couleur hex vers le blanc (0–1). */
 function lighten(hex: string, amount: number): string {
@@ -653,10 +654,16 @@ export function App() {
 
       <footer className="footer">
         {t.footer(TEAS.length, new Date().getFullYear())}
-        {" · "}
-        <a className="footer__link" href="/api/docs" title={t.apiTitle}>
-          {t.apiLink}
-        </a>
+        {/* L'API est servie par le site : dans l'app native, il n'y a pas de
+            serveur local, donc pas de lien vers /api/docs. */}
+        {!isTauri() && (
+          <>
+            {" · "}
+            <a className="footer__link" href="/api/docs" title={t.apiTitle}>
+              {t.apiLink}
+            </a>
+          </>
+        )}
       </footer>
 
       {selected && (
