@@ -887,3 +887,126 @@ body {
 .footer__link:hover {
   border-bottom-color: var(--text);
 }
+
+/* === Minuteur d'infusion (fiche produit) ============================== */
+.timer {
+  margin: 1.1rem 0 0.4rem;
+  padding: 0.9rem 1rem 0.6rem;
+  border: 1px solid;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.timer__label {
+  display: block;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 0.6rem;
+}
+
+.timer__main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.timer__dial {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  flex: none;
+}
+
+.timer__dial svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* La progression s'anime doucement au fil des ticks. */
+.timer__dial circle:last-child {
+  transition: stroke-dashoffset 0.25s linear;
+}
+
+.timer__clock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.timer__adjust {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.timer__btn {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.timer__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.timer__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.timer__btn--primary {
+  color: #fff;
+  border-color: transparent;
+  padding: 0.45rem 1.4rem;
+  font-size: 0.88rem;
+}
+
+.timer__status {
+  margin: 0.5rem 0 0;
+  min-height: 1.2em;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+/* Fin d'infusion : la carte pulse brièvement pour attirer l'œil. */
+.timer--done {
+  animation: timer-pop 0.7s ease 2;
+}
+
+@keyframes timer-pop {
+  0%, 100% { background: rgba(255, 255, 255, 0.16); }
+  50% { background: rgba(255, 255, 255, 0.42); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer--done { animation: none; }
+  .timer__dial circle:last-child { transition: none; }
+}
