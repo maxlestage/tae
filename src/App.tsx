@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   TEAS,
   FAMILY_ORDER,
@@ -50,25 +50,40 @@ function coffretGradient(): string {
   ].join(", ");
 }
 
-/** Conseil d'infusion (température · temps) dérivé du type de thé. */
-function brewInfo(tea: TeaSachet, t: UiStrings): string | null {
+/** Conseil d'infusion : température affichée + fourchette de durée (minutes). */
+interface BrewSpec {
+  /** Libellé de température, ou null pour l'infusion à froid. */
+  temp: string | null;
+  minMin: number;
+  maxMin: number;
+}
+
+function brewSpec(tea: TeaSachet): BrewSpec | null {
   if (tea.coffret) return null;
-  if (tea.coldBrew) return `${t.coldWater} · 5–10 min`;
+  if (tea.coldBrew) return { temp: null, minMin: 5, maxMin: 10 };
   switch (tea.typeKey) {
     case "blackTea":
     case "blackTeaFlavored":
     case "blackTeaSpiced":
-      return "90–95 °C · 3–4 min";
+      return { temp: "90–95 °C", minMin: 3, maxMin: 4 };
     case "greenTea":
     case "greenTeaFlavored":
-      return "75–80 °C · 2–3 min";
+      return { temp: "75–80 °C", minMin: 2, maxMin: 3 };
     case "whiteTea":
-      return "70–75 °C · 2–3 min";
+      return { temp: "70–75 °C", minMin: 2, maxMin: 3 };
     case "rooibos":
-      return "95–100 °C · 5–7 min";
+      return { temp: "95–100 °C", minMin: 5, maxMin: 7 };
     default:
-      return "95–100 °C · 5–6 min";
+      return { temp: "95–100 °C", minMin: 5, maxMin: 6 };
   }
+}
+
+/** Conseil d'infusion (température · temps) dérivé du type de thé. */
+function brewInfo(tea: TeaSachet, t: UiStrings): string | null {
+  const s = brewSpec(tea);
+  if (!s) return null;
+  const time = `${s.minMin}–${s.maxMin} min`;
+  return `${s.temp ?? t.coldWater} · ${time}`;
 }
 
 function formatValue(tea: TeaSachet, t: UiStrings): string {
@@ -83,6 +98,205 @@ function momentValue(tea: TeaSachet, t: UiStrings): string {
   return tea.caffeineFree ? t.momentEvening : t.momentDay;
 }
 
+
+/** Signal de fin : petit bip (Web Audio) + vibration si l'appareil le permet. */
+function ringBell() {
+  try {
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (Ctx) {
+      const ctx = new Ctx();
+      // Trois brefs bips descendants.
+      [0, 0.28, 0.56].forEach((offset, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 880 - i * 110;
+        const start = ctx.currentTime + offset;
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(0.25, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.24);
+      });
+      setTimeout(() => ctx.close().catch(() => {}), 1200);
+    }
+  } catch {
+    /* audio indisponible : on ignore */
+  }
+  try {
+    navigator.vibrate?.([200, 100, 200]);
+  } catch {
+    /* vibration indisponible */
+  }
+}
+
+function formatClock(totalSeconds: number): string {
+  const s = Math.max(0, Math.ceil(totalSeconds));
+  const m = Math.floor(s / 60);
+  return `${m}:${String(s % 60).padStart(2, "0")}`;
+}
+
+const TIMER_MIN = 30;
+const TIMER_MAX = 20 * 60;
+
+/**
+ * Minuteur d'infusion, pré-réglé sur la durée conseillée du thé.
+ * Le décompte s'appuie sur une échéance absolue (Date.now) : il reste juste
+ * même si l'onglet est mis en veille et que les timers sont ralentis.
+ */
+function BrewTimer({ tea, t }: { tea: TeaSachet; t: UiStrings }) {
+  const spec = brewSpec(tea);
+  const preset = (spec ? spec.minMin : 3) * 60;
+
+  const [duration, setDuration] = useState(preset);
+  const [remaining, setRemaining] = useState(preset);
+  const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
+  const deadlineRef = useRef(0);
+
+  // Un thé différent → on repart de sa durée conseillée.
+  useEffect(() => {
+    setDuration(preset);
+    setRemaining(preset);
+    setRunning(false);
+    setDone(false);
+  }, [preset]);
+
+  useEffect(() => {
+    if (!running) return;
+    deadlineRef.current = Date.now() + remaining * 1000;
+    const id = window.setInterval(() => {
+      const left = (deadlineRef.current - Date.now()) / 1000;
+      if (left <= 0) {
+        setRemaining(0);
+        setRunning(false);
+        setDone(true);
+        ringBell();
+      } else {
+        setRemaining(left);
+      }
+    }, 200);
+    return () => window.clearInterval(id);
+    // `remaining` est lu au démarrage pour fixer l'échéance ; l'inclure dans les
+    // dépendances relancerait l'effet à chaque tick.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running]);
+
+  // Garde l'écran allumé pendant l'infusion (si le navigateur le permet).
+  useEffect(() => {
+    if (!running) return;
+    let lock: { release: () => Promise<void> } | null = null;
+    const wl = (
+      navigator as unknown as {
+        wakeLock?: { request: (t: "screen") => Promise<typeof lock> };
+      }
+    ).wakeLock;
+    wl?.request("screen")
+      .then((l) => {
+        lock = l;
+      })
+      .catch(() => {});
+    return () => {
+      lock?.release().catch(() => {});
+    };
+  }, [running]);
+
+  if (!spec) return null;
+
+  const adjust = (delta: number) => {
+    const next = Math.min(TIMER_MAX, Math.max(TIMER_MIN, duration + delta));
+    setDuration(next);
+    setRemaining(next);
+    setDone(false);
+    setRunning(false);
+  };
+
+  const reset = () => {
+    setRemaining(duration);
+    setDone(false);
+    setRunning(false);
+  };
+
+  const progress = duration > 0 ? 1 - remaining / duration : 0;
+  const R = 34;
+  const circumference = 2 * Math.PI * R;
+
+  return (
+    <section
+      className={`timer${done ? " timer--done" : ""}`}
+      aria-label={t.timerAria}
+      style={{ borderColor: `${tea.ink}33` }}
+    >
+      <span className="timer__label">{t.timerLabel}</span>
+
+      <div className="timer__main">
+        <div className="timer__dial">
+          <svg viewBox="0 0 80 80" aria-hidden="true">
+            <circle cx="40" cy="40" r={R} fill="none" strokeWidth="5"
+              stroke={tea.ink} opacity="0.22" />
+            <circle
+              cx="40" cy="40" r={R} fill="none" strokeWidth="5"
+              stroke={tea.ink} strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference * (1 - progress)}
+              transform="rotate(-90 40 40)"
+            />
+          </svg>
+          <span className="timer__clock" role="timer" aria-live="off">
+            {formatClock(remaining)}
+          </span>
+        </div>
+
+        <div className="timer__controls">
+          <button
+            type="button"
+            className="timer__btn timer__btn--primary"
+            style={{ background: tea.ink }}
+            onClick={() => {
+              if (done) reset();
+              else setRunning((r) => !r);
+            }}
+          >
+            {done
+              ? t.timerReset
+              : running
+                ? t.timerPause
+                : remaining < duration
+                  ? t.timerResume
+                  : t.timerStart}
+          </button>
+
+          <div className="timer__adjust">
+            <button type="button" className="timer__btn" style={{ borderColor: tea.ink }}
+              onClick={() => adjust(-30)} aria-label={t.timerLess}
+              disabled={duration <= TIMER_MIN}>
+              −30 s
+            </button>
+            <button type="button" className="timer__btn" style={{ borderColor: tea.ink }}
+              onClick={() => adjust(30)} aria-label={t.timerMore}
+              disabled={duration >= TIMER_MAX}>
+              +30 s
+            </button>
+            {!done && remaining < duration && (
+              <button type="button" className="timer__btn" style={{ borderColor: tea.ink }}
+                onClick={reset}>
+                {t.timerReset}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <p className="timer__status" aria-live="polite">
+        {done ? t.timerDone : ""}
+      </p>
+    </section>
+  );
+}
 
 function Sachet({ tea }: { tea: TeaSachet }) {
   return (
@@ -268,6 +482,8 @@ function TeaModal({
             </div>
           )}
         </dl>
+
+        <BrewTimer tea={tea} t={t} />
 
         {!tea.coffret && (
           <p className="modal__ingredients">
