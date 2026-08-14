@@ -45,6 +45,15 @@ export interface UiStrings {
   collapseAll: string;
   expandAll: string;
   country: string;
+  timerLabel: string;
+  timerStart: string;
+  timerPause: string;
+  timerResume: string;
+  timerReset: string;
+  timerDone: string;
+  timerLess: string;
+  timerMore: string;
+  timerAria: string;
   footer: (count: number, year: number) => string;
   apiLink: string;
   apiTitle: string;
@@ -90,6 +99,15 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Tout réduire",
     expandAll: "Tout déplier",
     country: "Gamme vendue en France",
+    timerLabel: "Minuteur d'infusion",
+    timerStart: "Démarrer",
+    timerPause: "Pause",
+    timerResume: "Reprendre",
+    timerReset: "Réinitialiser",
+    timerDone: "C'est prêt \u{1F375}",
+    timerLess: "Retirer 30 secondes",
+    timerMore: "Ajouter 30 secondes",
+    timerAria: "Minuteur d'infusion",
     footer: (n, year) =>
       `© ${year} par Maxime Nathan Lestage · @maxlestage · ${n} sachets`,
     apiLink: "API",
@@ -134,6 +152,15 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Collapse all",
     expandAll: "Expand all",
     country: "Range sold in France",
+    timerLabel: "Brewing timer",
+    timerStart: "Start",
+    timerPause: "Pause",
+    timerResume: "Resume",
+    timerReset: "Reset",
+    timerDone: "Ready \u{1F375}",
+    timerLess: "Remove 30 seconds",
+    timerMore: "Add 30 seconds",
+    timerAria: "Brewing timer",
     footer: (n, year) =>
       `© ${year} by Maxime Nathan Lestage · @maxlestage · ${n} tea bags`,
     apiLink: "API",
@@ -178,6 +205,15 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Contraer todo",
     expandAll: "Expandir todo",
     country: "Gama vendida en Francia",
+    timerLabel: "Temporizador de infusión",
+    timerStart: "Iniciar",
+    timerPause: "Pausa",
+    timerResume: "Reanudar",
+    timerReset: "Reiniciar",
+    timerDone: "¡Listo! \u{1F375}",
+    timerLess: "Quitar 30 segundos",
+    timerMore: "Añadir 30 segundos",
+    timerAria: "Temporizador de infusión",
     footer: (n, year) =>
       `© ${year} por Maxime Nathan Lestage · @maxlestage · ${n} bolsitas`,
     apiLink: "API",
