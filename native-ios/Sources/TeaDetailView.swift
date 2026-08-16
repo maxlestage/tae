@@ -10,8 +10,11 @@ struct TeaDetailView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Palette.gradient(tea).ignoresSafeArea()
-            TextureOverlay(opacity: 0.12).ignoresSafeArea()
+            // Fond plein écran : la texture est en overlay du dégradé, donc
+            // elle ne peut pas élargir la mise en page (cf. TextureOverlay).
+            Palette.gradient(tea)
+                .overlay(TextureOverlay(opacity: 0.12))
+                .ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 16) {
