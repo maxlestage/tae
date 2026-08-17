@@ -818,7 +818,9 @@ export function App() {
                         />
                       ))}
                     </span>
-                    <span className="group__title">{t.intensityLabel}</span>
+                    <span className="group__title">
+                      {t.intensityName(group.level!)}
+                    </span>
                   </>
                 ) : group.moment !== undefined ? (
                   <>
