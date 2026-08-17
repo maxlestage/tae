@@ -78,7 +78,9 @@ struct TeaDetailView: View {
     }
 
     private var factsGrid: some View {
-        let cols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+        // Colonnes adaptatives : à 3 colonnes fixes, des valeurs comme
+        // « 90–95 °C · 3–4 min » se coupaient en plusieurs lignes serrées.
+        let cols = [GridItem(.adaptive(minimum: 150), spacing: 10)]
         return LazyVGrid(columns: cols, spacing: 10) {
             fact(Loc.typeLabel(lang), Loc.typeName(tea.typeKey, lang))
             fact(Loc.colourLabel(lang), Loc.familyLabel(tea.family, lang))
@@ -98,10 +100,13 @@ struct TeaDetailView: View {
             Text(value)
                 .font(.subheadline).fontWeight(.bold).foregroundColor(ink)
                 .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)   // rétrécit plutôt que de couper
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
+        .padding(.horizontal, 8)
         .background(Color.white.opacity(0.16))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
