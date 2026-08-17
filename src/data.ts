@@ -72,6 +72,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#e20025"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 4,
   },
   {
     id: "english-breakfast",
@@ -86,6 +87,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#c8102e"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 5,
   },
   {
     id: "earl-grey",
@@ -100,6 +102,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#1d3c66"],
     ink: "#3a2a00",
     caffeineFree: false,
+    intensity: 4,
   },
   {
     id: "russian-earl-grey",
@@ -114,6 +117,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#16304f"],
     ink: "#3a2a00",
     caffeineFree: false,
+    intensity: 5,
   },
   {
     id: "darjeeling",
@@ -128,6 +132,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#b5611f"],
     ink: "#4a2400",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "lemon-black",
@@ -142,6 +147,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#f5a623"],
     ink: "#4a2a00",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "red-fruits-black",
@@ -156,6 +162,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#c8102e"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "forest-fruits-black",
@@ -170,6 +177,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#7b2d8e"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "strawberry-black",
@@ -184,6 +192,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#d23a5a"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "blackcurrant-black",
@@ -198,6 +207,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#5e2a84"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "vanilla-black",
@@ -212,6 +222,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#caa06a"],
     ink: "#4a2a00",
     caffeineFree: false,
+    intensity: 3,
   },
 
   // === Ambre — infusions ===
@@ -228,6 +239,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#d9673a", "#9a2f16"],
     ink: "#fff1e6",
     caffeineFree: true,
+    intensity: 2,
   },
   {
     id: "chamomile",
@@ -242,6 +254,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#f3d04a", "#d99a1e"],
     ink: "#4a3500",
     caffeineFree: true,
+    intensity: 1,
   },
 
   // === Vert — gamme thé vert + infusions menthe ===
@@ -258,6 +271,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#7cc243", "#1b5e20"],
     ink: "#0d2e12",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-mint",
@@ -272,6 +286,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#86d35a", "#178a4c"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-orient",
@@ -286,6 +301,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9ad36a", "#3f8a3a"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-citrus",
@@ -300,6 +316,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a8d44f", "#5a9a2e"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-lemon",
@@ -314,6 +331,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#b6d44a", "#6f9a2e"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "sencha",
@@ -328,6 +346,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#8fce5a", "#2f7d3a"],
     ink: "#0d2812",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-mint-intense",
@@ -342,6 +361,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6cc85a", "#1f8a4c"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "peppermint",
@@ -356,6 +376,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#56c596", "#1b8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 3,
   },
   {
     id: "spearmint-soft",
@@ -370,6 +391,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6cc89a", "#1f8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 2,
   },
 
   // === Jaune — thés noirs aromatisés (suite) ===
@@ -386,6 +408,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#f2a31e"],
     ink: "#4a2a00",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "peach-mango",
@@ -400,6 +423,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#f0913f"],
     ink: "#4a2400",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "vanilla-caramel",
@@ -414,6 +438,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#b3742a"],
     ink: "#4a2400",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "blackberry-blueberry",
@@ -428,6 +453,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#5e2a84"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "citrus-black",
@@ -442,6 +468,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#f5a623"],
     ink: "#4a2a00",
     caffeineFree: false,
+    intensity: 3,
   },
 
   // === Ambre — infusion (suite) ===
@@ -458,6 +485,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#e8d24a", "#bfa12e"],
     ink: "#4a3e00",
     caffeineFree: true,
+    intensity: 1,
   },
 
   // === Vert — thés verts + infusions (suite) ===
@@ -478,6 +506,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#8fbf52", "#7a2f5a"],
     ink: "#12260c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "jasmine-petals",
@@ -496,6 +525,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#b6dd8a", "#4f9a3a"],
     ink: "#11320f",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "matcha-japan",
@@ -514,6 +544,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#86c64a", "#3f7d1f"],
     ink: "#10250a",
     caffeineFree: false,
+    intensity: 4,
   },
   {
     id: "boost",
@@ -528,6 +559,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9ad34f", "#2f8a3a"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "jasmine-peach",
@@ -546,6 +578,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a8d45a", "#e0913f"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "verbena",
@@ -560,6 +593,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#bcd860", "#6f9a23"],
     ink: "#27330a",
     caffeineFree: true,
+    intensity: 1,
   },
   {
     id: "green-tchae-mint",
@@ -578,6 +612,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#86d35a", "#178a4c"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-detox-fr",
@@ -592,6 +627,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9ccb5a", "#5a9a2e"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "moroccan-mint",
@@ -610,6 +646,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#56c596", "#1b8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 3,
   },
   {
     id: "digestion",
@@ -624,6 +661,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#7cc89a", "#2f8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 2,
   },
   {
     id: "green-lemon-honey",
@@ -642,6 +680,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#bcd84a", "#8a9a2e"],
     ink: "#1e2a08",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-ginger",
@@ -656,6 +695,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a6d44f", "#5a8a2e"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "green-pomegranate",
@@ -670,6 +710,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9abf52", "#8a2f4a"],
     ink: "#12260c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "verbena-mint",
@@ -688,6 +729,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a8d46a", "#5a9a3a"],
     ink: "#1e2e0c",
     caffeineFree: true,
+    intensity: 2,
   },
   {
     id: "white-tea",
@@ -702,6 +744,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#e3ead0", "#9bb37a"],
     ink: "#2c3a1c",
     caffeineFree: false,
+    intensity: 1,
   },
 
   // === Rouge — infusion fruitée ===
@@ -718,6 +761,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#d81b3f", "#8e0e2a"],
     ink: "#fff0f3",
     caffeineFree: true,
+    intensity: 3,
   },
 
   // === Violet — infusions du soir / bien-être ===
@@ -734,6 +778,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9b7bc4", "#5b3d8a"],
     ink: "#f3ecff",
     caffeineFree: true,
+    intensity: 1,
   },
   {
     id: "evening-mint-licorice",
@@ -752,6 +797,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6f5aa0", "#3d2a6e"],
     ink: "#f1e8ff",
     caffeineFree: true,
+    intensity: 2,
   },
 
   // === Infuse à froid (cold brew) ===
@@ -768,6 +814,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#f3d04a", "#d99a1e"],
     ink: "#4a3500",
     caffeineFree: true,
+    intensity: 1,
     coldBrew: true,
   },
   {
@@ -787,6 +834,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#d6224a", "#8a0f30"],
     ink: "#fff0f3",
     caffeineFree: true,
+    intensity: 3,
     coldBrew: true,
   },
   {
@@ -802,6 +850,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#f58aa6", "#e0594a"],
     ink: "#4a1208",
     caffeineFree: true,
+    intensity: 2,
     coldBrew: true,
   },
   {
@@ -817,6 +866,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#e8913c", "#b05216"],
     ink: "#3d1f00",
     caffeineFree: true,
+    intensity: 2,
     coldBrew: true,
   },
   {
@@ -832,6 +882,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#56c596", "#3aa06a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 2,
     coldBrew: true,
   },
 
@@ -853,6 +904,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#e20025"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 4,
     pyramid: true,
   },
   {
@@ -868,6 +920,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#c8102e"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 5,
     pyramid: true,
   },
   {
@@ -883,6 +936,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#1d3c66"],
     ink: "#3a2a00",
     caffeineFree: false,
+    intensity: 4,
     pyramid: true,
   },
   {
@@ -898,6 +952,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#c8102e"],
     ink: "#4a1206",
     caffeineFree: false,
+    intensity: 3,
     pyramid: true,
   },
   {
@@ -913,6 +968,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#f5a623"],
     ink: "#4a2a00",
     caffeineFree: false,
+    intensity: 3,
     pyramid: true,
   },
   {
@@ -928,6 +984,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#d9673a", "#9a2f16"],
     ink: "#fff1e6",
     caffeineFree: true,
+    intensity: 2,
     pyramid: true,
   },
   {
@@ -943,6 +1000,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#f3d04a", "#cdbb3a"],
     ink: "#4a3500",
     caffeineFree: true,
+    intensity: 1,
     pyramid: true,
   },
   {
@@ -958,6 +1016,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#8fce5a", "#2f7d3a"],
     ink: "#0d2812",
     caffeineFree: false,
+    intensity: 2,
     pyramid: true,
   },
   {
@@ -977,6 +1036,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a8d44f", "#e08a2e"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
     pyramid: true,
   },
   {
@@ -992,6 +1052,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6cc85a", "#1f8a4c"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 3,
     pyramid: true,
   },
   {
@@ -1007,6 +1068,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#6cc89a", "#1f8a5a"],
     ink: "#06291c",
     caffeineFree: true,
+    intensity: 2,
     pyramid: true,
   },
 
@@ -1028,6 +1090,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#a6d45a", "#e0a93f"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-tchae",
@@ -1042,6 +1105,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#7cc243", "#2f8a3a"],
     ink: "#0d2e12",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "green-marrakech-mint-bio",
@@ -1060,6 +1124,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#86d35a", "#1f8a4c"],
     ink: "#0d2e1b",
     caffeineFree: false,
+    intensity: 3,
   },
   {
     id: "green-tropical",
@@ -1074,6 +1139,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#9ad36a", "#e0a93f"],
     ink: "#13280c",
     caffeineFree: false,
+    intensity: 2,
   },
   {
     id: "organic-lemon-ginger",
@@ -1092,6 +1158,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#e8c24a", "#bf8a2e"],
     ink: "#4a3500",
     caffeineFree: true,
+    intensity: 3,
   },
   {
     id: "rooibos-vanilla",
@@ -1106,6 +1173,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#d9673a", "#9a4a16"],
     ink: "#fff1e6",
     caffeineFree: true,
+    intensity: 2,
   },
 
   // === Éditions limitées / saisonnières ===
@@ -1126,6 +1194,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#c9742e", "#7e3d12"],
     ink: "#fff1e6",
     caffeineFree: true,
+    intensity: 3,
     limited: true,
   },
   {
@@ -1141,6 +1210,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#b07d2e"],
     ink: "#4a2400",
     caffeineFree: false,
+    intensity: 3,
     limited: true,
   },
   {
@@ -1160,6 +1230,7 @@ export const TEAS: TeaSachet[] = [
     colors: ["#ffe105", "#c2641f"],
     ink: "#4a2400",
     caffeineFree: false,
+    intensity: 5,
     limited: true,
   },
 
