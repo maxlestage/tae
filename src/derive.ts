@@ -3,28 +3,6 @@ import type { Lang, Localized, TeaSachet, TypeKey } from "./data.ts";
 // Réexport pour le générateur de l'API publique (source unique du catalogue).
 export { TEAS } from "./data.ts";
 
-/** Ajustements d'intensité pour des références marquantes (sinon dérivé du type). */
-const INTENSITY_OVERRIDE: Record<string, number> = {
-  "yellow-label": 4,
-  "extra-bold": 5,
-  intense: 5,
-  "english-breakfast": 4,
-  darjeeling: 3,
-  "decaf-black": 3,
-  matcha: 4,
-  "matcha-japan": 4,
-  sencha: 2,
-  "es-sencha": 2,
-  "white-tea": 1,
-  "green-mint-intense": 3,
-  "es-mint-intense": 3,
-  "moroccan-mint": 3,
-  peppermint: 3,
-  ginger: 3,
-  "lemon-ginger": 3,
-  chai: 4,
-};
-
 /** Ingrédients principaux dérivés du type (fallback). */
 const BASE_INGREDIENTS: Record<TypeKey, Localized> = {
   blackTea: { fr: "Thé noir", en: "Black tea", es: "Té negro" },
@@ -129,11 +107,17 @@ export function ingredientsText(tea: TeaSachet, lang: Lang): string {
   return ingredientsFor(tea)?.[lang] ?? "";
 }
 
-/** Intensité 1–5 ; 0 = non applicable (coffret). */
+/**
+ * Intensité 1–5 ; 0 = non applicable (coffret).
+ *
+ * Chaque thé porte désormais son propre `intensity` dans `data.ts` : la valeur
+ * est jugée thé par thé. Le repli par type ci-dessous ne sert plus qu'aux
+ * références ajoutées sans intensité — le déduire du type donnait des paquets
+ * fourre-tout (42 thés sur 78 dans le même).
+ */
 export function intensityValue(tea: TeaSachet): number {
   if (tea.coffret) return 0;
   if (tea.intensity) return tea.intensity;
-  if (INTENSITY_OVERRIDE[tea.id]) return INTENSITY_OVERRIDE[tea.id];
   switch (tea.typeKey) {
     case "blackTea":
     case "blackTeaSpiced":
