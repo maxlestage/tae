@@ -45,6 +45,7 @@ export interface UiStrings {
   collapseAll: string;
   expandAll: string;
   country: string;
+  intensityName: (level: number) => string;
   timerLabel: string;
   timerStart: string;
   timerPause: string;
@@ -99,6 +100,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Tout réduire",
     expandAll: "Tout déplier",
     country: "Gamme vendue en France",
+    intensityName: (n) =>
+      `${["Très léger", "Léger", "Moyen", "Corsé", "Très corsé"][Math.min(Math.max(n, 1), 5) - 1]} · ${n}/5`,
     timerLabel: "Minuteur d'infusion",
     timerStart: "Démarrer",
     timerPause: "Pause",
@@ -152,6 +155,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Collapse all",
     expandAll: "Expand all",
     country: "Range sold in France",
+    intensityName: (n) =>
+      `${["Very light", "Light", "Medium", "Bold", "Very bold"][Math.min(Math.max(n, 1), 5) - 1]} · ${n}/5`,
     timerLabel: "Brewing timer",
     timerStart: "Start",
     timerPause: "Pause",
@@ -205,6 +210,8 @@ export const UI: Record<Lang, UiStrings> = {
     collapseAll: "Contraer todo",
     expandAll: "Expandir todo",
     country: "Gama vendida en Francia",
+    intensityName: (n) =>
+      `${["Muy suave", "Suave", "Medio", "Intenso", "Muy intenso"][Math.min(Math.max(n, 1), 5) - 1]} · ${n}/5`,
     timerLabel: "Temporizador de infusión",
     timerStart: "Iniciar",
     timerPause: "Pausa",

@@ -7,6 +7,9 @@ struct TeaGroup: Identifiable {
     let title: String
     let color: Color
     let teas: [Tea]
+    /// Renseigné pour un groupe d'intensité : l'en-tête montre alors les points
+    /// 1–5 plutôt qu'une pastille de couleur, qui n'aurait aucun sens.
+    var intensity: Int? = nil
 }
 
 struct ContentView: View {
@@ -60,8 +63,9 @@ struct ContentView: View {
             return stride(from: 5, through: 1, by: -1).compactMap { lvl in
                 let teas = filtered.filter { !$0.isCoffret && $0.intensity == lvl }
                 guard !teas.isEmpty else { return nil }
-                return TeaGroup(id: "i\(lvl)", title: "\(Loc.intensityLabel(lang)) \(lvl)/5",
-                                color: Color(hex: "#8a8a8a"), teas: teas)
+                return TeaGroup(id: "i\(lvl)", title: Loc.intensityName(lvl, lang),
+                                color: Color(hex: "#8a8a8a"), teas: teas,
+                                intensity: lvl)
             }
         }
     }
@@ -160,8 +164,14 @@ struct ContentView: View {
         return VStack(spacing: 12) {
             Button { withAnimation(.easeInOut(duration: 0.2)) { toggle(group.id) } } label: {
                 HStack(spacing: 10) {
-                    Circle().fill(group.color).frame(width: 18, height: 18)
-                    Text(group.title).font(.title3).fontWeight(.bold).foregroundColor(.primary)
+                    if let level = group.intensity {
+                        IntensityDots(value: level, ink: .primary)
+                    } else {
+                        Circle().fill(group.color).frame(width: 18, height: 18)
+                    }
+                    Text(group.title)
+                        .font(.title3).fontWeight(.bold).foregroundColor(.primary)
+                        .lineLimit(1).minimumScaleFactor(0.8)
                     Spacer()
                     Text("\(group.teas.count)")
                         .font(.subheadline).foregroundColor(.secondary)
