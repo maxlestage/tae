@@ -94,10 +94,10 @@ struct BrewTimerView: View {
                     .font(.caption).fontWeight(.semibold)
                     .foregroundColor(ink.opacity(0.75))
 
-                HStack(spacing: 18) {
-                    dial
-                    controls
-                }
+                // Disposition verticale : côte à côte, les puces de réglage
+                // n'avaient pas la place et se coupaient caractère par caractère.
+                dial
+                controls
 
                 Text(done
                      ? Loc.timerDone(lang)
@@ -130,53 +130,63 @@ struct BrewTimerView: View {
                 .stroke(ink, style: StrokeStyle(lineWidth: 5, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Text(clock)
-                .font(.title3).fontWeight(.heavy)
+                .font(.title).fontWeight(.heavy)
                 .monospacedDigit()
+                .lineLimit(1)
                 .foregroundColor(ink)
         }
-        .frame(width: 84, height: 84)
+        .frame(width: 108, height: 108)
     }
 
     private var controls: some View {
-        VStack(spacing: 8) {
-            Button(action: primaryAction) {
-                Text(primaryLabel)
-                    .font(.subheadline).fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 22).padding(.vertical, 9)
-                    .background(ink)
-                    .clipShape(Capsule())
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 6) {
+        VStack(spacing: 10) {
+            // Réglage : deux puces courtes + une icône pour la remise à zéro.
+            // Le mot « Réinitialiser » est trop long ici et forçait le retour
+            // à la ligne caractère par caractère.
+            HStack(spacing: 8) {
                 adjustButton("−30 s", delta: -30, label: Loc.timerLess(lang),
                              disabled: seconds <= Self.minSeconds)
                 adjustButton("+30 s", delta: 30, label: Loc.timerMore(lang),
                              disabled: seconds >= Self.maxSeconds)
                 if !done, remaining != nil {
                     Button(action: reset) {
-                        chip(Loc.timerReset(lang))
+                        chip(Image(systemName: "arrow.counterclockwise"))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Loc.timerReset(lang))
                 }
             }
+
+            Button(action: primaryAction) {
+                Text(primaryLabel)
+                    .font(.subheadline).fontWeight(.bold)
+                    .lineLimit(1)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .background(ink)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
         }
     }
 
     private func adjustButton(_ title: String, delta: Int, label: String, disabled: Bool) -> some View {
-        Button { adjust(by: delta) } label: { chip(title) }
+        Button { adjust(by: delta) } label: { chip(Text(title)) }
             .buttonStyle(.plain)
             .disabled(disabled)
             .opacity(disabled ? 0.4 : 1)
             .accessibilityLabel(label)
     }
 
-    private func chip(_ title: String) -> some View {
-        Text(title)
+    /// Puce compacte : `lineLimit(1)` + `fixedSize` pour qu'elle ne se coupe jamais.
+    private func chip<Content: View>(_ content: Content) -> some View {
+        content
             .font(.caption).fontWeight(.bold)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .foregroundColor(ink)
-            .padding(.horizontal, 11).padding(.vertical, 6)
+            .padding(.horizontal, 12).padding(.vertical, 7)
             .background(Color.white.opacity(0.28))
             .overlay(Capsule().stroke(ink.opacity(0.5), lineWidth: 1))
             .clipShape(Capsule())
