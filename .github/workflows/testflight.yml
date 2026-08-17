@@ -1,20 +1,28 @@
 name: TestFlight (iOS)
 
-# Compile l'app iOS native sur un runner macOS de GitHub et l'envoie sur
-# TestFlight — aucun Mac requis de ton côté. Se lance à la main (bouton
-# « Run workflow ») ou en poussant un tag « ios-v… » (ex. ios-v1.0.1).
+# Chaîne automatique : à chaque push sur master, l'app est régénérée et
+# compilée (garde-fou : on voit tout de suite si le Swift casse), puis — si les
+# secrets App Store Connect sont présents — archivée et envoyée sur TestFlight.
+# Rien à incrémenter ni à préparer à la main.
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - "ios-v*"
+    branches: [master]
+    paths:
+      - "native-ios/**"
+      - "src/**"
+      - "build.mjs"
+      - "package.json"
+      - ".github/workflows/testflight.yml"
+  workflow_dispatch:
+
+# Un seul build à la fois : un push plus récent annule le précédent.
+concurrency:
+  group: testflight
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: macos-14
-    defaults:
-      run:
-        working-directory: native-ios
     env:
       SCHEME: LiptonThes
       KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
@@ -22,6 +30,9 @@ jobs:
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Historique complet : le numéro de build est déduit du nombre de commits.
+          fetch-depth: 0
 
       - name: Sélectionner Xcode
         run: |
@@ -31,18 +42,58 @@ jobs:
           if [ -n "$latest" ]; then sudo xcode-select -s "$latest"; fi
           xcodebuild -version
 
-      - name: Installer XcodeGen
-        run: brew install xcodegen
+      - name: Numéro de build automatique
+        id: version
+        run: |
+          # Le nombre de commits ne fait que croître : le numéro est donc
+          # toujours supérieur au précédent, sans intervention.
+          echo "build=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Build number : $(git rev-list --count HEAD)"
 
-      - name: Générer le projet Xcode
-        run: xcodegen generate
+      - name: Synchroniser le catalogue depuis le web
+        run: |
+          npm ci
+          npm run native:data      # build web + copie de dist/api/teas.json
+
+      - name: Installer XcodeGen et générer le projet
+        working-directory: native-ios
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      # Compile sans signer : marche même sans secrets, et sert de garde-fou
+      # sur chaque push (erreurs Swift détectées immédiatement).
+      - name: Vérifier la compilation
+        working-directory: native-ios
+        run: |
+          xcodebuild build \
+            -project LiptonThes.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.build }}"
+
+      - name: Les secrets App Store Connect sont-ils présents ?
+        id: secrets
+        run: |
+          if [ -n "$KEY_ID" ] && [ -n "$ISSUER_ID" ] && [ -n "$TEAM_ID" ] \
+             && [ -n "${{ secrets.ASC_API_KEY_P8 }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Secrets absents — compilation vérifiée, envoi TestFlight ignoré."
+          fi
 
       - name: Installer la clé App Store Connect
+        if: steps.secrets.outputs.ready == 'true'
         run: |
           mkdir -p "$HOME/private_keys"
           printf '%s' "${{ secrets.ASC_API_KEY_P8 }}" > "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
 
-      - name: Archiver (signature auto via la clé API)
+      - name: Archiver
+        if: steps.secrets.outputs.ready == 'true'
+        working-directory: native-ios
         run: |
           xcodebuild archive \
             -project LiptonThes.xcodeproj \
@@ -55,9 +106,11 @@ jobs:
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CURRENT_PROJECT_VERSION="${{ github.run_number }}"
+            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.build }}"
 
       - name: Exporter l'IPA
+        if: steps.secrets.outputs.ready == 'true'
+        working-directory: native-ios
         run: |
           cat > ExportOptions.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
@@ -82,9 +135,11 @@ jobs:
             -authenticationKeyIssuerID "$ISSUER_ID"
 
       - name: Envoyer sur TestFlight
+        if: steps.secrets.outputs.ready == 'true'
+        working-directory: native-ios
         run: |
           IPA=$(find build/export -name '*.ipa' | head -1)
-          echo "Upload de $IPA"
+          echo "Upload de $IPA (build ${{ steps.version.outputs.build }})"
           xcrun altool --upload-app --type ios --file "$IPA" \
             --apiKey "$KEY_ID" --apiIssuer "$ISSUER_ID"
 
