@@ -37,6 +37,18 @@ enum Loc {
     }
     static func varied(_ l: Lang) -> String { [.fr: "Varié", .en: "Varies", .es: "Variado"][l]! }
 
+    /// Nom du niveau d'intensité (plus parlant qu'un simple « 4/5 »).
+    static func intensityName(_ level: Int, _ l: Lang) -> String {
+        let names: [Lang: [String]] = [
+            .fr: ["Très léger", "Léger", "Moyen", "Corsé", "Très corsé"],
+            .en: ["Very light", "Light", "Medium", "Bold", "Very bold"],
+            .es: ["Muy suave", "Suave", "Medio", "Intenso", "Muy intenso"],
+        ]
+        let list = names[l]!
+        let name = list[min(max(level, 1), 5) - 1]
+        return "\(name) · \(level)/5"
+    }
+
     // MARK: Infusion & minuteur
 
     static func brewLabel(_ l: Lang) -> String {
