@@ -42,6 +42,8 @@ struct TeaDetailView: View {
                         .padding(.vertical, 4)
                     }
 
+                    BrewTimerView(tea: tea, lang: lang, ink: ink)
+
                     if let ing = tea.ingredients {
                         VStack(spacing: 4) {
                             Text(Loc.ingredientsLabel(lang).uppercased())
@@ -83,6 +85,9 @@ struct TeaDetailView: View {
             fact(Loc.caffeineLabel(lang),
                  tea.isCoffret ? Loc.varied(lang) : (tea.caffeineFree ? Loc.caffeineFree(lang) : Loc.caffeinated(lang)))
             fact(Loc.formatLabel(lang), Loc.fmt(tea, lang))
+            if let brew = brewInfo(for: tea, lang) {
+                fact(Loc.brewLabel(lang), brew)
+            }
         }
     }
 
