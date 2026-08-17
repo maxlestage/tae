@@ -7,9 +7,9 @@ options:
 settings:
   base:
     MARKETING_VERSION: "1.0.0"
-    # Numéro de build : doit être strictement supérieur au dernier envoyé sur
-    # App Store Connect (build 4 refusé pour ITMS-90474). À incrémenter à chaque
-    # nouvel envoi, sinon Apple rejette le doublon.
+    # Numéro de build de repli, utilisé uniquement pour les builds locaux
+    # (simulateur, essais). Les envois passent par la CI, qui l'écrase par le
+    # nombre de commits — donc toujours croissant, sans intervention.
     CURRENT_PROJECT_VERSION: "6"
     SWIFT_VERSION: "5.9"
     TARGETED_DEVICE_FAMILY: "1,2"
