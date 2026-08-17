@@ -110,17 +110,25 @@ extension SwiftUI, qu'aucune coquille WebView ne peut fournir.
 > Compiler et publier une app iOS nécessite **macOS + Xcode** et un **compte
 > Apple Developer**. Le code et le projet sont prêts ; ces étapes se font sur un Mac.
 
-```bash
-brew install xcodegen         # une fois
-cd native-ios
-xcodegen generate             # crée LiptonThes.xcodeproj
-open LiptonThes.xcodeproj      # Xcode → choisir l'équipe → Run / Archive
-```
+### Envoi automatique sur TestFlight
 
-Voir [`native-ios/README.md`](native-ios/README.md) et, pour la distribution,
-[`native-ios/TESTFLIGHT.md`](native-ios/TESTFLIGHT.md) (Xcode Cloud, ou le
-workflow GitHub Actions `.github/workflows/testflight.yml` qui compile sur un
-runner macOS — sans Mac). Après une modif du catalogue : `npm run native:data`.
+Tout est enchaîné par la CI : **un push sur `master`** régénère le projet,
+synchronise le catalogue depuis le web, **vérifie la compilation**, puis archive
+et envoie sur TestFlight. Le **numéro de build est automatique** (nombre de
+commits, donc toujours croissant) — rien à incrémenter.
+
+Sans les secrets App Store Connect, la CI s'arrête après la compilation : elle
+sert alors de garde-fou (on voit immédiatement si le Swift casse). Pour activer
+l'envoi, ajouter les 4 secrets décrits dans
+[`native-ios/TESTFLIGHT.md`](native-ios/TESTFLIGHT.md).
+
+### Travailler en local (Mac)
+
+```bash
+brew install xcodegen          # une fois
+npm run ios:prepare            # build web + catalogue + projet Xcode
+open native-ios/LiptonThes.xcodeproj
+```
 
 ## Structure
 
