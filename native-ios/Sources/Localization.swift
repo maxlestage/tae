@@ -37,6 +37,46 @@ enum Loc {
     }
     static func varied(_ l: Lang) -> String { [.fr: "Varié", .en: "Varies", .es: "Variado"][l]! }
 
+    // MARK: Infusion & minuteur
+
+    static func brewLabel(_ l: Lang) -> String {
+        [.fr: "Infusion", .en: "Brewing", .es: "Infusión"][l]!
+    }
+    static func coldWater(_ l: Lang) -> String {
+        [.fr: "Eau froide", .en: "Cold water", .es: "Agua fría"][l]!
+    }
+    static func timerLabel(_ l: Lang) -> String {
+        [.fr: "Minuteur d'infusion", .en: "Brewing timer", .es: "Temporizador de infusión"][l]!
+    }
+    static func timerStart(_ l: Lang) -> String {
+        [.fr: "Démarrer", .en: "Start", .es: "Iniciar"][l]!
+    }
+    static func timerPause(_ l: Lang) -> String {
+        [.fr: "Pause", .en: "Pause", .es: "Pausa"][l]!
+    }
+    static func timerResume(_ l: Lang) -> String {
+        [.fr: "Reprendre", .en: "Resume", .es: "Reanudar"][l]!
+    }
+    static func timerReset(_ l: Lang) -> String {
+        [.fr: "Réinitialiser", .en: "Reset", .es: "Reiniciar"][l]!
+    }
+    static func timerDone(_ l: Lang) -> String {
+        [.fr: "C'est prêt 🍵", .en: "Ready 🍵", .es: "¡Listo! 🍵"][l]!
+    }
+    static func timerAdvised(_ l: Lang, range: String) -> String {
+        switch l {
+        case .fr: return "Conseillé : \(range)"
+        case .en: return "Advised: \(range)"
+        case .es: return "Recomendado: \(range)"
+        }
+    }
+    static func timerLess(_ l: Lang) -> String {
+        [.fr: "Retirer 30 secondes", .en: "Remove 30 seconds", .es: "Quitar 30 segundos"][l]!
+    }
+    static func timerMore(_ l: Lang) -> String {
+        [.fr: "Ajouter 30 secondes", .en: "Add 30 seconds", .es: "Añadir 30 segundos"][l]!
+    }
+
     // MARK: Écran « À propos » / crédits
 
     static func aboutTitle(_ l: Lang) -> String {
