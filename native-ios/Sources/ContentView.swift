@@ -13,12 +13,20 @@ struct TeaGroup: Identifiable {
 }
 
 struct ContentView: View {
-    @State private var lang: Lang = .fr
+    // Langue mémorisée entre deux lancements (comme sur le site), et partagée
+    // avec l'écran de lancement.
+    @AppStorage("tea-lang") private var langCode = Lang.fr.rawValue
     @State private var sort: SortMode = .color
     @State private var family: String? = nil
     @State private var collapsed: Set<String> = []
     @State private var selected: Tea? = nil
     @State private var showAbout = false
+
+    private var lang: Lang { Lang(rawValue: langCode) ?? .fr }
+
+    private var langSelection: Binding<Lang> {
+        Binding(get: { lang }, set: { langCode = $0.rawValue })
+    }
 
     var body: some View {
         ScrollView {
@@ -78,7 +86,7 @@ struct ContentView: View {
 
     private var topBar: some View {
         HStack {
-            Picker("", selection: $lang) {
+            Picker("", selection: langSelection) {
                 ForEach(Lang.allCases) { Text($0.label).tag($0) }
             }
             .pickerStyle(.segmented)
