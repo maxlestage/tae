@@ -37,6 +37,17 @@ enum Loc {
     }
     static func varied(_ l: Lang) -> String { [.fr: "Varié", .en: "Varies", .es: "Variado"][l]! }
 
+    // MARK: Écran de lancement
+
+    static func splashCreatedBy(_ l: Lang) -> String {
+        [.fr: "Créé et développé par",
+         .en: "Created and developed by",
+         .es: "Creado y desarrollado por"][l]!
+    }
+    static func splashLoading(_ l: Lang) -> String {
+        [.fr: "Infusion en cours…", .en: "Brewing…", .es: "Infusionando…"][l]!
+    }
+
     /// Nom du niveau d'intensité (plus parlant qu'un simple « 4/5 »).
     static func intensityName(_ level: Int, _ l: Lang) -> String {
         let names: [Lang: [String]] = [
