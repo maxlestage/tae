@@ -16,7 +16,12 @@ struct SplashView: View {
     /// Durée minimale d'affichage, pour éviter un flash désagréable.
     private let minimumDisplay: TimeInterval = 1.6
 
-    private let ink = Color(hex: "#4a1206")
+    /// Thé tiré au sort à chaque lancement : le fond reprend son dégradé et son
+    /// encre (déjà calibrée pour rester lisible sur ce fond). Les coffrets sont
+    /// écartés — leur dégradé arc-en-ciel n'a pas d'encre adaptée au splash.
+    private let tea = DataStore.teas.filter { !$0.isCoffret }.randomElement()
+
+    private var ink: Color { Color(hex: tea?.ink ?? "#4a1206") }
 
     @State private var badgeIn = false
     @State private var titleIn = false
@@ -71,14 +76,23 @@ struct SplashView: View {
     // MARK: Éléments
 
     private var background: some View {
-        LinearGradient(
-            stops: [
-                .init(color: Palette.lighten("#ffe105", 0.42), location: 0),
-                .init(color: Color(hex: "#ffe105"), location: 0.45),
-                .init(color: Color(hex: "#e20025"), location: 1),
-            ],
-            startPoint: .topLeading, endPoint: .bottomTrailing
-        )
+        Group {
+            if let tea {
+                // Le dégradé du thé tiré au sort — un fond différent à chaque
+                // lancement, parmi les 70+ références.
+                Palette.gradient(tea)
+            } else {
+                // Repli (catalogue vide) : le jaune → rouge Lipton.
+                LinearGradient(
+                    stops: [
+                        .init(color: Palette.lighten("#ffe105", 0.42), location: 0),
+                        .init(color: Color(hex: "#ffe105"), location: 0.45),
+                        .init(color: Color(hex: "#e20025"), location: 1),
+                    ],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+            }
+        }
         .overlay(TextureOverlay(opacity: 0.14))
         .ignoresSafeArea()
     }
@@ -104,6 +118,16 @@ struct SplashView: View {
             Text(Loc.splashLoading(lang))
                 .font(.footnote).fontWeight(.semibold)
                 .foregroundColor(ink.opacity(0.75))
+
+            // Nomme le thé qui donne sa couleur au fond : sans cela, un fond
+            // différent à chaque lancement pourrait passer pour un bug.
+            if let tea {
+                Text(tea.name[lang])
+                    .font(.caption2).fontWeight(.bold)
+                    .kerning(0.6)
+                    .foregroundColor(ink.opacity(0.55))
+                    .lineLimit(1)
+            }
         }
     }
 
