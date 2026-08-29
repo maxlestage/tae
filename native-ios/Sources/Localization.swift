@@ -40,9 +40,9 @@ enum Loc {
     // MARK: Écran de lancement
 
     static func splashCreatedBy(_ l: Lang) -> String {
-        [.fr: "Créé et développé par",
-         .en: "Created and developed by",
-         .es: "Creado y desarrollado por"][l]!
+        [.fr: "Conçu et développé par",
+         .en: "Designed and developed by",
+         .es: "Diseñado y desarrollado por"][l]!
     }
     static func splashLoading(_ l: Lang) -> String {
         [.fr: "Infusion en cours…", .en: "Brewing…", .es: "Infusionando…"][l]!
@@ -109,7 +109,9 @@ enum Loc {
         [.fr: "Crédits", .en: "Credits", .es: "Créditos"][l]!
     }
     static func aboutBy(_ l: Lang) -> String {
-        [.fr: "Application créée par", .en: "App created by", .es: "Aplicación creada por"][l]!
+        [.fr: "Application conçue et développée par",
+         .en: "App designed and developed by",
+         .es: "Aplicación diseñada y desarrollada por"][l]!
     }
     static func aboutVersion(_ l: Lang) -> String {
         [.fr: "Version", .en: "Version", .es: "Versión"][l]!
