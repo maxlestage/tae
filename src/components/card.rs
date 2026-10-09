@@ -1,7 +1,7 @@
 use super::Opened;
 use crate::catalog::Tea;
 use crate::i18n::{Lang, type_label, ui};
-use crate::tea::{card_style, lines};
+use crate::tea::{brew_spec, card_style, lines};
 use web_sys::HtmlElement;
 use yew::prelude::*;
 
@@ -86,6 +86,16 @@ pub fn TeaCard(props: &CardProps) -> Html {
                 { for lines(tea, t).into_iter().map(|l| html! { <span class="card__line">{ l }</span> }) }
                 <span class="card__name">{ tea.name.get(props.lang) }</span>
                 <span class="card__desc">{ tea.description.get(props.lang) }</span>
+                if let Some(spec) = brew_spec(tea) {
+                    <span class="card__meta">
+                        <span class="intensity" title={t.intensity_name(tea.intensity)}>
+                            { for (1..=5).map(|i| html! {
+                                <span class={classes!("intensity__dot", (i <= tea.intensity).then_some("is-on"))}></span>
+                            }) }
+                        </span>
+                        <span class="card__time">{ format!("⏱ {}", spec.time_label()) }</span>
+                    </span>
+                }
                 <span class="card__open">{ t.open_card }</span>
             </button>
         </div>

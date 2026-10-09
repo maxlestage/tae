@@ -3,6 +3,7 @@
 mod app;
 mod catalog;
 mod components;
+mod content;
 mod dom;
 mod i18n;
 mod motion;

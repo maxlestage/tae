@@ -1,0 +1,92 @@
+{
+  "blackTea": {
+    "tempC": [90, 95],
+    "minutes": [3, 5],
+    "tips": {
+      "fr": "Eau frémissante. Au-delà de 5 min, le thé devient amer.",
+      "en": "Near-boiling water. Past 5 min it turns bitter.",
+      "es": "Agua casi hirviendo. Más de 5 min amarga."
+    }
+  },
+  "blackTeaFlavored": {
+    "tempC": [90, 95],
+    "minutes": [3, 4],
+    "tips": {
+      "fr": "Un peu plus court pour préserver les arômes.",
+      "en": "Slightly shorter to keep the aromas.",
+      "es": "Un poco más corto para conservar los aromas."
+    }
+  },
+  "blackTeaSpiced": {
+    "tempC": [90, 95],
+    "minutes": [4, 5],
+    "tips": {
+      "fr": "Se marie très bien avec un nuage de lait.",
+      "en": "Pairs well with a dash of milk.",
+      "es": "Combina bien con un poco de leche."
+    }
+  },
+  "greenTea": {
+    "tempC": [70, 80],
+    "minutes": [1, 3],
+    "tips": {
+      "fr": "Eau pas trop chaude, sinon amertume.",
+      "en": "Don't use boiling water or it gets bitter.",
+      "es": "Agua no muy caliente o amarga."
+    }
+  },
+  "greenTeaFlavored": {
+    "tempC": [70, 80],
+    "minutes": [2, 3],
+    "tips": {
+      "fr": "Idéal l'après-midi.",
+      "en": "Great in the afternoon.",
+      "es": "Ideal por la tarde."
+    }
+  },
+  "whiteTea": {
+    "tempC": [70, 80],
+    "minutes": [2, 5],
+    "tips": {
+      "fr": "Thé délicat : eau douce et infusion patiente.",
+      "en": "Delicate tea: soft water, patient steeping.",
+      "es": "Té delicado: agua suave e infusión paciente."
+    }
+  },
+  "rooibos": {
+    "tempC": [90, 100],
+    "minutes": [5, 7],
+    "tips": {
+      "fr": "Naturellement sans théine, infusion longue possible.",
+      "en": "Naturally caffeine-free, long steeping is fine.",
+      "es": "Sin teína por naturaleza, admite infusión larga."
+    }
+  },
+  "infusion": {
+    "tempC": [90, 100],
+    "minutes": [5, 7],
+    "tips": {
+      "fr": "Eau bien chaude pour libérer les plantes.",
+      "en": "Hot water to release the herbs.",
+      "es": "Agua bien caliente para liberar las plantas."
+    }
+  },
+  "infusionFruity": {
+    "tempC": [90, 100],
+    "minutes": [5, 8],
+    "tips": {
+      "fr": "Délicieuse aussi glacée.",
+      "en": "Also delicious iced.",
+      "es": "Deliciosa también con hielo."
+    }
+  },
+  "coffret": {
+    "tempC": null,
+    "minutes": null,
+    "tips": {
+      "fr": "Coffret de plusieurs parfums : suivre chaque sachet.",
+      "en": "Gift set of several flavours: follow each bag.",
+      "es": "Estuche de varios sabores: seguir cada bolsita."
+    }
+  }
+}
