@@ -2,7 +2,7 @@ use super::{LangProps, section_head};
 use crate::catalog::{TEAS, TypeKey, types_of};
 use crate::content::{
     COLD_BREW, COLD_TIP, COLUMN_TEMP, COLUMN_TIME, COLUMN_TIP, COLUMN_TYPE, GUIDE, RULES,
-    TEAS_IN_CATALOGUE, type_tip,
+    teas_count, type_tip,
 };
 use crate::i18n::{type_label, ui};
 use crate::tea::{BrewSpec, brew_for};
@@ -103,7 +103,7 @@ pub fn Guide(props: &LangProps) -> Html {
                             <tr data-reveal="">
                                 <th scope="row" data-label={COLUMN_TYPE.get(lang)}>
                                     <span class="brew-table__type">{ label }</span>
-                                    <span class="brew-table__count">{ format!("{count} {}", TEAS_IN_CATALOGUE.get(lang)) }</span>
+                                    <span class="brew-table__count">{ teas_count(count, lang) }</span>
                                 </th>
                                 <td data-label={COLUMN_TEMP.get(lang)}>
                                     <span class="brew-table__value">{ spec.temp_label(t) }</span>

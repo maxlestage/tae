@@ -3,6 +3,7 @@
 //! glossaire viennent de `data/` (partagés avec l'API) via `build.rs`.
 
 use crate::catalog::{Localized, Tea, TypeKey};
+use crate::i18n::Lang;
 
 /// Entrée du glossaire.
 pub struct Term {
@@ -101,7 +102,15 @@ pub const COLUMN_TYPE: Localized = l("Type", "Type", "Tipo");
 pub const COLUMN_TEMP: Localized = l("Température", "Temperature", "Temperatura");
 pub const COLUMN_TIME: Localized = l("Durée", "Time", "Tiempo");
 pub const COLUMN_TIP: Localized = l("Conseil", "Tip", "Consejo");
-pub const TEAS_IN_CATALOGUE: Localized = l("sachets", "tea bags", "bolsitas");
+/// « 1 sachet », « 5 sachets ».
+pub fn teas_count(n: usize, lang: Lang) -> String {
+    let unit = if n == 1 {
+        l("sachet", "tea bag", "bolsita")
+    } else {
+        l("sachets", "tea bags", "bolsitas")
+    };
+    format!("{n} {}", unit.get(lang))
+}
 pub const COLD_BREW: Localized = l("Infuse à froid", "Cold brew", "Infusión en frío");
 pub const COLD_TIP: Localized = l(
     "Sachet dans une carafe d'eau froide, puis au frais : une boisson douce, jamais amère.",
