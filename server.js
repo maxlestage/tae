@@ -3,19 +3,22 @@ import { readFile } from "node:fs/promises";
 import { join, normalize, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { brotliCompressSync, gzipSync, constants as zlib } from "node:zlib";
 import { BREWING, GLOSSARY, EXERCISES } from "./api-content.js";
 
-const DIST = join(fileURLToPath(new URL(".", import.meta.url)), "dist");
+const ROOT = fileURLToPath(new URL(".", import.meta.url));
+const DIST = join(ROOT, "dist");
 const PORT = process.env.PORT || 3000;
 
 // === API publique ========================================================
-// Catalogue chargé en mémoire depuis dist/api/teas.json (généré au build).
+// Catalogue chargé en mémoire depuis data/teas.json : la source unique, aussi
+// compilée dans le front Yew et embarquée dans l'app iOS.
 let TEAS = [];
 try {
-  const raw = await readFile(join(DIST, "api", "teas.json"), "utf8");
+  const raw = await readFile(join(ROOT, "data", "teas.json"), "utf8");
   TEAS = JSON.parse(raw).teas ?? [];
 } catch {
-  console.warn("api: dist/api/teas.json introuvable (lancer `npm run build`).");
+  console.warn("api: data/teas.json introuvable ou invalide.");
 }
 
 const LANGS = ["fr", "en", "es"];
@@ -937,12 +940,77 @@ const MIME = {
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".webmanifest": "application/manifest+json; charset=utf-8",
+  // Indispensable à WebAssembly.instantiateStreaming (chargement du front Yew).
+  ".wasm": "application/wasm",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".woff2": "font/woff2",
 };
+
+// Types qui gagnent à être compressés (le WASM fond d'environ deux tiers).
+const COMPRESSIBLE = new Set([".html", ".js", ".css", ".json", ".webmanifest", ".wasm", ".svg"]);
+
+/** Fichiers statiques déjà lus (et compressés), par chemin et URL de base. */
+const staticCache = new Map();
+
+async function loadStatic(filePath, base) {
+  const key = `${filePath}|${base}`;
+  const hit = staticCache.get(key);
+  if (hit) return hit;
+
+  let body = await readFile(filePath);
+  const ext = extname(filePath);
+  // Pour le HTML, on remplace __BASE_URL__ par l'URL absolue du site,
+  // afin que les aperçus de lien (Open Graph) pointent vers la bonne image.
+  if (ext === ".html") {
+    body = Buffer.from(body.toString("utf8").replaceAll("__BASE_URL__", base));
+  }
+  const entry = {
+    body,
+    type: MIME[ext] || "application/octet-stream",
+    etag: `"${createHash("sha1").update(body).digest("base64")}"`,
+    br: null,
+    gzip: null,
+  };
+  if (COMPRESSIBLE.has(ext) && body.length > 1024) {
+    entry.br = brotliCompressSync(body, {
+      params: { [zlib.BROTLI_PARAM_QUALITY]: 11, [zlib.BROTLI_PARAM_SIZE_HINT]: body.length },
+    });
+    entry.gzip = gzipSync(body, { level: 9 });
+  }
+  // Garde-fou : l'en-tête Host est libre, on borne la taille du cache.
+  if (staticCache.size > 256) staticCache.clear();
+  staticCache.set(key, entry);
+  return entry;
+}
+
+function sendStatic(req, res, entry) {
+  const headers = {
+    "content-type": entry.type,
+    etag: entry.etag,
+    // Noms de fichiers stables : on revalide à chaque visite (304 si inchangé).
+    "cache-control": "no-cache",
+    vary: "accept-encoding",
+  };
+  if (req.headers["if-none-match"] === entry.etag) {
+    res.writeHead(304, headers);
+    return res.end();
+  }
+  const accept = req.headers["accept-encoding"] ?? "";
+  let body = entry.body;
+  if (entry.br && /\bbr\b/.test(accept)) {
+    body = entry.br;
+    headers["content-encoding"] = "br";
+  } else if (entry.gzip && /\bgzip\b/.test(accept)) {
+    body = entry.gzip;
+    headers["content-encoding"] = "gzip";
+  }
+  headers["content-length"] = body.length;
+  res.writeHead(200, headers);
+  res.end(req.method === "HEAD" ? undefined : body);
+}
 
 const server = createServer(async (req, res) => {
   try {
@@ -963,29 +1031,18 @@ const server = createServer(async (req, res) => {
       return res.end("Forbidden");
     }
 
-    let body;
+    const proto = req.headers["x-forwarded-proto"]?.split(",")[0] ?? "https";
+    const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+    const base = host ? `${proto}://${host}` : "";
+
+    let entry;
     try {
-      body = await readFile(filePath);
+      entry = await loadStatic(filePath, extname(filePath) === ".html" ? base : "");
     } catch {
       // Fallback SPA : on renvoie index.html.
-      filePath = join(DIST, "index.html");
-      body = await readFile(filePath);
+      entry = await loadStatic(join(DIST, "index.html"), base);
     }
-
-    // Pour le HTML, on remplace __BASE_URL__ par l'URL absolue du site,
-    // afin que les aperçus de lien (Open Graph) pointent vers la bonne image.
-    if (extname(filePath) === ".html") {
-      const proto =
-        req.headers["x-forwarded-proto"]?.split(",")[0] ?? "https";
-      const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
-      const base = host ? `${proto}://${host}` : "";
-      body = Buffer.from(body.toString("utf8").replaceAll("__BASE_URL__", base));
-    }
-
-    res.writeHead(200, {
-      "content-type": MIME[extname(filePath)] || "application/octet-stream",
-    });
-    res.end(body);
+    sendStatic(req, res, entry);
   } catch {
     res.writeHead(500);
     res.end("Internal Server Error");
@@ -993,5 +1050,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Lipton tea colors — serving ./dist on :${PORT}`);
+  console.log(`Lipton tea colors — front Yew (./dist) + API sur :${PORT}`);
 });

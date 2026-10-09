@@ -1,22 +1,26 @@
-# --- Étape build : installe les deps et compile le front avec esbuild ---
-FROM node:22-slim AS build
+# --- Étape 1 : front Yew (Rust → WebAssembly) compilé par Trunk → ./dist ---
+FROM rust:1.97-slim AS front
 WORKDIR /app
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
-# Cache des dépendances
-COPY package.json package-lock.json* ./
-RUN npm install
+COPY rust-toolchain.toml Cargo.toml Cargo.lock build.rs Trunk.toml index.html ./
+COPY scripts ./scripts
+COPY data ./data
+COPY src ./src
+COPY styles ./styles
+COPY public ./public
+RUN sh scripts/build.sh
 
-# Build statique → ./dist
-COPY . .
-RUN npm run build
-
-# --- Étape runtime : image légère qui sert ./dist ---
-FROM node:22-slim AS runtime
+# --- Étape 2 : image légère Node qui sert ./dist + l'API publique ---
+FROM node:24-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=build /app/dist ./dist
-COPY server.js ./
+COPY --from=front /app/dist ./dist
+COPY server.js api-content.js package.json ./
+COPY data ./data
 
 # Heroku fournit $PORT au démarrage ; server.js l'utilise.
 EXPOSE 3000
