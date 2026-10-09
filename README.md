@@ -1,49 +1,79 @@
 # 🫖 Lipton — Sachets de thé par couleurs
 
-Front-end **React 19** (build **esbuild**, serveur **Node**) qui présente une
-collection de sachets de thé Lipton **triés par couleurs**. Chaque thé a sa
-**fiche colorée** reprenant les teintes du thé ou de sa boîte (dégradé +
-nuancier des codes hex).
+Site qui présente la gamme de sachets de thé Lipton vendue en France, **triée par
+couleurs**. Chaque thé a sa **fiche colorée** reprenant les teintes de sa boîte
+(dégradé + nuancier des codes hex), son intensité, ses ingrédients et un
+minuteur d'infusion.
+
+Le front est écrit en **Rust** avec **[Yew](https://yew.rs) 0.23** et compilé en
+**WebAssembly** par **[Trunk](https://trunkrs.dev)** ; un serveur **Node 24**
+sans dépendance sert le site et une **API JSON publique**.
+
+> Présentation complète de l'app : **[FICHE-PRODUIT.md](FICHE-PRODUIT.md)**.
 
 ## Fonctionnalités
 
-- 🎨 **Fiches colorées** — dégradé aux couleurs du thé / de la boîte, encre lisible adaptée.
-- 🗂️ **Tri par familles de couleurs** — Jaune, Ambre, Rouge, Rose, Violet, Bleu, Vert.
-- 🔘 **Filtres** par couleur en un clic.
-- 🍵 **Sachet illustré** et nuancier hex sur chaque carte.
-- ⚡ Stack légère : React 19 + esbuild, serveur Node sans dépendance.
+- 🎨 **Fiches colorées** — dégradé aux couleurs de la boîte, encre lisible adaptée, texture toile.
+- 🗂️ **Tri** par couleur, par intensité (1 à 5) ou par moment (journée / soir).
+- 🔘 **Filtres** par famille de couleur, sections repliables, préférences mémorisées.
+- ⏱️ **Minuteur d'infusion** pré-réglé par thé (bip + vibration, écran gardé allumé).
+- 🌍 **FR / EN / ES**, thème **clair / sombre**, **PWA** installable et hors-ligne.
+
+### Animations
+
+Le site adopte un langage de mouvement « agence créative » :
+
+- **Intro** : rideau jaune Lipton avec compteur 0 → 100 %, affiché en HTML pur
+  pendant le téléchargement du WASM, qui se lève en goutte.
+- **Titre lettre par lettre**, logo qui pivote, **chiffres clés** qui défilent.
+- **Halos colorés** en parallaxe (souris + scroll) et grain photo.
+- **Bandeaux défilants** de noms de thés, accélérés et inclinés par la vitesse de scroll.
+- **Curseur personnalisé** (point + anneau à inertie, « Ouvrir » au survol d'une carte)
+  et **boutons magnétiques**.
+- **Cartes en 3D** qui s'inclinent sous le pointeur, avec reflet ; le sachet se balance.
+- **Apparitions au scroll** en cascade et titres révélés par masque.
+- **Fiche** qui se dévoile **en cercle depuis le point du clic** (et s'y referme).
+- **Changement de thème** en cercle (View Transitions API).
+- Tout est désactivé si le système demande de **réduire les animations**.
+
+Ces effets sont pilotés par `src/motion.rs` (une boucle `requestAnimationFrame`
+qui écrit des variables CSS, sans re-rendu Yew) et par le CSS.
 
 ## Démarrer
 
+Prérequis : **Node 24** et **[Rust](https://rustup.rs)** (la version et la cible
+`wasm32-unknown-unknown` sont fixées par `rust-toolchain.toml`), plus **Trunk** :
+
 ```bash
-npm install
-npm run dev   # serveur esbuild + watch  →  http://localhost:3000
+cargo install trunk --locked   # ou binaire : https://github.com/trunk-rs/trunk/releases
+npm run dev                    # Trunk (rechargement à chaud) → http://localhost:3000
 ```
+
+`npm run dev` lance aussi l'API Node sur le port 3001 ; Trunk lui relaie `/api/`.
 
 ## Autres commandes
 
 ```bash
-npm run build # build de production dans ./dist
-npm start     # sert ./dist sur $PORT (défaut 3000)
+npm run build   # build de production → ./dist (installe Rust + Trunk si absents)
+npm start       # sert ./dist + l'API sur $PORT (défaut 3000)
+cargo clippy --target wasm32-unknown-unknown   # lint
 ```
 
 ## Déploiement Heroku
 
-L'app fonctionne directement sur le **buildpack Node** de Heroku :
+- **Buildpack Node** (`git push heroku master`) : Heroku exécute `npm run build` ;
+  `scripts/build.sh` installe alors Rust et Trunk dans un dossier temporaire
+  (hors du slug), compile le WASM, puis `npm start` lance `server.js`.
+- **Container stack** (`heroku stack:set container`) : `heroku.yml` construit le
+  `Dockerfile` multi-étapes (Rust → WASM, puis image Node 24 légère).
 
-```bash
-git push heroku main
-```
-
-Heroku exécute `npm run build` (esbuild → `./dist`) puis `npm start`
-(`server.js`, qui écoute sur `$PORT`). Un `Dockerfile` + `heroku.yml` sont
-aussi fournis si tu préfères un déploiement en *container stack*.
+Le serveur compresse les fichiers statiques (Brotli / gzip : le WASM passe
+d'environ 330 Ko à 120 Ko), les sert avec un ETag et le type `application/wasm`.
 
 ## API publique
 
 Le serveur expose une **API JSON publique** (lecture seule, CORS ouvert) avec
-tout le catalogue. Les données sont générées au build depuis `src/data.ts`
-(source unique) vers `dist/api/teas.json`.
+tout le catalogue, lu depuis `data/teas.json` (source unique).
 
 | Méthode & route         | Description                                                |
 | ----------------------- | --------------------------------------------------------- |
@@ -100,9 +130,8 @@ curl "https://<app>.herokuapp.com/api/stats"
 
 Une **app iOS 100 % native** (SwiftUI, aucune WebView) vit dans
 [`native-ios/`](native-ios/). Elle **réutilise les mêmes données** que le site :
-le catalogue des 78 sachets y est embarqué (`teas.json`, copié depuis
-`dist/api/teas.json`), donc l'app fonctionne **hors-ligne**. Le site web reste
-inchangé.
+le catalogue des 78 sachets y est embarqué (`teas.json`, copie de
+`data/teas.json`), donc l'app fonctionne **hors-ligne**.
 
 C'est aussi la base nécessaire pour un **widget iPhone** : WidgetKit impose une
 extension SwiftUI, qu'aucune coquille WebView ne peut fournir.
@@ -113,7 +142,7 @@ extension SwiftUI, qu'aucune coquille WebView ne peut fournir.
 ### Envoi automatique sur TestFlight
 
 Tout est enchaîné par la CI : **un push sur `master`** régénère le projet,
-synchronise le catalogue depuis le web, **vérifie la compilation**, puis archive
+copie le catalogue (`data/teas.json`), **vérifie la compilation**, puis archive
 et envoie sur TestFlight. Le **numéro de build est automatique** (nombre de
 commits, donc toujours croissant) — rien à incrémenter.
 
@@ -126,40 +155,63 @@ l'envoi, ajouter les 4 secrets décrits dans
 
 ```bash
 brew install xcodegen          # une fois
-npm run ios:prepare            # build web + catalogue + projet Xcode
+npm run ios:prepare            # catalogue + projet Xcode
 open native-ios/LiptonThes.xcodeproj
 ```
 
 ## Structure
 
 ```
-build.mjs             Build esbuild (et serveur de dev avec --serve)
-server.js             Serveur statique Node + API JSON publique, sert ./dist sur $PORT
-api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
-native-ios/           App iOS native SwiftUI (projet XcodeGen)
-Procfile              web: npm start
+index.html            Page d'entrée Trunk (+ écran d'intro statique)
+Trunk.toml            Build WASM (wasm-opt, minification, proxy de dev)
+Cargo.toml            Crate Rust du front (Yew 0.23, wasm-bindgen, web-sys)
+build.rs              Génère le catalogue Rust depuis data/teas.json (validé au build)
+rust-toolchain.toml   Version de Rust + cible wasm32
 src/
-  main.tsx            Montage React
-  App.tsx             UI : groupes de couleurs + cartes
-  data.ts             Données des sachets et leurs couleurs
-  derive.ts           Intensité / ingrédients dérivés (partagé app + API)
-  styles.css          Styles
+  main.rs             Montage Yew + service worker
+  app.rs              État (langue, thème, filtres, tri, sections, fiche ouverte)
+  catalog.rs          Types du catalogue (Tea, Family, TypeKey)
+  i18n.rs             Textes FR / EN / ES
+  tea.rs              Dégradés, conseils d'infusion, libellés dérivés
+  motion.rs           Moteur d'animation (curseur, aimant, 3D, bandeaux, reveal, intro)
+  dom.rs              Accès navigateur (stockage local, préférences)
+  components/         Hero, bandeaux, barre d'outils, groupes, carte, fiche, minuteur, pied de page
+styles/main.css       Styles et animations
+public/               Assets statiques (polices, logo, textures, icônes, manifest, sw.js)
+data/teas.json        Catalogue des sachets — source unique (front, API, iOS)
+server.js             Serveur Node : ./dist + API JSON publique
+api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
+scripts/              build.sh (production) et dev.sh (développement)
+native-ios/           App iOS native SwiftUI (projet XcodeGen)
 ```
 
 ## Ajouter un thé
 
-Ajoutez une entrée dans `TEAS` (`src/data.ts`) avec sa famille de couleur et
-ses deux couleurs de dégradé (`colors`) :
+Ajoutez une entrée dans `data/teas.json` (et incrémentez `count`) : le build Rust
+la valide (couleurs `#rrggbb`, famille et type connus, intensité 1–5,
+traductions présentes) et échoue avec un message clair sinon.
 
-```ts
+```json
 {
-  id: "vanille",
-  name: "Vanille",
-  type: "Thé noir aromatisé",
-  description: "Thé noir et vanille douce.",
-  family: "Ambre",
-  colors: ["#e8c98a", "#b07d2e"],
-  ink: "#3d2600",
-  caffeine: "Théiné",
+  "id": "vanille",
+  "name": { "fr": "Vanille", "en": "Vanilla", "es": "Vainilla" },
+  "description": {
+    "fr": "Thé noir et vanille douce.",
+    "en": "Black tea and soft vanilla.",
+    "es": "Té negro y vainilla suave."
+  },
+  "typeKey": "blackTeaFlavored",
+  "family": "Ambre",
+  "colors": ["#e8c98a", "#b07d2e"],
+  "ink": "#3d2600",
+  "caffeineFree": false,
+  "intensity": 3,
+  "ingredients": {
+    "fr": "Thé noir, arôme naturel",
+    "en": "Black tea, natural flavouring",
+    "es": "Té negro, aroma natural"
+  }
 }
 ```
+
+Puis `npm run native:data` pour mettre à jour la copie de l'app iOS.

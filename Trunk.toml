@@ -1,0 +1,22 @@
+# Build du front Yew → ./dist (servi par server.js).
+[build]
+target = "index.html"
+dist = "dist"
+# Noms de fichiers stables : le service worker peut les pré-cacher.
+filehash = false
+# CSS / HTML minifiés en production. (Le minifieur JS de Trunk bute sur la
+# glue wasm-bindgen et la laisse telle quelle : avertissement sans gravité,
+# le serveur la compresse de toute façon.)
+minify = "on_release"
+
+[watch]
+ignore = ["dist", "native-ios", "node_modules"]
+
+# `npm run dev` : l'API publique tourne sur le serveur Node (port 3001).
+[[proxy]]
+backend = "http://127.0.0.1:3001/api/"
+
+# Binaryen récent pour wasm-opt (les extensions WASM activées par Rust sont
+# déclarées dans index.html via data-wasm-opt-params).
+[tools]
+wasm_opt = "version_133"
