@@ -1,7 +1,8 @@
-//! Génère le catalogue Rust à partir de `data/teas.json` (source unique, aussi
-//! lue par l'API Node et l'app iOS). Les sachets deviennent des `static` :
-//! aucun parsing JSON dans le navigateur, et une donnée invalide fait échouer
-//! la compilation au lieu de casser l'app en production.
+//! Génère les données Rust à partir de `data/` (source unique, aussi lue par
+//! l'API Node et l'app iOS) : le catalogue (`teas.json`), les conseils
+//! d'infusion (`brewing.json`) et le glossaire (`glossary.json`) deviennent des
+//! `static` — aucun parsing JSON dans le navigateur, et une donnée invalide
+//! fait échouer la compilation au lieu de casser l'app en production.
 
 use serde_json::Value;
 use std::collections::HashSet;
@@ -100,8 +101,57 @@ fn main() {
     }
     out.push_str("];\n");
 
-    let dest = Path::new(&env::var("OUT_DIR").unwrap()).join("teas.rs");
-    fs::write(dest, out).unwrap();
+    let out_dir = env::var("OUT_DIR").unwrap();
+    fs::write(Path::new(&out_dir).join("teas.rs"), out).unwrap();
+    fs::write(Path::new(&out_dir).join("content.rs"), content()).unwrap();
+}
+
+/// Conseils d'infusion par type + glossaire.
+fn content() -> String {
+    println!("cargo:rerun-if-changed=data/brewing.json");
+    println!("cargo:rerun-if-changed=data/glossary.json");
+    let read = |path: &str| -> Value {
+        let raw = fs::read_to_string(path).unwrap_or_else(|_| panic!("{path} introuvable"));
+        serde_json::from_str(&raw).unwrap_or_else(|e| panic!("{path} : JSON invalide ({e})"))
+    };
+
+    let brewing = read("data/brewing.json");
+    let mut out = String::from("pub static TIPS: &[(TypeKey, Localized)] = &[\n");
+    for ty in TYPES {
+        let tips = &brewing[ty]["tips"];
+        assert!(
+            !tips.is_null(),
+            "data/brewing.json : conseil manquant pour `{ty}`"
+        );
+        writeln!(
+            out,
+            "    (TypeKey::{}, {}),",
+            pascal(ty),
+            localized(tips, ty)
+        )
+        .unwrap();
+    }
+    out.push_str("];\n\n");
+
+    let glossary = read("data/glossary.json");
+    let entries = glossary
+        .as_array()
+        .expect("data/glossary.json : tableau attendu");
+    out.push_str("pub static GLOSSARY: &[Term] = &[\n");
+    for entry in entries {
+        let term = entry["term"]
+            .as_str()
+            .expect("data/glossary.json : `term` manquant");
+        writeln!(
+            out,
+            "    Term {{ label: {}, definition: {} }},",
+            localized(&entry["label"], term),
+            localized(&entry["definition"], term)
+        )
+        .unwrap();
+    }
+    out.push_str("];\n");
+    out
 }
 
 fn str_field<'a>(tea: &'a Value, key: &str, id: &str) -> &'a str {

@@ -11,7 +11,7 @@
 use crate::dom::{document, now, reduced_motion, root, window};
 use gloo_events::EventListener;
 use gloo_timers::callback::Timeout;
-use js_sys::{Array, Function, Reflect};
+use js_sys::Array;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -40,6 +40,9 @@ struct State {
     velocity: f64,
     scrolled: bool,
     marquee_offsets: Vec<f64>,
+    /// Bandeaux survolés : ralentissement lissé (0 = normal, 1 = ralenti).
+    marquee_slow: f64,
+    over_marquee: bool,
     /// Élément magnétique survolé + décalage appliqué.
     magnet: Option<(HtmlElement, f64, f64)>,
     tilt: Option<HtmlElement>,
@@ -74,6 +77,7 @@ pub fn install() {
     if fine_pointer {
         create_cursor();
     }
+    crate::fx::install(fine_pointer);
 
     // Écouteurs passifs (comportement par défaut de gloo-events).
     EventListener::new(&window(), "pointermove", on_pointer_move).forget();
@@ -157,6 +161,29 @@ fn update_cursor_mode(target: &Element) {
         };
         if c.label.text_content().unwrap_or_default() != text {
             c.label.set_text_content(Some(&text));
+            // Sur une carte, la pastille prend les couleurs du thé.
+            let colours = labelled
+                .as_ref()
+                .and_then(|el| el.dyn_ref::<HtmlElement>())
+                .map(|el| {
+                    let style = el.style();
+                    (
+                        style.get_property_value("--tea").unwrap_or_default(),
+                        style.get_property_value("--ink").unwrap_or_default(),
+                    )
+                })
+                .filter(|(bg, _)| !bg.is_empty());
+            let ring = c.ring.style();
+            match colours {
+                Some((bg, ink)) => {
+                    let _ = ring.set_property("--cursor-bg", &bg);
+                    let _ = ring.set_property("--cursor-ink", &ink);
+                }
+                None => {
+                    let _ = ring.remove_property("--cursor-bg");
+                    let _ = ring.remove_property("--cursor-ink");
+                }
+            }
         }
         if c.mode != mode {
             for m in ["is-label", "is-hover"] {
@@ -195,6 +222,8 @@ fn on_pointer_move(event: &web_sys::Event) {
 
 /// Effets liés à l'élément sous le pointeur : mode du curseur, aimant, inclinaison.
 fn hover(target: &Element, x: f64, y: f64) {
+    let over_marquee = target.closest(".marquees").ok().flatten().is_some();
+    STATE.with_borrow_mut(|s| s.over_marquee = over_marquee);
     update_cursor_mode(target);
     magnet(target, x, y);
     tilt(target, x, y);
@@ -295,6 +324,8 @@ fn start_loop() {
 }
 
 fn frame(t: f64) {
+    // Défilement fluide d'abord : tout le reste lit la position à jour.
+    crate::fx::step(t);
     let win = window();
     let doc = document();
     let scroll = win.scroll_y().unwrap_or(0.0);
@@ -309,47 +340,52 @@ fn frame(t: f64) {
         .and_then(|v| v.as_f64())
         .unwrap_or(1.0);
 
-    let (dt, velocity, scrolled_changed, mouse, ring, parallax) = STATE.with_borrow_mut(|s| {
-        let dt = if s.last_t == 0.0 {
-            16.7
-        } else {
-            (t - s.last_t).min(64.0)
-        };
-        s.last_t = t;
-        // Lissage indépendant de la fréquence d'affichage.
-        let k = |base: f64| 1.0 - (1.0 - base).powf(dt / 16.7);
+    let (dt, velocity, scrolled_changed, mouse, ring, parallax, slow) =
+        STATE.with_borrow_mut(|s| {
+            let dt = if s.last_t == 0.0 {
+                16.7
+            } else {
+                (t - s.last_t).min(64.0)
+            };
+            s.last_t = t;
+            // Lissage indépendant de la fréquence d'affichage.
+            let k = |base: f64| 1.0 - (1.0 - base).powf(dt / 16.7);
 
-        let raw = scroll - s.last_scroll;
-        s.last_scroll = scroll;
-        s.velocity += (raw - s.velocity) * k(0.12);
+            let raw = scroll - s.last_scroll;
+            s.last_scroll = scroll;
+            s.velocity += (raw - s.velocity) * k(0.12);
 
-        let scrolled = scroll > 24.0;
-        let changed = scrolled != s.scrolled;
-        s.scrolled = scrolled;
+            let scrolled = scroll > 24.0;
+            let changed = scrolled != s.scrolled;
+            s.scrolled = scrolled;
 
-        s.ring.0 += (s.mouse.0 - s.ring.0) * k(0.2);
-        s.ring.1 += (s.mouse.1 - s.ring.1) * k(0.2);
+            s.ring.0 += (s.mouse.0 - s.ring.0) * k(0.2);
+            s.ring.1 += (s.mouse.1 - s.ring.1) * k(0.2);
 
-        let target = if s.pointer_seen {
+            let target = if s.pointer_seen {
+                (
+                    s.mouse.0 / view_w * 2.0 - 1.0,
+                    s.mouse.1 / view_h * 2.0 - 1.0,
+                )
+            } else {
+                (0.0, 0.0)
+            };
+            s.parallax.0 += (target.0 - s.parallax.0) * k(0.06);
+            s.parallax.1 += (target.1 - s.parallax.1) * k(0.06);
+
+            let slow = if s.over_marquee { 1.0 } else { 0.0 };
+            s.marquee_slow += (slow - s.marquee_slow) * k(0.08);
+
             (
-                s.mouse.0 / view_w * 2.0 - 1.0,
-                s.mouse.1 / view_h * 2.0 - 1.0,
+                dt,
+                s.velocity,
+                changed.then_some(scrolled),
+                s.mouse,
+                s.ring,
+                s.parallax,
+                s.marquee_slow,
             )
-        } else {
-            (0.0, 0.0)
-        };
-        s.parallax.0 += (target.0 - s.parallax.0) * k(0.06);
-        s.parallax.1 += (target.1 - s.parallax.1) * k(0.06);
-
-        (
-            dt,
-            s.velocity,
-            changed.then_some(scrolled),
-            s.mouse,
-            s.ring,
-            s.parallax,
-        )
-    });
+        });
 
     let html = root();
     if let Some(scrolled) = scrolled_changed {
@@ -399,7 +435,7 @@ fn frame(t: f64) {
                 if s.marquee_offsets.len() <= i {
                     s.marquee_offsets.resize(i + 1, 0.0);
                 }
-                let v = speed.signum() * (speed.abs() + boost);
+                let v = speed.signum() * (speed.abs() + boost) * (1.0 - 0.8 * slow);
                 let o = (s.marquee_offsets[i] + v * dt / 1000.0).rem_euclid(half);
                 s.marquee_offsets[i] = o;
                 o
@@ -411,12 +447,18 @@ fn frame(t: f64) {
         }
     }
 
+    // Progression au scroll ([data-scrub]) et, de temps en temps, ambiance.
+    crate::fx::scrub(view_h);
+
     // Le DOM peut changer sous un pointeur immobile (fiche ouverte, scroll) :
     // on réévalue régulièrement l'élément survolé.
     let (recheck, pointer_seen) = STATE.with_borrow_mut(|s| {
         s.frame = s.frame.wrapping_add(1);
         (s.frame % 6 == 0, s.pointer_seen)
     });
+    if recheck {
+        crate::fx::ambient(view_h);
+    }
     if recheck && pointer_seen {
         if let Some(el) = doc.element_from_point(mouse.0 as f32, mouse.1 as f32) {
             hover(&el, mouse.0, mouse.1);
@@ -455,6 +497,7 @@ pub fn observe_reveals() {
     if !enabled() {
         return;
     }
+    crate::fx::refresh();
     let Ok(nodes) = document().query_selector_all("[data-reveal]:not([data-observed])") else {
         return;
     };
@@ -485,6 +528,7 @@ fn create_observer() -> IntersectionObserver {
                         .set_property("--d", &format!("{}ms", k.min(10) * 70));
                 }
                 let _ = target.set_attribute("data-shown", "");
+                crate::fx::scramble(&target);
                 observer.unobserve(&target);
                 k += 1;
             }
@@ -524,26 +568,4 @@ pub fn finish_intro() {
         Timeout::new(1700, move || preloader.remove()).forget();
     })
     .forget();
-}
-
-// --- Transitions de vue --------------------------------------------------------
-
-/// Applique `update` (qui doit modifier le DOM de façon synchrone) dans une
-/// View Transition qui se dévoile en cercle depuis (x, y). Sans support du
-/// navigateur, ou en mouvement réduit, la mise à jour est immédiate.
-pub fn circle_transition(x: f64, y: f64, update: impl FnOnce() + 'static) {
-    let doc = document();
-    let start = Reflect::get(&doc, &JsValue::from_str("startViewTransition"))
-        .ok()
-        .and_then(|f| f.dyn_into::<Function>().ok());
-    match start {
-        Some(start) if enabled() => {
-            let style = root().style();
-            let _ = style.set_property("--vt-x", &format!("{x:.0}px"));
-            let _ = style.set_property("--vt-y", &format!("{y:.0}px"));
-            // En cas d'échec, l'état Yew (mis à jour par l'appelant) suffit.
-            let _ = start.call1(&doc, &Closure::once_into_js(update));
-        }
-        _ => update(),
-    }
 }

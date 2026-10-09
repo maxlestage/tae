@@ -119,6 +119,27 @@ pub fn BrewTimer(props: &TimerProps) -> Html {
     let remaining = use_state(|| preset);
     let running = use_state(|| false);
     let done = use_state(|| false);
+    let node = use_node_ref();
+
+    // Pendant l'infusion, la fiche entière le sait : le sachet y trempe.
+    {
+        let node = node.clone();
+        use_effect_with(*running, move |&is_running| {
+            let card = node
+                .cast::<web_sys::Element>()
+                .and_then(|el| el.closest(".modal__card").ok().flatten());
+            if let Some(card) = &card {
+                let _ = card
+                    .class_list()
+                    .toggle_with_force("is-brewing", is_running);
+            }
+            move || {
+                if let Some(card) = card {
+                    let _ = card.class_list().remove_1("is-brewing");
+                }
+            }
+        });
+    }
 
     // Un thé différent → on repart de sa durée conseillée.
     {
@@ -227,12 +248,15 @@ pub fn BrewTimer(props: &TimerProps) -> Html {
 
     html! {
         <section
+            ref={node}
             class={classes!("timer", done.then_some("timer--done"), running.then_some("timer--running"))}
             aria-label={t.timer_label}
         >
             <span class="timer__label">{ t.timer_label }</span>
             <div class="timer__main">
                 <div class="timer__dial">
+                    // Volutes de vapeur, visibles pendant l'infusion.
+                    <span class="steam" aria-hidden="true"><i></i><i></i><i></i></span>
                     <svg viewBox="0 0 80 80" aria-hidden="true">
                         <circle class="timer__track" cx="40" cy="40" r={R.to_string()} />
                         <circle

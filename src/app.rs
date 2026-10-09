@@ -1,6 +1,7 @@
 use crate::catalog::{Family, TEAS, Tea, present_families};
 use crate::components::{
-    Footer, Group, Hero, Marquee, Opened, Section, SectionKind, TeaModal, Toolbar,
+    About, Colours, Faq, Footer, Glossary, Group, Guide, Hero, Kinds, Marquee, Opened, Section,
+    SectionKind, TeaModal, Toolbar, roll,
 };
 use crate::dom::{self, load, save};
 use crate::i18n::{Lang, family_label, ui};
@@ -205,16 +206,22 @@ pub fn App() -> Html {
 
     // --- Callbacks ---------------------------------------------------------------
 
+    // Changer de langue : toute la page bascule dans une transition.
     let on_lang = {
         let lang = lang.clone();
-        Callback::from(move |l| lang.set(l))
+        Callback::from(move |l| {
+            if l != *lang {
+                let lang = lang.clone();
+                crate::fx::page_transition(move || lang.set(l));
+            }
+        })
     };
     let on_theme = {
         let theme = theme.clone();
         Callback::from(move |(next, x, y): (Theme, f64, f64)| {
             let theme = theme.clone();
             // Le DOM change dans la transition (capture avant/après), puis l'état suit.
-            motion::circle_transition(x, y, move || {
+            crate::fx::circle_transition(x, y, move || {
                 let _ = dom::root().set_attribute("data-theme", next.key());
                 theme.set(next);
             });
@@ -243,6 +250,26 @@ pub fn App() -> Html {
                 }
             }
             collapsed.set(next);
+        })
+    };
+    let on_switch = {
+        let opened = opened.clone();
+        Callback::from(move |tea: &'static Tea| {
+            if let Some(current) = (*opened).clone() {
+                opened.set(Some(Opened { tea, ..current }));
+            }
+        })
+    };
+    // Une couleur choisie dans « Pourquoi par couleurs ? » : on filtre le
+    // catalogue dessus (tri par couleur) et on y remonte.
+    let on_pick_family = {
+        let (active, sort) = (active.clone(), sort.clone());
+        Callback::from(move |family: Family| {
+            active.set(Some(family));
+            sort.set(SortMode::Color);
+            if let Some(el) = dom::document().get_element_by_id("catalogue") {
+                crate::fx::scroll_to(&el);
+            }
         })
     };
     let on_open = {
@@ -302,7 +329,7 @@ pub fn App() -> Html {
                 data-magnetic="0.2"
             >
                 <span class={classes!("chip__dot", rainbow.then_some("dot--rainbow"))} style={dot_style}></span>
-                { label }
+                { roll(&label) }
             </button>
         }
     };
@@ -313,18 +340,27 @@ pub fn App() -> Html {
         <>
             <a class="skip" href="#catalogue">{ t.skip }</a>
             <div class="progress" aria-hidden="true"></div>
+            // Lueur d'ambiance : prend la couleur de la section à l'écran (fx.rs).
+            <div class="ambient" aria-hidden="true"></div>
             <Toolbar lang={*lang} theme={*theme} {on_lang} {on_theme} />
 
             <Hero lang={*lang} />
             <Marquee lang={*lang} />
 
-            <main class="catalogue" id="catalogue">
+            <main>
+            <section class="catalogue" id="catalogue">
                 <div class="catalogue__head">
                     <h2 class="catalogue__title">
                         <span class="mask" data-reveal="mask"><span>{ t.catalogue }</span></span>
                     </h2>
-                    <span class="catalogue__count" data-reveal="">
-                        { format!("{shown:02}") }
+                    // Clé = nombre affiché : il redéfile à chaque filtre.
+                    <span
+                        class="catalogue__count"
+                        key={shown.to_string()}
+                        style={format!("--to: {shown}")}
+                        data-reveal=""
+                    >
+                        <span class="sr-only">{ shown }</span>
                     </span>
                 </div>
 
@@ -365,7 +401,7 @@ pub fn App() -> Html {
                     if !sections.is_empty() {
                         <button type="button" class="tool-btn" onclick={toggle_all} data-magnetic="0.25">
                             <span class={classes!("tool-btn__icon", all_collapsed.then_some("is-collapsed"))} aria-hidden="true"></span>
-                            { if all_collapsed { t.expand_all } else { t.collapse_all } }
+                            { roll(if all_collapsed { t.expand_all } else { t.collapse_all }) }
                         </button>
                     }
                 </div>
@@ -388,12 +424,20 @@ pub fn App() -> Html {
                         }
                     }) }
                 </div>
+            </section>
+
+            <Guide lang={*lang} />
+            <Kinds lang={*lang} />
+            <Colours lang={*lang} on_pick={on_pick_family} />
+            <Glossary lang={*lang} />
+            <Faq lang={*lang} />
+            <About lang={*lang} />
             </main>
 
             <Footer lang={*lang} />
 
             if let Some(o) = (*opened).clone() {
-                <TeaModal opened={o} lang={*lang} {on_close} />
+                <TeaModal opened={o} lang={*lang} {on_close} {on_switch} />
             }
         </>
     }

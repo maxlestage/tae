@@ -43,51 +43,62 @@ pub fn card_style(tea: &Tea) -> String {
     )
 }
 
-/// Conseil d'infusion : température (None = à froid) + durée en minutes.
+/// Conseil d'infusion : température en °C (None = à froid) + durée en minutes.
 #[derive(Clone, Copy, PartialEq)]
 pub struct BrewSpec {
-    pub temp: Option<&'static str>,
+    pub temp_c: Option<(u32, u32)>,
     pub min_min: u32,
     pub max_min: u32,
+}
+
+impl BrewSpec {
+    /// « 90–95 °C », ou « Eau froide ».
+    pub fn temp_label(&self, t: &Ui) -> String {
+        match self.temp_c {
+            Some((lo, hi)) => format!("{lo}–{hi} °C"),
+            None => t.cold_water.to_owned(),
+        }
+    }
+
+    /// « 3–4 min »
+    pub fn time_label(&self) -> String {
+        format!("{}–{} min", self.min_min, self.max_min)
+    }
 }
 
 pub fn brew_spec(tea: &Tea) -> Option<BrewSpec> {
     if tea.coffret {
         return None;
     }
-    if tea.cold_brew {
-        return Some(BrewSpec {
-            temp: None,
-            min_min: 5,
-            max_min: 10,
-        });
-    }
-    let (temp, min_min, max_min) = match tea.type_key {
-        TypeKey::BlackTea | TypeKey::BlackTeaFlavored | TypeKey::BlackTeaSpiced => {
-            ("90–95 °C", 3, 4)
+    Some(brew_for(tea.type_key, tea.cold_brew))
+}
+
+/// Repères d'infusion d'un type de thé (ou de la gamme à froid) — les mêmes
+/// valeurs que l'app iOS.
+pub fn brew_for(type_key: TypeKey, cold_brew: bool) -> BrewSpec {
+    let (temp_c, min_min, max_min) = if cold_brew {
+        (None, 5, 10)
+    } else {
+        match type_key {
+            TypeKey::BlackTea | TypeKey::BlackTeaFlavored | TypeKey::BlackTeaSpiced => {
+                (Some((90, 95)), 3, 4)
+            }
+            TypeKey::GreenTea | TypeKey::GreenTeaFlavored => (Some((75, 80)), 2, 3),
+            TypeKey::WhiteTea => (Some((70, 75)), 2, 3),
+            TypeKey::Rooibos => (Some((95, 100)), 5, 7),
+            _ => (Some((95, 100)), 5, 6),
         }
-        TypeKey::GreenTea | TypeKey::GreenTeaFlavored => ("75–80 °C", 2, 3),
-        TypeKey::WhiteTea => ("70–75 °C", 2, 3),
-        TypeKey::Rooibos => ("95–100 °C", 5, 7),
-        _ => ("95–100 °C", 5, 6),
     };
-    Some(BrewSpec {
-        temp: Some(temp),
+    BrewSpec {
+        temp_c,
         min_min,
         max_min,
-    })
+    }
 }
 
 /// « 90–95 °C · 3–4 min »
 pub fn brew_info(tea: &Tea, t: &Ui) -> Option<String> {
-    brew_spec(tea).map(|s| {
-        format!(
-            "{} · {}–{} min",
-            s.temp.unwrap_or(t.cold_water),
-            s.min_min,
-            s.max_min
-        )
-    })
+    brew_spec(tea).map(|s| format!("{} · {}", s.temp_label(t), s.time_label()))
 }
 
 pub fn format_value(tea: &Tea, t: &Ui) -> &'static str {
