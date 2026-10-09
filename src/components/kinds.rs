@@ -1,4 +1,4 @@
-use super::{LangProps, section_head};
+use super::{LangProps, ambient, section_head};
 use crate::catalog::{TEAS, TypeKey, types_of};
 use crate::content::{RANGES_TITLE, Range, TYPES, type_blurb};
 use crate::i18n::{type_label, ui};
@@ -29,8 +29,11 @@ pub fn Kinds(props: &LangProps) -> Html {
                 <span class={classes!("pill", k.caffeine_free().then_some("pill--soft"))}>{ caffeine }</span>
                 <p class="kind__text">{ type_blurb(k).get(lang) }</p>
                 <span class="kind__swatches" aria-hidden="true">
-                    { for teas.iter().take(12).map(|x| html! {
-                        <i style={format!("background: linear-gradient(135deg, {} 50%, {} 50%)", x.colors[0], x.colors[1])}></i>
+                    { for teas.iter().take(12).enumerate().map(|(i, x)| html! {
+                        <i style={format!(
+                            "--si: {i}; background: linear-gradient(135deg, {} 50%, {} 50%)",
+                            x.colors[0], x.colors[1]
+                        )}></i>
                     }) }
                 </span>
             </article>
@@ -52,7 +55,7 @@ pub fn Kinds(props: &LangProps) -> Html {
     });
 
     html! {
-        <section class="section kinds" id="types">
+        <section class="section kinds" id="types" data-ambient={ambient("types")}>
             { section_head("types", &TYPES, lang) }
             <div class="kinds__grid">{ for kinds }</div>
             <h3 class="subhead" data-reveal="">{ RANGES_TITLE.get(lang) }</h3>

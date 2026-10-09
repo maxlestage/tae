@@ -1,4 +1,4 @@
-use super::{LangProps, section_head};
+use super::{LangProps, ambient, section_head};
 use crate::catalog::{TEAS, TypeKey, types_of};
 use crate::content::{
     COLD_BREW, COLD_TIP, COLUMN_TEMP, COLUMN_TIME, COLUMN_TIP, COLUMN_TYPE, GUIDE, RULES,
@@ -56,7 +56,7 @@ pub fn Guide(props: &LangProps) -> Html {
     }
 
     html! {
-        <section class="section guide" id="infusion">
+        <section class="section guide" id="infusion" data-ambient={ambient("infusion")}>
             { section_head("infusion", &GUIDE, lang) }
 
             <ol class="rules">

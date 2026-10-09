@@ -42,10 +42,21 @@ Le site adopte un langage de mouvement « agence créative » :
 - **Changement de thème** en cercle (View Transitions API).
 - **Menu** en rideau jaune, liens qui montent un à un ; jauges, barres et
   compteurs qui se remplissent à l'apparition ; FAQ en accordéon animé.
+- **Défilement fluide** à la molette et trajets animés vers les sections ;
+  **lueur d'ambiance** qui prend la couleur de la section à l'écran.
+- **Sachets flottants** et reflet sur le logo dans l'accueil, qui recule et
+  s'efface au scroll ; lettres qui sautent au survol.
+- En-têtes de section : **mot fantôme** qui glisse avec le scroll, sur-titre
+  **brouillé** puis révélé, chapeau qui **s'allume mot à mot**.
+- **Ondes au clic**, **texte roulant** au survol, curseur aux couleurs du thé
+  survolé, cartes dévoilées par un **volet**, nombre de sachets qui redéfile.
+- Minuteur : **vapeur** et sachet qui **trempe** ; pied de page : badge
+  circulaire qui tourne ; **changement de langue** en fondu glissé.
 - Tout est désactivé si le système demande de **réduire les animations**.
 
-Ces effets sont pilotés par `src/motion.rs` (une boucle `requestAnimationFrame`
-qui écrit des variables CSS, sans re-rendu Yew) et par le CSS.
+Ces effets sont pilotés par `src/motion.rs` et `src/fx.rs` (une boucle
+`requestAnimationFrame` qui écrit des variables CSS, sans re-rendu Yew) et par
+le CSS.
 
 ## Démarrer
 
@@ -76,7 +87,7 @@ cargo clippy --target wasm32-unknown-unknown   # lint
   `Dockerfile` multi-étapes (Rust → WASM, puis image Node 24 légère).
 
 Le serveur compresse les fichiers statiques (Brotli / gzip : le WASM passe
-d'environ 425 Ko à 150 Ko), les sert avec un ETag et le type `application/wasm`.
+d'environ 450 Ko à 155 Ko), les sert avec un ETag et le type `application/wasm`.
 
 ## API publique
 
@@ -185,6 +196,8 @@ src/
   content.rs          Contenu éditorial FR / EN / ES (guide, types, FAQ, à propos, menu)
   tea.rs              Dégradés, repères d'infusion, libellés dérivés
   motion.rs           Moteur d'animation (curseur, aimant, 3D, bandeaux, reveal, intro)
+  fx.rs               Défilement fluide, progression au scroll, ambiance, ondes,
+                      textes brouillés, transitions de page
   dom.rs              Accès navigateur (stockage local, préférences)
   components/         Hero, bandeaux, barre d'outils + menu, groupes, carte, fiche,
                       minuteur, guide, types, couleurs, glossaire, FAQ, à propos, pied de page

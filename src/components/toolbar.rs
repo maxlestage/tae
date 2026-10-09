@@ -98,7 +98,7 @@ pub fn Toolbar(props: &ToolbarProps) -> Html {
                     data-magnetic="0.3"
                 >
                     <span class="menu-btn__text" aria-hidden="true">
-                        { if *menu_open { MENU_CLOSE_SHORT } else { MENU }.get(props.lang) }
+                        { super::roll(if *menu_open { MENU_CLOSE_SHORT } else { MENU }.get(props.lang)) }
                     </span>
                     <span class="menu-btn__icon" aria-hidden="true"></span>
                 </button>
