@@ -9,9 +9,7 @@ on:
     branches: [master]
     paths:
       - "native-ios/**"
-      - "src/**"
-      - "build.mjs"
-      - "package.json"
+      - "data/**"
       - ".github/workflows/testflight.yml"
   workflow_dispatch:
 
@@ -29,7 +27,7 @@ jobs:
       ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Historique complet : le numéro de build est déduit du nombre de commits.
           fetch-depth: 0
@@ -50,10 +48,8 @@ jobs:
           echo "build=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
           echo "Build number : $(git rev-list --count HEAD)"
 
-      - name: Synchroniser le catalogue depuis le web
-        run: |
-          npm ci
-          npm run native:data      # build web + copie de dist/api/teas.json
+      - name: Synchroniser le catalogue (data/teas.json)
+        run: npm run native:data      # copie de la source unique dans l'app
 
       - name: Installer XcodeGen et générer le projet
         working-directory: native-ios
@@ -145,7 +141,7 @@ jobs:
 
       - name: Conserver l'IPA en artefact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: LiptonThes-ipa
           path: native-ios/build/export/*.ipa

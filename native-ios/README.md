@@ -2,7 +2,7 @@
 
 Application iOS **100 % native** (SwiftUI), séparée du site web mais qui
 **réutilise les mêmes données** : le catalogue des 78 sachets est embarqué
-(`Resources/teas.json`, généré par le build web dans `dist/api/teas.json`), donc
+(`Resources/teas.json`, copie de `data/teas.json` à la racine du dépôt), donc
 l'app fonctionne **hors-ligne**. Aucune WebView : toute l'interface est native.
 
 ## Fonctionnalités
@@ -34,13 +34,12 @@ script `ci_scripts/ci_post_clone.sh` qui régénère le projet dans le runner.
 
 ## Mettre à jour les données
 
-Le fichier `Resources/teas.json` est une copie de `dist/api/teas.json`
-(source unique). Après avoir modifié le catalogue côté web :
+Le fichier `Resources/teas.json` est une copie de `data/teas.json` (source
+unique, partagée avec le site et l'API). Après avoir modifié le catalogue :
 
 ```bash
 # depuis la racine du dépôt
-npm run build
-cp dist/api/teas.json native-ios/Resources/teas.json
+npm run native:data
 ```
 
 ## Structure

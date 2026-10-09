@@ -1,0 +1,6 @@
+# Toolchain figée : même compilateur en local, en CI et dans Docker.
+[toolchain]
+channel = "1.97"
+components = ["rustfmt", "clippy"]
+targets = ["wasm32-unknown-unknown"]
+profile = "minimal"
