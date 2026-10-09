@@ -1,6 +1,7 @@
 use crate::catalog::{Family, TEAS, Tea, present_families};
 use crate::components::{
-    Footer, Group, Hero, Marquee, Opened, Section, SectionKind, TeaModal, Toolbar,
+    About, Colours, Faq, Footer, Glossary, Group, Guide, Hero, Kinds, Marquee, Opened, Section,
+    SectionKind, TeaModal, Toolbar,
 };
 use crate::dom::{self, load, save};
 use crate::i18n::{Lang, family_label, ui};
@@ -245,6 +246,26 @@ pub fn App() -> Html {
             collapsed.set(next);
         })
     };
+    let on_switch = {
+        let opened = opened.clone();
+        Callback::from(move |tea: &'static Tea| {
+            if let Some(current) = (*opened).clone() {
+                opened.set(Some(Opened { tea, ..current }));
+            }
+        })
+    };
+    // Une couleur choisie dans « Pourquoi par couleurs ? » : on filtre le
+    // catalogue dessus (tri par couleur) et on y remonte.
+    let on_pick_family = {
+        let (active, sort) = (active.clone(), sort.clone());
+        Callback::from(move |family: Family| {
+            active.set(Some(family));
+            sort.set(SortMode::Color);
+            if let Some(el) = dom::document().get_element_by_id("catalogue") {
+                el.scroll_into_view();
+            }
+        })
+    };
     let on_open = {
         let opened = opened.clone();
         Callback::from(move |o: Opened| opened.set(Some(o)))
@@ -318,7 +339,8 @@ pub fn App() -> Html {
             <Hero lang={*lang} />
             <Marquee lang={*lang} />
 
-            <main class="catalogue" id="catalogue">
+            <main>
+            <section class="catalogue" id="catalogue">
                 <div class="catalogue__head">
                     <h2 class="catalogue__title">
                         <span class="mask" data-reveal="mask"><span>{ t.catalogue }</span></span>
@@ -388,12 +410,20 @@ pub fn App() -> Html {
                         }
                     }) }
                 </div>
+            </section>
+
+            <Guide lang={*lang} />
+            <Kinds lang={*lang} />
+            <Colours lang={*lang} on_pick={on_pick_family} />
+            <Glossary lang={*lang} />
+            <Faq lang={*lang} />
+            <About lang={*lang} />
             </main>
 
             <Footer lang={*lang} />
 
             if let Some(o) = (*opened).clone() {
-                <TeaModal opened={o} lang={*lang} {on_close} />
+                <TeaModal opened={o} lang={*lang} {on_close} {on_switch} />
             }
         </>
     }

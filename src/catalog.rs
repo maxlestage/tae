@@ -65,8 +65,6 @@ impl Family {
 pub enum TypeKey {
     BlackTea,
     BlackTeaFlavored,
-    // Accepté par le catalogue (et l'API), même si aucune référence ne l'utilise.
-    #[allow(dead_code)]
     BlackTeaSpiced,
     GreenTea,
     GreenTeaFlavored,
@@ -75,6 +73,38 @@ pub enum TypeKey {
     Infusion,
     InfusionFruity,
     Coffret,
+}
+
+impl TypeKey {
+    /// Ordre d'affichage (du thé noir aux coffrets).
+    pub const ALL: [TypeKey; 10] = [
+        TypeKey::BlackTea,
+        TypeKey::BlackTeaFlavored,
+        TypeKey::BlackTeaSpiced,
+        TypeKey::GreenTea,
+        TypeKey::GreenTeaFlavored,
+        TypeKey::WhiteTea,
+        TypeKey::Rooibos,
+        TypeKey::Infusion,
+        TypeKey::InfusionFruity,
+        TypeKey::Coffret,
+    ];
+
+    /// Naturellement sans théine (rooibos et infusions).
+    pub fn caffeine_free(self) -> bool {
+        matches!(
+            self,
+            TypeKey::Rooibos | TypeKey::Infusion | TypeKey::InfusionFruity
+        )
+    }
+}
+
+/// Types présents parmi des sachets, dans l'ordre d'affichage.
+pub fn types_of<'a>(teas: impl IntoIterator<Item = &'a Tea> + Clone) -> Vec<TypeKey> {
+    TypeKey::ALL
+        .into_iter()
+        .filter(|k| teas.clone().into_iter().any(|t| t.type_key == *k))
+        .collect()
 }
 
 /// Chaîne traduite dans les trois langues.
