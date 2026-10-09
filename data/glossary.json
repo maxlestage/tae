@@ -1,0 +1,184 @@
+[
+  {
+    "term": "théine",
+    "label": {
+      "fr": "Théine",
+      "en": "Theine (caffeine)",
+      "es": "Teína"
+    },
+    "definition": {
+      "fr": "Nom de la caféine présente dans le thé ; effet stimulant.",
+      "en": "The caffeine naturally found in tea; a stimulant.",
+      "es": "La cafeína presente en el té; efecto estimulante."
+    }
+  },
+  {
+    "term": "rooibos",
+    "label": {
+      "fr": "Rooibos",
+      "en": "Rooibos",
+      "es": "Rooibos"
+    },
+    "definition": {
+      "fr": "« Buisson rouge » d'Afrique du Sud, infusion sans théine.",
+      "en": "South-African \"red bush\", a caffeine-free infusion.",
+      "es": "\"Arbusto rojo\" de Sudáfrica, infusión sin teína."
+    }
+  },
+  {
+    "term": "infusion",
+    "label": {
+      "fr": "Infusion",
+      "en": "Herbal infusion",
+      "es": "Infusión"
+    },
+    "definition": {
+      "fr": "Boisson de plantes/fruits sans feuille de thé (sans théine).",
+      "en": "A herbal/fruit brew without tea leaves (caffeine-free).",
+      "es": "Bebida de plantas/frutas sin hoja de té (sin teína)."
+    }
+  },
+  {
+    "term": "pyramide",
+    "label": {
+      "fr": "Sachet pyramide",
+      "en": "Pyramid bag",
+      "es": "Bolsita piramidal"
+    },
+    "definition": {
+      "fr": "Sachet en forme de pyramide laissant les feuilles se déployer (gamme Exclusive Selection).",
+      "en": "Pyramid-shaped bag that lets leaves unfurl (Exclusive Selection range).",
+      "es": "Bolsita piramidal que deja desplegar las hojas (gama Exclusive Selection)."
+    }
+  },
+  {
+    "term": "cold brew",
+    "label": {
+      "fr": "Infusion à froid",
+      "en": "Cold brew",
+      "es": "Infusión en frío"
+    },
+    "definition": {
+      "fr": "Infusion à l'eau froide, au goût plus doux et jamais amer ; la gamme « Infuse à froid » est conçue pour cela.",
+      "en": "Steeping in cold water for a smoother taste that never turns bitter; the “Cold brew” range is designed for it.",
+      "es": "Infusión en agua fría, de sabor más suave y nunca amargo; la gama «Infusión en frío» está pensada para ello."
+    }
+  },
+  {
+    "term": "intensité",
+    "label": {
+      "fr": "Intensité",
+      "en": "Intensity",
+      "es": "Intensidad"
+    },
+    "definition": {
+      "fr": "Force du thé en bouche, de 1 (léger) à 5 (corsé).",
+      "en": "Strength in the cup, from 1 (light) to 5 (bold).",
+      "es": "Fuerza en boca, de 1 (ligero) a 5 (intenso)."
+    }
+  },
+  {
+    "term": "Rainforest Alliance",
+    "label": {
+      "fr": "Rainforest Alliance",
+      "en": "Rainforest Alliance",
+      "es": "Rainforest Alliance"
+    },
+    "definition": {
+      "fr": "Certification d'agriculture durable présente sur la gamme.",
+      "en": "Sustainable-farming certification carried by the range.",
+      "es": "Certificación de agricultura sostenible de la gama."
+    }
+  },
+  {
+    "term": "oxydation",
+    "label": {
+      "fr": "Oxydation",
+      "en": "Oxidation",
+      "es": "Oxidación"
+    },
+    "definition": {
+      "fr": "Réaction des feuilles à l'air après la cueillette : complète pour le thé noir (couleur ambrée, goût corsé), évitée pour le thé vert.",
+      "en": "The leaves' reaction to air after picking: full for black tea (amber colour, bold taste), avoided for green tea.",
+      "es": "Reacción de las hojas al aire tras la cosecha: completa en el té negro (color ámbar, sabor intenso), evitada en el té verde."
+    }
+  },
+  {
+    "term": "bergamote",
+    "label": {
+      "fr": "Bergamote",
+      "en": "Bergamot",
+      "es": "Bergamota"
+    },
+    "definition": {
+      "fr": "Agrume dont l'essence parfume le thé Earl Grey.",
+      "en": "Citrus fruit whose oil flavours Earl Grey tea.",
+      "es": "Cítrico cuya esencia perfuma el té Earl Grey."
+    }
+  },
+  {
+    "term": "hibiscus",
+    "label": {
+      "fr": "Hibiscus",
+      "en": "Hibiscus",
+      "es": "Hibisco"
+    },
+    "definition": {
+      "fr": "Fleur au goût acidulé, base de nombreuses infusions fruitées, qui colore l'eau en rouge.",
+      "en": "Tangy flower behind many fruit infusions; it turns the water red.",
+      "es": "Flor de sabor ácido, base de muchas infusiones de frutas, que tiñe el agua de rojo."
+    }
+  },
+  {
+    "term": "matcha",
+    "label": {
+      "fr": "Matcha",
+      "en": "Matcha",
+      "es": "Matcha"
+    },
+    "definition": {
+      "fr": "Thé vert japonais réduit en poudre très fine.",
+      "en": "Japanese green tea ground into a very fine powder.",
+      "es": "Té verde japonés molido en un polvo muy fino."
+    }
+  },
+  {
+    "term": "arôme naturel",
+    "label": {
+      "fr": "Arôme naturel",
+      "en": "Natural flavouring",
+      "es": "Aroma natural"
+    },
+    "definition": {
+      "fr": "Arôme issu de matières naturelles (fruits, plantes, épices) ajouté pour parfumer le thé.",
+      "en": "Flavouring obtained from natural sources (fruit, herbs, spices) added to scent the tea.",
+      "es": "Aroma obtenido de materias naturales (frutas, plantas, especias) añadido para perfumar el té."
+    }
+  },
+  {
+    "term": "coffret",
+    "label": {
+      "fr": "Coffret",
+      "en": "Gift set",
+      "es": "Estuche"
+    },
+    "definition": {
+      "fr": "Assortiment de plusieurs parfums dans une même boîte, pour goûter ou offrir.",
+      "en": "Assortment of several flavours in one box, to taste or to give.",
+      "es": "Surtido de varios sabores en una misma caja, para probar o regalar."
+    }
+  },
+  {
+    "term": "édition limitée",
+    "label": {
+      "fr": "Édition limitée",
+      "en": "Limited edition",
+      "es": "Edición limitada"
+    },
+    "definition": {
+      "fr": "Recette saisonnière ou temporaire, disponible un temps seulement.",
+      "en": "Seasonal or temporary recipe, available for a limited time only.",
+      "es": "Receta de temporada o temporal, disponible solo un tiempo."
+    }
+  }
+]

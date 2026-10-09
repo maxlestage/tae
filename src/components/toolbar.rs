@@ -1,5 +1,8 @@
+use super::menu::Menu;
 use crate::app::Theme;
+use crate::content::{MENU, MENU_CLOSE, MENU_CLOSE_SHORT};
 use crate::i18n::{Lang, ui};
+use web_sys::HtmlElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -11,10 +14,27 @@ pub struct ToolbarProps {
     pub on_theme: Callback<(Theme, f64, f64)>,
 }
 
-/// Barre fixe : marque, choix de langue (pastille glissante), thème.
+/// Barre fixe : marque, choix de langue (pastille glissante), thème, menu.
 #[function_component]
 pub fn Toolbar(props: &ToolbarProps) -> Html {
     let t = ui(props.lang);
+    let menu_open = use_state(|| false);
+    let menu_btn = use_node_ref();
+    let toggle_menu = {
+        let menu_open = menu_open.clone();
+        Callback::from(move |_: MouseEvent| menu_open.set(!*menu_open))
+    };
+    // Fermeture : après Échap, le focus revient au bouton Menu.
+    let close_menu = {
+        let (menu_open, menu_btn) = (menu_open.clone(), menu_btn.clone());
+        Callback::from(move |refocus: bool| {
+            menu_open.set(false);
+            if let Some(btn) = menu_btn.cast::<HtmlElement>().filter(|_| refocus) {
+                let _ = btn.focus();
+            }
+        })
+    };
+    let menu_label = if *menu_open { MENU_CLOSE } else { MENU };
     let next = props.theme.toggled();
     let on_theme = {
         let cb = props.on_theme.clone();
@@ -28,6 +48,7 @@ pub fn Toolbar(props: &ToolbarProps) -> Html {
     };
 
     html! {
+        <>
         <div class="toolbar">
             <a class="brand" href="#top" data-magnetic="0.25">
                 <img class="brand__logo" src="/lipton-logo.png" alt="Lipton" width="501" height="200" />
@@ -66,7 +87,24 @@ pub fn Toolbar(props: &ToolbarProps) -> Html {
                 >
                     <span class="theme-toggle__icon" aria-hidden="true"></span>
                 </button>
+                <button
+                    type="button"
+                    class={classes!("menu-btn", menu_open.then_some("is-open"))}
+                    ref={menu_btn}
+                    onclick={toggle_menu}
+                    aria-expanded={menu_open.to_string()}
+                    aria-controls="menu"
+                    aria-label={menu_label.get(props.lang)}
+                    data-magnetic="0.3"
+                >
+                    <span class="menu-btn__text" aria-hidden="true">
+                        { super::roll(if *menu_open { MENU_CLOSE_SHORT } else { MENU }.get(props.lang)) }
+                    </span>
+                    <span class="menu-btn__icon" aria-hidden="true"></span>
+                </button>
             </div>
         </div>
+        <Menu lang={props.lang} open={*menu_open} on_close={close_menu} />
+        </>
     }
 }
