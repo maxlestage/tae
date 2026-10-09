@@ -1,6 +1,7 @@
 use super::Sachet;
 use super::timer::BrewTimer;
-use crate::catalog::Tea;
+use crate::catalog::{TEAS, Tea};
+use crate::content::{RANGE_LABEL, Range, SIMILAR, TIP_LABEL, tip, type_blurb};
 use crate::i18n::{Lang, family_label, type_label, ui};
 use crate::tea::{brew_info, caffeine_value, card_style, format_value, lines, moment_value};
 use gloo_events::EventListener;
@@ -25,6 +26,24 @@ pub struct ModalProps {
     pub opened: Opened,
     pub lang: Lang,
     pub on_close: Callback<()>,
+    /// Ouvrir un autre thé dans la même fiche (suggestions).
+    pub on_switch: Callback<&'static Tea>,
+}
+
+/// Jusqu'à 4 thés de la même couleur, les plus proches en intensité.
+fn similar(tea: &'static Tea) -> Vec<&'static Tea> {
+    let mut out: Vec<&'static Tea> = TEAS
+        .iter()
+        .filter(|t| t.family == tea.family && t.id != tea.id)
+        .collect();
+    out.sort_by_key(|t| {
+        (
+            t.intensity.abs_diff(tea.intensity),
+            t.type_key != tea.type_key,
+        )
+    });
+    out.truncate(4);
+    out
 }
 
 #[function_component]
@@ -85,6 +104,8 @@ pub fn TeaModal(props: &ModalProps) -> Html {
         tea.colors[0], tea.colors[1]
     );
 
+    let suggestions = similar(tea);
+
     let fact = |label: &'static str, value: Html| {
         html! {
             <div class="fact">
@@ -115,7 +136,7 @@ pub fn TeaModal(props: &ModalProps) -> Html {
                 <span aria-hidden="true">{ "✕" }</span>
             </button>
             <div class="modal__card" style={card_style(tea)} onclick={stop}>
-                <div class="modal__scroll">
+                <div class="modal__scroll" key={tea.id}>
                     <div class="modal__head">
                         <Sachet swing=true />
                         <span class="card__type">{ type_label(lang, tea.type_key) }</span>
@@ -136,16 +157,40 @@ pub fn TeaModal(props: &ModalProps) -> Html {
                         }
                         if tea.intensity > 0 {
                             { fact(t.intensity_label, html! {
-                                <span class="intensity" role="img" aria-label={format!("{}/5", tea.intensity)}>
-                                    { for (1..=5).map(|i| html! {
-                                        <span class={classes!("intensity__dot", (i <= tea.intensity).then_some("is-on"))}></span>
-                                    }) }
-                                </span>
+                                <>
+                                    <span class="intensity" aria-hidden="true">
+                                        { for (1..=5).map(|i| html! {
+                                            <span class={classes!("intensity__dot", (i <= tea.intensity).then_some("is-on"))}></span>
+                                        }) }
+                                    </span>
+                                    <span class="fact__sub">{ t.intensity_name(tea.intensity) }</span>
+                                </>
                             }) }
                         }
                     </dl>
 
                     <BrewTimer {tea} {lang} />
+
+                    if let Some(tip) = tip(tea) {
+                        <div class="modal__note">
+                            <span class="modal__note-label">{ TIP_LABEL.get(lang) }</span>
+                            <p>{ tip.get(lang) }</p>
+                        </div>
+                    }
+
+                    <div class="modal__note">
+                        <span class="modal__note-label">{ type_label(lang, tea.type_key) }</span>
+                        <p>{ type_blurb(tea.type_key).get(lang) }</p>
+                    </div>
+
+                    { for Range::ALL.into_iter().filter(|r| r.of(tea)).map(|r| html! {
+                        <div class="modal__note">
+                            <span class="modal__note-label">
+                                { format!("{} · {} {}", RANGE_LABEL.get(lang), r.icon(), r.name().get(lang)) }
+                            </span>
+                            <p>{ r.text().get(lang) }</p>
+                        </div>
+                    }) }
 
                     if let Some(ingredients) = tea.ingredients {
                         <p class="modal__ingredients">
@@ -170,6 +215,31 @@ pub fn TeaModal(props: &ModalProps) -> Html {
                             }) }
                         </div>
                     </div>
+
+                    if !suggestions.is_empty() {
+                        <div class="modal__similar">
+                            <span class="modal__palette-label">{ SIMILAR.get(lang) }</span>
+                            <div class="modal__similar-list">
+                                { for suggestions.into_iter().map(|other| {
+                                    let on_switch = props.on_switch.clone();
+                                    html! {
+                                        <button
+                                            type="button"
+                                            class="similar"
+                                            onclick={move |_| on_switch.emit(other)}
+                                            aria-label={t.open_aria(other.name.get(lang))}
+                                        >
+                                            <i class="similar__dot" style={format!(
+                                                "background: linear-gradient(135deg, {} 50%, {} 50%)",
+                                                other.colors[0], other.colors[1]
+                                            )}></i>
+                                            { other.name.get(lang) }
+                                        </button>
+                                    }
+                                }) }
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
