@@ -82,7 +82,7 @@ pub fn Menu(props: &MenuProps) -> Html {
                 <p class="menu__api">
                     <span class="menu__api-title">{ "API" }</span>
                     { for API_LINKS.iter().map(|(href, label)| html! {
-                        <a href={*href}>{ label.get(lang) }</a>
+                        <a href={*href}>{ super::roll(label.get(lang)) }</a>
                     }) }
                 </p>
             </aside>

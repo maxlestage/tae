@@ -5,6 +5,7 @@ mod catalog;
 mod components;
 mod content;
 mod dom;
+mod fx;
 mod i18n;
 mod motion;
 mod tea;

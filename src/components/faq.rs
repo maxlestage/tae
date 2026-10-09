@@ -1,4 +1,4 @@
-use super::{LangProps, section_head};
+use super::{LangProps, ambient, roll, section_head};
 use crate::content::{API_LINKS, FAQ, FAQ_HEADING};
 use yew::prelude::*;
 
@@ -10,7 +10,7 @@ pub fn Faq(props: &LangProps) -> Html {
     let last = FAQ.len() - 1;
 
     html! {
-        <section class="section faq" id="faq">
+        <section class="section faq" id="faq" data-ambient={ambient("faq")}>
             { section_head("faq", &FAQ_HEADING, lang) }
             <div class="faq__list">
                 { for FAQ.iter().enumerate().map(|(i, qa)| html! {
@@ -25,7 +25,7 @@ pub fn Faq(props: &LangProps) -> Html {
                             if i == last {
                                 <p class="faq__links">
                                     { for API_LINKS.iter().map(|(href, label)| html! {
-                                        <a class="link-pill" href={*href}>{ label.get(lang) }</a>
+                                        <a class="link-pill" href={*href}>{ roll(label.get(lang)) }</a>
                                     }) }
                                 </p>
                             }

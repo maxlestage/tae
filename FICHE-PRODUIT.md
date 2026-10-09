@@ -118,9 +118,13 @@ position dans la page.
   fiche colorée. »
 - Trois **chiffres clés** qui défilent jusqu'à leur valeur : 78 sachets,
   6 couleurs, 3 langues.
-- Des **halos colorés** (jaune, rouge, vert, violet) qui flottent et se
-  déplacent légèrement avec la souris et le défilement.
-- Un indicateur « Défiler » qui mène au catalogue.
+- Des **halos colorés** (jaune, rouge, vert, violet) et sept **sachets de thé
+  flottants**, aux couleurs de vrais thés du catalogue, qui se balancent et
+  se déplacent en profondeur avec la souris et le défilement.
+- Un **reflet** qui balaie régulièrement le logo ; les lettres du titre
+  sautent au survol.
+- Un indicateur « Défiler » qui mène au catalogue. Dès qu'on fait défiler, le
+  contenu de l'accueil recule et s'efface.
 
 ### 3.4 Bandeaux défilants
 
@@ -190,6 +194,8 @@ carte.
 - Cadran circulaire qui se remplit, chiffres tabulaires, cadran qui « respire »
   pendant l'infusion.
 - Boutons Démarrer / Pause / Reprendre / Réinitialiser.
+- Pendant l'infusion : des **volutes de vapeur** montent du cadran et le
+  sachet de la fiche **trempe** en rythme.
 - En fin d'infusion : **trois bips** (Web Audio), **vibration** sur mobile,
   message « C'est prêt 🍵 » et la carte pulse.
 - L'écran reste **allumé** pendant l'infusion (Screen Wake Lock), et le
@@ -267,9 +273,10 @@ déplie en douceur) :
 - **À propos** : le projet, ses trois déclinaisons (le site, l'app iPhone,
   l'API), les liens Documentation · Bac à sable · Swagger · OpenAPI, les
   crédits et la mention de marque.
-- **Pied de page** : la signature « Une couleur, un thé. » en très grand, un
-  bouton rond jaune pour remonter, le plan du site (sept sections), les liens
-  API, le copyright.
+- **Pied de page** : la signature « Une couleur, un thé. » en très grand (ses
+  deux lignes glissent l'une vers l'autre au scroll), un bouton rond jaune pour
+  remonter entouré d'un texte circulaire qui tourne, le plan du site (sept
+  sections), les liens API, le copyright.
 
 ## 4. Le catalogue en chiffres
 
@@ -303,35 +310,54 @@ coffrets 7.
 ## 5. Le mouvement : toutes les animations
 
 Le site adopte le langage de mouvement des sites de studios créatifs, au
-service de la lecture.
+service de la lecture. Une boucle d'animation unique (Rust → WebAssembly)
+écrit des variables CSS à chaque image, sans re-rendu de l'interface.
 
-| Animation | Où | Comportement |
-| --- | --- | --- |
-| Intro et rideau | Chargement | Compteur 0 → 100 %, sachet qui se balance, rideau qui se lève en goutte |
-| Lettres en cascade | Titre de l'accueil | Chaque lettre monte d'un masque avec une légère rotation ; rejoué au changement de langue |
-| Logo qui pivote | Accueil | Entrée avec rebond |
-| Compteurs | Chiffres clés, « en chiffres » | Défilent de 0 à leur valeur à l'apparition |
-| Halos en parallaxe | Accueil | Flottent en continu, suivent la souris et le défilement |
-| Bandeaux défilants | Sous l'accueil | Vitesse et inclinaison liées à la vitesse du scroll |
-| Curseur sur mesure | Partout (souris) | Point + anneau à inertie ; s'agrandit sur les boutons ; pastille « Ouvrir » sur les cartes |
-| Boutons magnétiques | Marque, filtres, menu, thème, liens API… | Attirés vers le pointeur, reviennent en ressort |
-| Cartes 3D | Catalogue | Inclinaison sous le pointeur, reflet, élévation, sachet qui se balance |
-| Apparitions au scroll | Toutes les sections | Fondu + montée en cascade ; titres révélés par masque ; jauges et barres qui se remplissent |
-| Fiche en cercle | Ouverture / fermeture | Se dévoile depuis le point du clic et s'y referme |
-| Thème en cercle | Bouton soleil / lune | Le nouveau thème se propage en cercle (View Transitions) |
-| Menu plein écran | Bouton Menu | Rideau jaune, liens qui montent un à un, soulignement au survol |
-| Pastilles glissantes | Langue, tri | La pastille glisse vers l'option choisie |
-| Accordéon | FAQ | Déploiement en douceur, icône + → − |
-| Barre de progression | Haut de l'écran | Suit la position dans la page |
+**Partout**
+
+| Animation | Comportement |
+| --- | --- |
+| Défilement fluide | La molette est amortie (inertie douce) ; les liens vers une section y mènent par un trajet animé. Au clavier et au tactile, le défilement reste natif |
+| Lueur d'ambiance | Une lueur de fond prend en douceur la couleur de la section à l'écran (jaune, ambre, vert… et la couleur de chaque famille du catalogue) |
+| Curseur sur mesure | Point + anneau à inertie ; s'agrandit sur les éléments cliquables ; sur une carte, pastille « Ouvrir » aux couleurs du thé survolé |
+| Boutons magnétiques | Marque, filtres, menu, thème, liens API… attirés vers le pointeur, retour en ressort |
+| Ondes au clic | Une onde part du point de clic sur les filtres, tris, boutons, cartes, questions… |
+| Texte roulant | Au survol, le libellé des liens et boutons part vers le haut et sa copie arrive par le bas |
+| Apparitions au scroll | Fondu + montée en cascade ; titres révélés par masque |
+| Barre de progression | Suit la position dans la page |
+| Grain | Léger grain photo animé sur toute la page |
+
+**Par zone**
+
+| Zone | Animations |
+| --- | --- |
+| Intro | Compteur 0 → 100 %, sachet qui se balance, rideau qui se lève en goutte |
+| Barre d'outils | Glisse depuis le haut, devient translucide au scroll ; pastilles glissantes (langue, tri) ; menu plein écran en rideau jaune, liens qui montent un à un |
+| Accueil | Lettres en cascade (rejouées au changement de langue) et qui sautent au survol ; logo qui pivote puis reflet périodique ; compteurs ; halos et sachets flottants en parallaxe ; sortie (recul + fondu) au scroll |
+| Bandeaux | Défilement continu, accéléré et incliné par la vitesse du scroll, ralenti au survol |
+| En-têtes de section | Grand mot fantôme détouré qui glisse horizontalement avec le scroll ; sur-titre brouillé puis révélé ; chapeau qui s'allume mot à mot au fil du scroll |
+| Catalogue | Nombre de sachets qui redéfile à chaque filtre ; cartes dévoilées par un volet qui monte pendant que leur contenu se resserre ; inclinaison 3D, reflet et sachet qui se balance au survol |
+| Fiche | Se dévoile en cercle depuis le clic et s'y referme ; contenu en cascade ; sachet qui se balance |
+| Minuteur | Cadran qui se remplit et « respire » ; vapeur et sachet qui trempe pendant l'infusion ; pulsation à la fin |
+| Bien infuser | Chiffres des règles d'or qui glissent puis se remplissent au survol ; jauges qui se remplissent, chaleur qui ondule |
+| Types de thé | Cartes qui s'élèvent au survol, vague sur les pastilles de couleur |
+| Couleurs | Barres qui se remplissent, pastille qui bat au survol ; chiffres clés qui défilent |
+| Glossaire, FAQ | Filets qui se tracent ; termes et questions qui glissent au survol ; accordéon qui se déplie en douceur, icône + → − |
+| Pied de page | Signature dont les deux lignes glissent l'une vers l'autre ; badge circulaire qui tourne autour du bouton « remonter » |
+| Thème | Le nouveau thème se propage en cercle depuis le bouton (View Transitions) |
+| Langue | Toute la page s'efface vers le haut et la nouvelle langue monte, avec un léger flou |
 
 Tout est désactivé si l'appareil demande de **réduire les animations** : pas
-d'intro, pas de curseur, pas de mouvement ; le contenu s'affiche directement.
+d'intro, pas de curseur, pas de défilement amorti, pas de mouvement ; le
+contenu s'affiche directement.
 
 ## 6. Accessibilité, confidentialité, hors-ligne
 
 **Accessibilité**
 
-- Navigation complète au clavier, lien d'évitement « Aller au catalogue ».
+- Navigation complète au clavier, lien d'évitement « Aller au catalogue » ;
+  au clavier, les liens d'ancre gardent leur comportement natif (le focus
+  suit).
 - Focus placé sur la croix à l'ouverture d'une fiche, rendu à la carte à la
   fermeture ; menu fermé avec Échap, focus rendu au bouton.
 - Libellés pour les lecteurs d'écran (cartes, chiffres animés, intensité),
@@ -427,7 +453,7 @@ flowchart LR
 | --- | --- |
 | Front | **Rust** + **Yew 0.23**, compilé en **WebAssembly** (wasm-bindgen 0.2.129) |
 | Build | **Trunk 0.21** + **wasm-opt** (binaryen 133), Rust **1.97** figé par `rust-toolchain.toml` |
-| Animations | Moteur maison (`src/motion.rs` : boucle `requestAnimationFrame` qui écrit des variables CSS, sans re-rendu), IntersectionObserver, View Transitions API, `@property` CSS |
+| Animations | Moteur maison (`src/motion.rs`, `src/fx.rs` : boucle `requestAnimationFrame` qui écrit des variables CSS, sans re-rendu ; défilement amorti ; progression au scroll), IntersectionObserver, View Transitions API, `@property` CSS |
 | Serveur | **Node 24 LTS**, zéro dépendance : sert le site et l'API, compression Brotli / gzip, ETag |
 | Données | Trois fichiers JSON dans `data/`, partagés par le site, l'API et l'app iOS |
 | iOS | SwiftUI, XcodeGen, GitHub Actions → TestFlight |

@@ -1,4 +1,4 @@
-use super::{LangProps, section_head};
+use super::{LangProps, ambient, section_head};
 use crate::content::{GLOSSARY, GLOSSARY_HEADING};
 use yew::prelude::*;
 
@@ -26,7 +26,7 @@ pub fn Glossary(props: &LangProps) -> Html {
     terms.sort_by_key(|t| sort_key(t.label.get(lang)));
 
     html! {
-        <section class="section glossary" id="glossaire">
+        <section class="section glossary" id="glossaire" data-ambient={ambient("glossaire")}>
             { section_head("glossaire", &GLOSSARY_HEADING, lang) }
             <dl class="terms">
                 { for terms.into_iter().map(|term| html! {

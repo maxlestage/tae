@@ -96,7 +96,7 @@ pub fn TeaCard(props: &CardProps) -> Html {
                         <span class="card__time">{ format!("⏱ {}", spec.time_label()) }</span>
                     </span>
                 }
-                <span class="card__open">{ t.open_card }</span>
+                <span class="card__open">{ super::roll(t.open_card) }</span>
             </button>
         </div>
     }
