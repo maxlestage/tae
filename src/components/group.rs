@@ -77,13 +77,20 @@ pub fn Group(props: &GroupProps) -> Html {
         .collect::<Vec<_>>()
         .join(" · ");
 
+    // Lueur d'ambiance : la couleur de la famille (sections « couleur »).
+    let ambient = match section.kind {
+        SectionKind::Family(f) if f != Family::Coffret => f.swatch(),
+        SectionKind::Family(_) => "#9b7bc4",
+        _ => "",
+    };
+
     let on_toggle = {
         let (cb, key) = (props.on_toggle.clone(), section.key.clone());
         Callback::from(move |_: MouseEvent| cb.emit(key.clone()))
     };
 
     html! {
-        <section class="group" data-open={props.open.to_string()}>
+        <section class="group" data-open={props.open.to_string()} data-ambient={ambient}>
             <button
                 type="button"
                 class="group__head"

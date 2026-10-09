@@ -1,4 +1,4 @@
-use super::{LangProps, section_head};
+use super::{LangProps, ambient, roll, section_head};
 use crate::content::{ABOUT, API_LINKS, CREDITS, PILLARS, TRADEMARK};
 use yew::prelude::*;
 
@@ -7,7 +7,7 @@ use yew::prelude::*;
 pub fn About(props: &LangProps) -> Html {
     let lang = props.lang;
     html! {
-        <section class="section about" id="a-propos">
+        <section class="section about" id="a-propos" data-ambient={ambient("a-propos")}>
             { section_head("a-propos", &ABOUT, lang) }
             <div class="pillars">
                 { for PILLARS.iter().enumerate().map(|(i, p)| html! {
@@ -20,7 +20,7 @@ pub fn About(props: &LangProps) -> Html {
             </div>
             <p class="about__links" data-reveal="">
                 { for API_LINKS.iter().map(|(href, label)| html! {
-                    <a class="link-pill" href={*href} data-magnetic="0.25">{ label.get(lang) }</a>
+                    <a class="link-pill" href={*href} data-magnetic="0.25">{ roll(label.get(lang)) }</a>
                 }) }
             </p>
             <p class="about__credits" data-reveal="">{ CREDITS.get(lang) }</p>

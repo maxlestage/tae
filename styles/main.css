@@ -2857,7 +2857,9 @@ html.menu-open .brand {
 }
 
 .card__time {
-  opacity: 0.85;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
 }
 
@@ -3041,9 +3043,6 @@ html.menu-open .brand {
   mix-blend-mode: normal;
 }
 
-::view-transition-new(root) {
-  animation: vt-circle 0.8s var(--ease-in-out);
-}
 
 @keyframes vt-circle {
   from { clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 0px)); }
@@ -3079,7 +3078,589 @@ html.menu-open .brand {
   .footer__top {
     top: auto;
     bottom: 5.5rem;
+    right: calc(var(--gutter) + 1.2rem);
   }
+}
+
+/* =========================================================================
+   Animations supplémentaires (pilotées par fx.rs + motion.rs)
+   ========================================================================= */
+
+/* Défilement fluide : c'est fx.rs qui anime, pas le navigateur. */
+html.motion.has-smooth {
+  scroll-behavior: auto;
+}
+
+/* --- Lueur d'ambiance : couleur de la section à l'écran ------------------- */
+@property --ambient {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+.ambient {
+  --ambient: transparent;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 55% at 50% -8%, color-mix(in srgb, var(--ambient) 24%, transparent), transparent 72%),
+    radial-gradient(55% 45% at 100% 108%, color-mix(in srgb, var(--ambient) 14%, transparent), transparent 70%);
+  transition: --ambient 1.4s ease;
+}
+
+/* --- Onde au clic ------------------------------------------------------------ */
+:is(.chip, .seg, .tool-btn, .timer__btn, .similar, .colour-row, .group__head, .theme-toggle,
+  .menu-btn, .faq__question) {
+  position: relative;
+  overflow: hidden;
+}
+
+:is(.chip, .seg, .tool-btn, .timer__btn, .similar, .colour-row, .group__head, .theme-toggle,
+  .menu-btn, .card, .faq__question)[data-ripple]::after {
+  content: "";
+  position: absolute;
+  left: var(--rip-x);
+  top: var(--rip-y);
+  width: var(--rip-s);
+  height: var(--rip-s);
+  margin: calc(var(--rip-s) / -2) 0 0 calc(var(--rip-s) / -2);
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  animation: ripple 0.75s var(--ease-out);
+}
+
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.25; }
+  to { transform: scale(1); opacity: 0; }
+}
+
+/* --- Texte roulant au survol --------------------------------------------------- */
+.roll {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.3em;
+  overflow: hidden;
+  vertical-align: top;
+  line-height: 1.3;
+}
+
+.roll > span {
+  display: block;
+  white-space: nowrap;
+  transition: translate 0.55s var(--ease-out);
+}
+
+a:hover .roll > span,
+button:hover .roll > span,
+a:focus-visible .roll > span,
+button:focus-visible .roll > span {
+  translate: 0 -100%;
+}
+
+/* --- Sur-titres brouillés -------------------------------------------------------- */
+.scramble::after {
+  content: attr(data-text);
+}
+
+.scramble[data-scrambling]::after {
+  content: attr(data-scrambling);
+}
+
+/* --- Hero : sachets flottants, reflet du logo, sortie au scroll -------------------- */
+.float-bag {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate3d(
+    calc(var(--px, 0) * var(--depth) * 70px),
+    calc(var(--sy, 0) * var(--depth) * -0.9px + var(--py, 0) * var(--depth) * 45px),
+    0
+  );
+  rotate: var(--rot);
+}
+
+.float-bag.is-far {
+  filter: blur(1.5px);
+  opacity: 0.55;
+}
+
+.float-bag__tag {
+  width: calc(15px * var(--s));
+  height: calc(12px * var(--s));
+  border-radius: 2px;
+  background: var(--yellow);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.float-bag__string {
+  width: 1.5px;
+  height: calc(34px * var(--s));
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+.float-bag__bag {
+  width: calc(44px * var(--s));
+  height: calc(52px * var(--s));
+  border-radius: 6px 6px 9px 9px;
+  background: linear-gradient(150deg, var(--c1) 0 52%, var(--c2) 100%);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.motion .float-bag {
+  opacity: 0;
+  animation: bag-bob var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+
+.motion.is-loaded .float-bag {
+  opacity: 0.92;
+  transition: opacity 1.4s ease 0.9s;
+}
+
+.motion.is-loaded .float-bag.is-far {
+  opacity: 0.5;
+}
+
+@keyframes bag-bob {
+  from { translate: 0 -14px; rotate: var(--rot); }
+  to { translate: 0 16px; rotate: calc(var(--rot) * -0.6); }
+}
+
+@media (max-width: 640px) {
+  .float-bag:nth-last-child(-n + 3) {
+    display: none;
+  }
+}
+
+.hero__logo-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: -0.02em;
+  margin-left: 0.15em;
+}
+
+.hero__logo-wrap .hero__logo {
+  display: block;
+  margin: 0;
+}
+
+/* Reflet qui balaie le logo (masqué à sa forme). */
+.hero__logo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.7) 50%, transparent 62%);
+  background-size: 260% 100%;
+  background-position: 160% 0;
+  -webkit-mask: url("/lipton-logo.png") center / contain no-repeat;
+  mask: url("/lipton-logo.png") center / contain no-repeat;
+}
+
+.motion.is-loaded .hero__logo-wrap::after {
+  animation: shine 5.5s ease-in-out 2.4s infinite;
+}
+
+@keyframes shine {
+  0% { background-position: 160% 0; }
+  32%, 100% { background-position: -60% 0; }
+}
+
+/* Le contenu du hero recule et s'efface quand on fait défiler. */
+.motion .hero__inner {
+  --e: clamp(0, (var(--p, 0.5) - 0.5) * 2.4, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate3d(0, calc(var(--e) * -16vh), 0) scale(calc(1 - var(--e) * 0.1));
+  opacity: calc(1 - var(--e) * 1.2);
+  will-change: transform, opacity;
+}
+
+.hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Lettres du titre : petit saut au survol. */
+.split__word {
+  padding-top: 0.16em;
+  margin-top: -0.16em;
+}
+
+.split__char {
+  transition: transform 0.45s var(--ease-back), color 0.3s ease;
+}
+
+.split__char:hover {
+  transform: translateY(-0.1em) rotate(-6deg);
+  color: var(--red);
+}
+
+/* --- En-têtes de section : mot fantôme et chapeau qui s'allume ------------------ */
+.section__head {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Les mots fantômes débordent volontairement : on les coupe aux bords de
+   l'écran (sinon la page s'élargit sur mobile). */
+main,
+.footer {
+  overflow-x: clip;
+}
+
+.section__ghost {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: -0.3em;
+  font-size: clamp(5.5rem, 21vw, 19rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line);
+  pointer-events: none;
+  user-select: none;
+  translate: -50% 0;
+  transform: translateX(calc((0.5 - var(--p, 0.5)) * 45vw));
+}
+
+.section__intro.scrub-words {
+  color: var(--text);
+}
+
+.motion .scrub-words {
+  --q: clamp(0, (var(--p, 1) - 0.1) / 0.36, 1);
+}
+
+.motion .scrub-words .w {
+  opacity: clamp(0.18, calc(var(--q) * (var(--wn) + 4) - var(--wi)), 1);
+  transition: opacity 0.25s linear;
+}
+
+/* --- Catalogue : le nombre affiché redéfile à chaque filtre ------------------------ */
+.catalogue__count {
+  --n: var(--to);
+  counter-reset: n var(--n);
+}
+
+.catalogue__count::after {
+  content: counter(n, decimal-leading-zero);
+}
+
+.motion .catalogue__count {
+  --n: 0;
+}
+
+.motion .catalogue__count[data-shown] {
+  animation: count 1.2s var(--ease-out) both;
+}
+
+/* Cartes : dévoilées par un volet qui monte, le contenu se resserre. Le volet
+   est sur la carte, pas sur l'enveloppe observée (un clip-path vide la
+   rendrait invisible pour l'IntersectionObserver). */
+.motion .card-wrap[data-reveal] {
+  opacity: 1;
+  translate: 0 70px;
+  transition: translate 1.15s var(--ease-out) var(--d, 0ms);
+}
+
+.motion .card-wrap[data-shown] {
+  translate: 0 0;
+}
+
+.motion .card-wrap[data-reveal] .card {
+  scale: 1.12;
+  clip-path: inset(100% 0 0 0 round 20px);
+  transition: clip-path 1.05s var(--ease-out) var(--d, 0ms), scale 1.3s var(--ease-out) var(--d, 0ms),
+    transform 0.6s var(--ease-out), box-shadow 0.4s ease;
+}
+
+.motion .card-wrap[data-shown] .card {
+  scale: 1;
+  clip-path: inset(-60px -60px -120px -60px round 20px);
+}
+
+.group__count {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.group__head:hover .group__count {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* --- Cartes d'information : élévation au survol ------------------------------- */
+.motion :is(.kind, .pillar, .figure, .rule, .range)[data-reveal] {
+  transition: opacity 0.9s var(--ease-out) var(--d, 0ms), translate 1.1s var(--ease-out) var(--d, 0ms),
+    transform 0.5s var(--ease-out), border-color 0.3s ease, box-shadow 0.4s ease;
+}
+
+:is(.kind, .pillar, .figure, .rule, .range):hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 44px var(--shadow);
+}
+
+.kind:hover .kind__swatches i {
+  scale: 1;
+  animation: wave 0.8s var(--ease-out) calc(var(--si, 0) * 40ms);
+}
+
+@keyframes wave {
+  40% { translate: 0 -7px; scale: 1.35; }
+}
+
+.kind__count,
+.pillar__num {
+  transition: color 0.4s ease, -webkit-text-stroke-color 0.4s ease;
+}
+
+.kind:hover .kind__count {
+  color: var(--text);
+}
+
+.pillar:hover .pillar__num {
+  color: var(--text);
+}
+
+/* Règles d'or : le grand chiffre glisse à l'apparition, se remplit au survol. */
+.rule__num {
+  transition: translate 1.2s var(--ease-out) calc(var(--d, 0ms) + 200ms), opacity 1s ease,
+    color 0.4s ease, -webkit-text-stroke-color 0.4s ease;
+}
+
+.motion .rule[data-reveal] .rule__num {
+  translate: 50px 0;
+  opacity: 0;
+}
+
+.motion .rule[data-shown] .rule__num {
+  translate: 0 0;
+  opacity: 1;
+}
+
+.rule:hover .rule__num {
+  color: color-mix(in srgb, var(--yellow) 70%, transparent);
+  -webkit-text-stroke-color: transparent;
+}
+
+/* Barres de couleur : la pastille bat au survol. */
+.colour-row:hover .colour-row__dot {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.colour-row__fill {
+  transition: filter 0.3s ease;
+}
+
+.colour-row:hover .colour-row__fill {
+  filter: saturate(1.3) brightness(1.1);
+}
+
+@keyframes pulse {
+  50% { scale: 1.4; }
+}
+
+/* Jauges : la chaleur ondule. */
+.gauge__fill--hot {
+  background-size: 200% 100%;
+}
+
+.motion .gauge__fill--hot {
+  background-image: linear-gradient(90deg, #f5a623, #e20025, #f5a623);
+  animation: heat 2.4s linear infinite;
+}
+
+@keyframes heat {
+  to { background-position: -200% 0; }
+}
+
+/* Glossaire et FAQ : les filets se tracent à l'apparition. */
+.term,
+.faq__item {
+  position: relative;
+}
+
+.term {
+  border-top: none;
+}
+
+.faq__item {
+  border-bottom: none;
+}
+
+.term::before,
+.faq__item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+  transform-origin: left;
+}
+
+.term::before {
+  top: 0;
+}
+
+.faq__item::before {
+  bottom: 0;
+}
+
+.motion :is(.term, .faq__item)[data-reveal]::before {
+  transform: scaleX(0);
+  transition: transform 1.3s var(--ease-out) var(--d, 0ms);
+}
+
+.motion :is(.term, .faq__item)[data-shown]::before {
+  transform: scaleX(1);
+}
+
+.term__label {
+  transition: translate 0.45s var(--ease-out);
+}
+
+.term:hover .term__label {
+  translate: 8px 0;
+}
+
+.faq__question > span:first-child {
+  transition: translate 0.45s var(--ease-out);
+}
+
+.faq__question:hover > span:first-child {
+  translate: 8px 0;
+}
+
+/* --- Pied de page : badge circulaire, signature en ciseaux --------------------- */
+.footer__top {
+  overflow: visible;
+}
+
+.circle-text {
+  position: absolute;
+  left: -24%;
+  top: -24%;
+  width: 148%;
+  height: 148%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.circle-text text {
+  font-size: 8.6px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--text);
+}
+
+.motion .circle-text {
+  animation: spin 16s linear infinite;
+}
+
+.footer__arrow {
+  transition: translate 0.4s var(--ease-out);
+}
+
+.footer__top:hover .footer__arrow {
+  translate: 0 -5px;
+}
+
+@keyframes spin {
+  to { rotate: 360deg; }
+}
+
+.motion .footer__tagline .mask:first-child {
+  transform: translateX(calc((0.62 - var(--p, 0.62)) * -45%));
+}
+
+.motion .footer__tagline .mask:last-child {
+  transform: translateX(calc((0.62 - var(--p, 0.62)) * 45%));
+}
+
+/* --- Fiche : vapeur et sachet qui trempe pendant l'infusion -------------------- */
+.steam {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  width: 42px;
+  height: 40px;
+  translate: -50% -100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.timer--running .steam {
+  opacity: 1;
+}
+
+.steam i {
+  position: absolute;
+  bottom: 0;
+  width: 7px;
+  height: 32px;
+  border-radius: 999px;
+  background: linear-gradient(to top, color-mix(in srgb, currentColor 70%, transparent), transparent);
+  filter: blur(2.5px);
+  opacity: 0;
+}
+
+.steam i:nth-child(1) { left: 5px; }
+.steam i:nth-child(2) { left: 17px; animation-delay: 0.7s !important; }
+.steam i:nth-child(3) { left: 29px; animation-delay: 1.4s !important; }
+
+.motion .timer--running .steam i {
+  animation: steam 2.1s ease-out infinite;
+}
+
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(8px) scaleY(0.6); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(5px, -20px) scaleY(1.25); }
+}
+
+.motion .modal__card.is-brewing .sachet--swing {
+  animation: dunk 2.2s var(--ease-in-out) infinite;
+}
+
+@keyframes dunk {
+  0%, 100% { translate: 0 0; rotate: -3deg; }
+  45% { translate: 0 9px; rotate: 3deg; }
+  62% { translate: 0 6px; rotate: 1deg; }
+}
+
+/* --- Transitions de vue : thème en cercle, langue en fondu glissé ---------------- */
+html[data-vt="circle"]::view-transition-new(root) {
+  animation: vt-circle 0.8s var(--ease-in-out);
+}
+
+html[data-vt="page"]::view-transition-old(root) {
+  animation: vt-page-out 0.45s var(--ease-in-out) both;
+}
+
+html[data-vt="page"]::view-transition-new(root) {
+  animation: vt-page-in 0.75s var(--ease-out) 0.1s both;
+}
+
+@keyframes vt-page-out {
+  to { opacity: 0; transform: translateY(-40px); filter: blur(8px); }
+}
+
+@keyframes vt-page-in {
+  from { opacity: 0; transform: translateY(50px); filter: blur(8px); }
 }
 
 /* =========================================================================

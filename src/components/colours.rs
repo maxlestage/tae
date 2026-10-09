@@ -1,4 +1,4 @@
-use super::section_head;
+use super::{ambient, section_head};
 use crate::catalog::{Family, TEAS, types_of};
 use crate::content::{
     COLOURS, COLOURS_HINT, FIG_CAFFEINE_FREE, FIG_COFFRETS, FIG_COLD, FIG_EXCLUSIVE, FIG_LANGS,
@@ -75,7 +75,7 @@ pub fn Colours(props: &ColoursProps) -> Html {
     ];
 
     html! {
-        <section class="section colours" id="couleurs">
+        <section class="section colours" id="couleurs" data-ambient={ambient("couleurs")}>
             { section_head("couleurs", &COLOURS, lang) }
             <ul class="colour-rows">{ for bars }</ul>
             <p class="colours__hint" data-reveal="">{ COLOURS_HINT.get(lang) }</p>
