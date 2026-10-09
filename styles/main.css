@@ -2370,6 +2370,10 @@ html.has-cursor * {
   transform: scaleX(1);
 }
 
+.colour-row__fill.dot--rainbow {
+  background: linear-gradient(90deg, #ffcc00, #d98032, #d81b3f, #e06b97, #7b2d8e, #3a6ea5, #2e9e4f);
+}
+
 .colour-row__count {
   min-width: 2ch;
   text-align: right;
