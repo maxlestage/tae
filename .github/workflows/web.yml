@@ -1,0 +1,52 @@
+name: Web (Yew / WebAssembly)
+
+# Garde-fou du site : formatage, lint, build Trunk complet, puis test de fumée
+# du serveur Node (page, WASM servi en application/wasm, API).
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Toolchain Rust (rust-toolchain.toml)
+        run: rustup toolchain install && rustc --version
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Formatage
+        run: cargo fmt --check
+
+      - name: Lint (clippy, cible wasm32)
+        run: cargo clippy --target wasm32-unknown-unknown --locked -- -D warnings
+
+      - name: Build de production (Trunk)
+        run: npm run build
+
+      - name: Test de fumée du serveur
+        run: |
+          PORT=3000 node server.js &
+          sleep 2
+          curl -fsS http://localhost:3000/ | grep -q "lipton-thes"
+          ctype=$(curl -fsS -o /dev/null -w '%{content_type}' http://localhost:3000/lipton-thes_bg.wasm)
+          test "$ctype" = "application/wasm"
+          curl -fsS "http://localhost:3000/api/teas?limit=1" | grep -q "yellow-label"
+          curl -fsS http://localhost:3000/api/stats | grep -q '"total":'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site-dist
+          path: dist

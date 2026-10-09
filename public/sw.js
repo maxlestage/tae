@@ -1,9 +1,10 @@
 /* Service worker — Lipton · Sachets de thé (PWA) */
-const CACHE = "lipton-v8";
+const CACHE = "lipton-v9-yew";
 const ASSETS = [
   "/",
   "/index.html",
-  "/main.js",
+  "/lipton-thes.js",
+  "/lipton-thes_bg.wasm",
   "/main.css",
   "/paper-emboss.png",
   "/paper-emboss-90.png",
@@ -62,7 +63,7 @@ self.addEventListener("fetch", (event) => {
   // repli sur le cache hors-ligne. Évite de servir une vieille version.
   if (
     req.mode === "navigate" ||
-    /\.(?:js|css|webmanifest)$/.test(pathname)
+    /\.(?:js|css|wasm|webmanifest)$/.test(pathname)
   ) {
     event.respondWith(
       networkFirst(req, req.mode === "navigate" ? "/index.html" : undefined),

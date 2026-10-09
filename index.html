@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Lipton · Sachets de thé par couleurs</title>
+    <meta
+      name="description"
+      content="Gamme Lipton vendue en France 🇫🇷 — 78 sachets triés par couleurs, avec fiche colorée, intensité, ingrédients et minuteur d'infusion. FR / EN / ES."
+    />
+    <meta name="theme-color" content="#ffe105" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Lipton Thés" />
+
+    <!-- __BASE_URL__ est remplacé par l'URL absolue du site par server.js. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lipton · Sachets de thé" />
+    <meta property="og:title" content="Lipton · Sachets de thé par couleurs" />
+    <meta
+      property="og:description"
+      content="Gamme Lipton vendue en France 🇫🇷 — 78 sachets triés par couleurs, avec fiche colorée, intensité, ingrédients et minuteur d'infusion. FR / EN / ES."
+    />
+    <meta property="og:url" content="__BASE_URL__/" />
+    <meta property="og:image" content="__BASE_URL__/og-image.png?v=4" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lipton · Sachets de thé par couleurs" />
+    <meta name="twitter:image" content="__BASE_URL__/og-image.png?v=4" />
+
+    <link rel="preload" href="/fonts/poppins-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Trunk : compile le crate Rust en WebAssembly, minifie le CSS, copie les assets. -->
+    <!-- wasm-opt doit connaître les extensions WASM que Rust (≥ 1.87) active par défaut. -->
+    <link
+      data-trunk
+      rel="rust"
+      data-bin="lipton-thes"
+      data-wasm-opt="z"
+      data-wasm-opt-params="--enable-bulk-memory --enable-bulk-memory-opt --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue"
+    />
+    <link data-trunk rel="css" href="styles/main.css" />
+    <link data-trunk rel="copy-dir" href="public" data-target-path="." />
+  </head>
+  <body>
+    <!-- Écran d'intro en HTML statique : visible dès le premier octet, pendant le
+         téléchargement du WebAssembly. L'app Rust le congédie une fois montée. -->
+    <div id="preloader" class="preloader" aria-hidden="true">
+      <div class="preloader__panel">
+        <div class="preloader__bag">
+          <span class="preloader__string"></span>
+          <span class="preloader__sachet"><img src="/lipton-logo.png" alt="" /></span>
+        </div>
+        <div class="preloader__count"><span class="preloader__num"></span><sup>%</sup></div>
+        <div class="preloader__bar"></div>
+      </div>
+    </div>
+
+    <div id="app"></div>
+
+    <noscript>
+      <p class="noscript">Cette page a besoin de JavaScript et de WebAssembly pour s'afficher.</p>
+    </noscript>
+  </body>
+</html>

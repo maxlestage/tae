@@ -1,26 +1,17 @@
 {
   "name": "lipton-tea-colors",
-  "version": "1.0.0",
-  "description": "Sachets de thé Lipton triés par couleurs, avec une fiche colorée aux couleurs du thé ou de sa boîte.",
+  "version": "2.0.0",
+  "description": "Sachets de thé Lipton triés par couleurs : front Yew (Rust → WebAssembly) et API publique Node.",
   "type": "module",
+  "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
-    "dev": "node build.mjs --serve",
-    "build": "node build.mjs",
+    "dev": "sh scripts/dev.sh",
+    "build": "sh scripts/build.sh",
     "start": "node server.js",
-    "native:data": "node build.mjs && cp dist/api/teas.json native-ios/Resources/teas.json",
+    "native:data": "cp data/teas.json native-ios/Resources/teas.json",
     "ios:prepare": "npm run native:data && cd native-ios && xcodegen generate"
-  },
-  "dependencies": {
-    "esbuild": "^0.24.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
   }
 }
