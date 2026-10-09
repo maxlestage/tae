@@ -17,6 +17,12 @@ sans dépendance sert le site et une **API JSON publique**.
 - 🗂️ **Tri** par couleur, par intensité (1 à 5) ou par moment (journée / soir).
 - 🔘 **Filtres** par famille de couleur, sections repliables, préférences mémorisées.
 - ⏱️ **Minuteur d'infusion** pré-réglé par thé (bip + vibration, écran gardé allumé).
+- 📋 **Fiche enrichie** — conseil d'infusion, type et gamme expliqués, suggestions « Dans la même couleur ».
+- 📚 **Sections d'information** — *Bien infuser* (règles d'or, tableau par type avec
+  jauges), *Du thé noir au rooibos* (types et gammes), *Pourquoi par couleurs ?*
+  (répartition cliquable, chiffres clés), *Les mots du thé* (glossaire),
+  *Questions fréquentes*, *À propos*.
+- 🧭 **Menu plein écran** numéroté et plan du site dans le pied de page.
 - 🌍 **FR / EN / ES**, thème **clair / sombre**, **PWA** installable et hors-ligne.
 
 ### Animations
@@ -34,10 +40,23 @@ Le site adopte un langage de mouvement « agence créative » :
 - **Apparitions au scroll** en cascade et titres révélés par masque.
 - **Fiche** qui se dévoile **en cercle depuis le point du clic** (et s'y referme).
 - **Changement de thème** en cercle (View Transitions API).
+- **Menu** en rideau jaune, liens qui montent un à un ; jauges, barres et
+  compteurs qui se remplissent à l'apparition ; FAQ en accordéon animé.
+- **Défilement fluide** à la molette et trajets animés vers les sections ;
+  **lueur d'ambiance** qui prend la couleur de la section à l'écran.
+- **Sachets flottants** et reflet sur le logo dans l'accueil, qui recule et
+  s'efface au scroll ; lettres qui sautent au survol.
+- En-têtes de section : **mot fantôme** qui glisse avec le scroll, sur-titre
+  **brouillé** puis révélé, chapeau qui **s'allume mot à mot**.
+- **Ondes au clic**, **texte roulant** au survol, curseur aux couleurs du thé
+  survolé, cartes dévoilées par un **volet**, nombre de sachets qui redéfile.
+- Minuteur : **vapeur** et sachet qui **trempe** ; pied de page : badge
+  circulaire qui tourne ; **changement de langue** en fondu glissé.
 - Tout est désactivé si le système demande de **réduire les animations**.
 
-Ces effets sont pilotés par `src/motion.rs` (une boucle `requestAnimationFrame`
-qui écrit des variables CSS, sans re-rendu Yew) et par le CSS.
+Ces effets sont pilotés par `src/motion.rs` et `src/fx.rs` (une boucle
+`requestAnimationFrame` qui écrit des variables CSS, sans re-rendu Yew) et par
+le CSS.
 
 ## Démarrer
 
@@ -68,12 +87,14 @@ cargo clippy --target wasm32-unknown-unknown   # lint
   `Dockerfile` multi-étapes (Rust → WASM, puis image Node 24 légère).
 
 Le serveur compresse les fichiers statiques (Brotli / gzip : le WASM passe
-d'environ 330 Ko à 120 Ko), les sert avec un ETag et le type `application/wasm`.
+d'environ 450 Ko à 155 Ko), les sert avec un ETag et le type `application/wasm`.
 
 ## API publique
 
 Le serveur expose une **API JSON publique** (lecture seule, CORS ouvert) avec
-tout le catalogue, lu depuis `data/teas.json` (source unique).
+tout le catalogue, lu depuis `data/teas.json` (source unique). Le guide
+d'infusion (`/api/brewing`) et le glossaire (`/api/glossary`) viennent de
+`data/brewing.json` et `data/glossary.json`, partagés avec le site.
 
 | Méthode & route         | Description                                                |
 | ----------------------- | --------------------------------------------------------- |
@@ -165,20 +186,27 @@ open native-ios/LiptonThes.xcodeproj
 index.html            Page d'entrée Trunk (+ écran d'intro statique)
 Trunk.toml            Build WASM (wasm-opt, minification, proxy de dev)
 Cargo.toml            Crate Rust du front (Yew 0.23, wasm-bindgen, web-sys)
-build.rs              Génère le catalogue Rust depuis data/teas.json (validé au build)
+build.rs              Compile data/*.json en données Rust (validées au build)
 rust-toolchain.toml   Version de Rust + cible wasm32
 src/
   main.rs             Montage Yew + service worker
   app.rs              État (langue, thème, filtres, tri, sections, fiche ouverte)
   catalog.rs          Types du catalogue (Tea, Family, TypeKey)
-  i18n.rs             Textes FR / EN / ES
-  tea.rs              Dégradés, conseils d'infusion, libellés dérivés
+  i18n.rs             Textes de l'interface FR / EN / ES
+  content.rs          Contenu éditorial FR / EN / ES (guide, types, FAQ, à propos, menu)
+  tea.rs              Dégradés, repères d'infusion, libellés dérivés
   motion.rs           Moteur d'animation (curseur, aimant, 3D, bandeaux, reveal, intro)
+  fx.rs               Défilement fluide, progression au scroll, ambiance, ondes,
+                      textes brouillés, transitions de page
   dom.rs              Accès navigateur (stockage local, préférences)
-  components/         Hero, bandeaux, barre d'outils, groupes, carte, fiche, minuteur, pied de page
+  components/         Hero, bandeaux, barre d'outils + menu, groupes, carte, fiche,
+                      minuteur, guide, types, couleurs, glossaire, FAQ, à propos, pied de page
 styles/main.css       Styles et animations
 public/               Assets statiques (polices, logo, textures, icônes, manifest, sw.js)
 data/teas.json        Catalogue des sachets — source unique (front, API, iOS)
+data/brewing.json     Conseils d'infusion par type (front, API)
+data/glossary.json    Glossaire (front, API)
+docs/fiche-produit/   Captures d'écran de la fiche produit
 server.js             Serveur Node : ./dist + API JSON publique
 api-content.js        Contenu pédagogique de l'API (infusion, glossaire, exercices)
 scripts/              build.sh (production) et dev.sh (développement)
@@ -215,3 +243,7 @@ traductions présentes) et échoue avec un message clair sinon.
 ```
 
 Puis `npm run native:data` pour mettre à jour la copie de l'app iOS.
+
+Les conseils d'infusion (`data/brewing.json`) et le glossaire
+(`data/glossary.json`) se modifient de la même façon ; les textes des sections
+du site sont dans `src/content.rs`.
